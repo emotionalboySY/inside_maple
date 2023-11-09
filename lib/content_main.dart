@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:inside_maple/controllers/RecordController.dart';
 
 class ContentMain extends StatelessWidget {
   const ContentMain({super.key});
@@ -9,22 +11,33 @@ class ContentMain extends StatelessWidget {
       body: SizedBox(
         height: double.infinity,
         width: double.infinity,
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            _menuButton(
-              onPressed: () {
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                child: _menuButton(
+                  onPressed: () {
 
-              },
-              title: "보스 리워드 관리",
-            ),
-            _menuButton(
-              onPressed: () {
-
-              },
-              title: "보스 리워드 기록하기",
-            ),
-          ],
+                  },
+                  title: "보스 리워드 관리",
+                ),
+              ),
+              const SizedBox(
+                width: 16.0,
+              ),
+              Expanded(
+                child: _menuButton(
+                  onPressed: () {
+                    Get.put(RecordController());
+                    Get.toNamed("/page/addRecord");
+                  },
+                  title: "보스 리워드 기록하기",
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -36,10 +49,19 @@ class ContentMain extends StatelessWidget {
 }) {
     return ElevatedButton(
       onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.deepPurpleAccent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        )
+      ),
       child: Center(
         child: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 30,
+            color: Colors.white,
           ),
         ),
       ),

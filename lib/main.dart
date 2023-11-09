@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
-import 'package:inside_maple/content_main.dart';
+import 'package:inside_maple/routes.dart';
 import 'package:inside_maple/utils/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -84,14 +85,15 @@ class _MyAppState extends State<MyApp> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
         fontFamily: "Pretendard",
       ),
-      home: const ContentMain(),
+      initialRoute: "/main",
+      getPages: routes,
     );
   }
 }
