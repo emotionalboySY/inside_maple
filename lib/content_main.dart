@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/RecordController.dart';
+import 'package:inside_maple/controllers/add_record_controller.dart';
 
 class ContentMain extends StatelessWidget {
   const ContentMain({super.key});
@@ -30,7 +30,7 @@ class ContentMain extends StatelessWidget {
               Expanded(
                 child: _menuButton(
                   onPressed: () {
-                    Get.put(RecordController());
+                    Get.put(AddRecordController());
                     Get.toNamed("/page/addRecord");
                   },
                   title: "보스 리워드 기록하기",
