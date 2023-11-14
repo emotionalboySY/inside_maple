@@ -1,12 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/utils/logger.dart';
 
 class AddRecordController extends GetxController {
   late RxList<Boss> bossList;
+  RxList<Difficulty> diffList = <Difficulty>[].obs;
+  RxList<Item> itemList = <Item>[].obs;
+
+  RxDouble itemListLength = 250.0.obs;
+
   Rx<Boss?> selectedBoss = Rx<Boss?>(null);
   Rx<Difficulty?> selectedDiff = Rx<Difficulty?>(null);
-  RxList<Difficulty> diffList = <Difficulty>[].obs;
+  RxBool showLabel = true.obs;
 
   void loadDifficulty() {
     selectedDiff.value = null;
@@ -44,6 +50,32 @@ class AddRecordController extends GetxController {
 
   void selectDiff(Difficulty diff) {
     selectedDiff.value = diff;
+    loadItemList();
+  }
+
+  void toggleShowLabel() {
+    showLabel.value = !showLabel.value;
+    if(showLabel.value == true) {
+      itemListLength.value = 250.0;
+    } else {
+      itemListLength.value = 40.0;
+    }
+  }
+
+  void loadItemList() {
+    itemList.clear();
+    String bossName = describeEnum(selectedBoss);
+    String diffName = selectedDiff.value!.engName;
+
+    var itemIndexList = dropData[bossName]![diffName]!;
+
+    for(var itemElement in Item.values) {
+      if(itemIndexList.contains(itemElement.index)) {
+        itemList.add(itemElement);
+      }
+    }
+
+    itemList.refresh();
   }
 
   @override

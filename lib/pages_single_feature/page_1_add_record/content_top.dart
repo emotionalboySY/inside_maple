@@ -28,7 +28,7 @@ class TopItemsDifficulty extends StatelessWidget {
           ),
         ),
         Obx(
-              () => DropdownButtonHideUnderline(
+          () => DropdownButtonHideUnderline(
             child: DropdownButton(
               hint: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -38,15 +38,15 @@ class TopItemsDifficulty extends StatelessWidget {
               items: recordController.bossList
                   .map(
                     (element) => DropdownMenuItem(
-                  value: element,
-                  child: Text(
-                    element.korName,
-                    style: const TextStyle(
-                      color: Colors.black,
+                      value: element,
+                      child: Text(
+                        element.korName,
+                        style: const TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )
+                  )
                   .toList(),
               onChanged: (selectedValue) {
                 recordController.selectBoss(selectedValue!);
@@ -82,7 +82,7 @@ class TopItemsDifficulty extends StatelessWidget {
           ),
         ),
         Obx(
-              () => DropdownButtonHideUnderline(
+          () => DropdownButtonHideUnderline(
             child: DropdownButton<Difficulty>(
               hint: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -92,15 +92,15 @@ class TopItemsDifficulty extends StatelessWidget {
               items: recordController.diffList.isEmpty
                   ? []
                   : recordController.diffList
-                  .map(
-                    (Difficulty element) => DropdownMenuItem(
-                  value: element,
-                  child: Text(
-                    element.korName,
-                  ),
-                ),
-              )
-                  .toList(),
+                      .map(
+                        (Difficulty element) => DropdownMenuItem(
+                          value: element,
+                          child: Text(
+                            element.korName,
+                          ),
+                        ),
+                      )
+                      .toList(),
               onChanged: (selectedValue) {
                 recordController.selectDiff(selectedValue!);
               },

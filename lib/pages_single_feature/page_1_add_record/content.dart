@@ -42,11 +42,11 @@ class PageAddRecord extends StatelessWidget {
   }
 
   Widget _bottomItems() {
-    return Column(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: [
-        BottomItemDropItemList(),
+        Expanded(child: BottomItemDropItemList()),
       ],
     );
   }
