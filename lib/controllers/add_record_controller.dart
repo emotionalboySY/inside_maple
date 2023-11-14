@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/utils/logger.dart';
 
+import '../data.dart';
+
 class AddRecordController extends GetxController {
   late RxList<Boss> bossList;
   RxList<Difficulty> diffList = <Difficulty>[].obs;
@@ -13,6 +15,9 @@ class AddRecordController extends GetxController {
   Rx<Boss?> selectedBoss = Rx<Boss?>(null);
   Rx<Difficulty?> selectedDiff = Rx<Difficulty?>(null);
   RxBool showLabel = true.obs;
+
+  RxList<SelectedItem> selectedItemList = <SelectedItem>[].obs;
+  Rx<DateTime?> selectedDate = null.obs;
 
   void loadDifficulty() {
     selectedDiff.value = null;
@@ -76,6 +81,36 @@ class AddRecordController extends GetxController {
     }
 
     itemList.refresh();
+  }
+
+  void addItem(Item item) {
+    try {
+      SelectedItem selectedItem = selectedItemList.firstWhere((element) => element.itemData == item);
+      selectedItem.increaseCount();
+    }
+    catch (e) {
+      selectedItemList.add(SelectedItem(itemData: item, count: 1));
+    }
+    selectedItemList.refresh();
+  }
+
+  void increaseItem(int index) {
+    selectedItemList[index].increaseCount();
+    selectedItemList.refresh();
+  }
+
+  void decreaseItem(int index) {
+    selectedItemList[index].decreaseCount();
+    selectedItemList.refresh();
+  }
+
+  void removeItem(int index) {
+    selectedItemList.removeAt(index);
+    selectedItemList.refresh();
+  }
+
+  void setRaidDate(DateTime date) {
+    selectedDate.value = date;
   }
 
   @override

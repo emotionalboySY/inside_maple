@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/add_record_controller.dart';
-import 'package:inside_maple/pages_single_feature/page_1_add_record/content_bottom.dart';
+import 'package:inside_maple/pages_single_feature/page_1_add_record/content_bottom_item_grid.dart';
 import 'package:inside_maple/pages_single_feature/page_1_add_record/content_top.dart';
 
 import '../../constants.dart';
+import 'content_bottom_selected_list.dart';
 
 class PageAddRecord extends StatelessWidget {
   PageAddRecord({super.key});
@@ -46,7 +47,15 @@ class PageAddRecord extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: [
-        Expanded(child: BottomItemDropItemList()),
+        Expanded(
+          flex: 2,
+          child: BottomItemDropItemList(),
+        ),
+        _separator(axis: Axis.vertical),
+        Expanded(
+          flex: 1,
+          child: ContentBottomSelectedList(),
+        )
       ],
     );
   }

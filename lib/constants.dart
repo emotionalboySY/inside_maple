@@ -111,6 +111,11 @@ enum Item {
   const Item(this.korLabel, this.imagePath);
   final String korLabel;
   final String imagePath;
+
+  @override
+  String toString() {
+    return korLabel;
+  }
 }
 
 Map<String, Map<String, List<int>>> dropData = {
