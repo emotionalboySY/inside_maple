@@ -1,30 +1,81 @@
+import 'package:hive/hive.dart';
+
 import 'constants.dart';
 
+part 'data.g.dart';
+
+@HiveType(typeId: 3)
 class SelectedItem {
 
   SelectedItem({
-    required Item itemData,
-    required int count,
-}) : _itemData = itemData, _count = count;
+    required this.itemData,
+    required this.count,
+});
 
-  final Item _itemData;
-  int _count;
+  @HiveField(0)
+  final Item itemData;
+  @HiveField(1)
+  int count;
 
   void increaseCount() {
-    _count++;
+    count++;
   }
 
   void decreaseCount() {
-    if(_count > 1) {
-      _count--;
+    if(count > 1) {
+      count--;
     }
   }
 
-  Item get itemData => _itemData;
-  int get count => _count;
+  @override
+  String toString() {
+    return "${itemData.korLabel} : $count";
+  }
+}
+
+class WeekType {
+
+  WeekType({
+    required this.year,
+    required this.month,
+    required this.weekNum,
+    required this.startDate,
+    required this.endDate,
+  });
+
+  final int year;
+  final int month;
+  final int weekNum;
+  final DateTime startDate;
+  final DateTime endDate;
 
   @override
   String toString() {
-    return "${_itemData.korLabel} : $_count";
+    return "$year년 $month월 $weekNum주차";
   }
+}
+
+@HiveType(typeId: 4)
+class BossRecord {
+
+    BossRecord({
+      required this.boss,
+      required this.difficulty,
+      required this.date,
+      required this.itemList,
+    });
+
+    @HiveField(0)
+    final Boss boss;
+    @HiveField(1)
+    final Difficulty difficulty;
+    @HiveField(2)
+    final DateTime date;
+    @HiveField(3)
+    final List<SelectedItem> itemList;
+
+    @override
+    String toString() {
+      return "${boss.korName} $difficulty $date $itemList";
+    }
 }

@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+
 enum Boss {
   zakkum("00100", "Zakkum", "자쿰"),
   magnus("01011", "Magnus", "매그너스"),
@@ -50,6 +53,7 @@ enum Difficulty {
   extreme("extreme", "익스트림");
 
   const Difficulty(this.engName, this.korName);
+
   final String engName;
   final String korName;
 
@@ -175,3 +179,71 @@ Map<String, Map<String, List<int>>> dropData = {
     "extreme": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 46, 47],
   },
 };
+
+enum LoadStatus { empty, loading, success, failed }
+
+Widget separator({
+  required Axis axis,
+}) {
+  return Container(
+    width: (axis == Axis.vertical) ? 1 : double.infinity,
+    height: (axis == Axis.horizontal) ? 1 : double.infinity,
+    decoration: const BoxDecoration(
+      color: Colors.black,
+    ),
+  );
+}
+
+class DifficultyAdapter extends TypeAdapter<Difficulty> {
+
+  @override
+  final typeId = 0;
+
+  @override
+  Difficulty read(BinaryReader reader) {
+    var index = reader.readInt();
+    return Difficulty.values[index];
+  }
+
+  @override
+  void write(BinaryWriter writer, Difficulty obj) {
+    writer.writeInt(obj.index);
+  }
+
+}
+
+class BossAdapter extends TypeAdapter<Boss> {
+
+  @override
+  final typeId = 1;
+
+  @override
+  Boss read(BinaryReader reader) {
+    var index = reader.readInt();
+    return Boss.values[index];
+  }
+
+  @override
+  void write(BinaryWriter writer, Boss obj) {
+    writer.writeInt(obj.index);
+  }
+
+}
+
+class ItemAdapter extends TypeAdapter<Item> {
+
+  @override
+  final typeId = 2;
+
+  @override
+  Item read(BinaryReader reader) {
+    var index = reader.readInt();
+    return Item.values[index];
+  }
+
+  @override
+  void write(BinaryWriter writer, Item obj) {
+    writer.writeInt(obj.index);
+  }
+
+}

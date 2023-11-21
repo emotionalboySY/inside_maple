@@ -1,7 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:inside_maple/constants.dart';
+import 'package:inside_maple/controllers/record_controller.dart';
 import 'package:inside_maple/utils/logger.dart';
+import 'package:oktoast/oktoast.dart';
 
 import '../data.dart';
 
@@ -17,7 +21,9 @@ class AddRecordController extends GetxController {
   RxBool showLabel = true.obs;
 
   RxList<SelectedItem> selectedItemList = <SelectedItem>[].obs;
-  Rx<DateTime?> selectedDate = null.obs;
+  Rx<DateTime> selectedDate = DateTime(1900, 01, 01).obs;
+
+  RxBool saveStatus = false.obs;
 
   void loadDifficulty() {
     selectedDiff.value = null;
@@ -25,23 +31,23 @@ class AddRecordController extends GetxController {
     var diffTable = selectedBoss.value!.diffIndex;
     int diffNum = int.parse(diffTable);
 
-    if(diffNum != 0 && diffNum % 2 == 1) {
+    if (diffNum != 0 && diffNum % 2 == 1) {
       diffList.add(Difficulty.easy);
     }
     diffNum = (diffNum / 10).floor();
-    if(diffNum != 0 && diffNum % 2 == 1) {
+    if (diffNum != 0 && diffNum % 2 == 1) {
       diffList.add(Difficulty.normal);
     }
     diffNum = (diffNum / 10).floor();
-    if(diffNum != 0 && diffNum % 2 == 1) {
+    if (diffNum != 0 && diffNum % 2 == 1) {
       diffList.add(Difficulty.chaos);
     }
     diffNum = (diffNum / 10).floor();
-    if(diffNum != 0 && diffNum % 2 == 1) {
+    if (diffNum != 0 && diffNum % 2 == 1) {
       diffList.add(Difficulty.hard);
     }
     diffNum = (diffNum / 10).floor();
-    if(diffNum != 0 && diffNum % 2 == 1) {
+    if (diffNum != 0 && diffNum % 2 == 1) {
       diffList.add(Difficulty.extreme);
     }
 
@@ -60,7 +66,7 @@ class AddRecordController extends GetxController {
 
   void toggleShowLabel() {
     showLabel.value = !showLabel.value;
-    if(showLabel.value == true) {
+    if (showLabel.value == true) {
       itemListLength.value = 250.0;
     } else {
       itemListLength.value = 40.0;
@@ -74,8 +80,8 @@ class AddRecordController extends GetxController {
 
     var itemIndexList = dropData[bossName]![diffName]!;
 
-    for(var itemElement in Item.values) {
-      if(itemIndexList.contains(itemElement.index)) {
+    for (var itemElement in Item.values) {
+      if (itemIndexList.contains(itemElement.index)) {
         itemList.add(itemElement);
       }
     }
@@ -87,8 +93,7 @@ class AddRecordController extends GetxController {
     try {
       SelectedItem selectedItem = selectedItemList.firstWhere((element) => element.itemData == item);
       selectedItem.increaseCount();
-    }
-    catch (e) {
+    } catch (e) {
       selectedItemList.add(SelectedItem(itemData: item, count: 1));
     }
     selectedItemList.refresh();
@@ -109,8 +114,57 @@ class AddRecordController extends GetxController {
     selectedItemList.refresh();
   }
 
+  Future<void> pickDate() async {
+    DateTime? date = await showDatePicker(
+      context: Get.context!,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2021),
+      lastDate: DateTime.now(),
+    );
+    if(date != null) {
+      setRaidDate(date);
+    }
+    else {
+      setRaidDate(DateTime(1900, 01, 01));
+    }
+  }
+
   void setRaidDate(DateTime date) {
+    logger.d(date);
     selectedDate.value = date;
+  }
+
+  Future<void> saveRecordData() async {
+    saveStatus.value = true;
+    try {
+      final box = Hive.box('insideMaple');
+      List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]);
+      BossRecord singleRecord = BossRecord(
+        boss: selectedBoss.value!,
+        difficulty: selectedDiff.value!,
+        date: selectedDate.value,
+        itemList: selectedItemList,
+      );
+      logger.d(singleRecord.toString());
+      recordRawList.add(singleRecord);
+      await box.put('bossRecordData', recordRawList);
+      resetSelected();
+      showToast("보스 기록이 성공적으로 저장되었습니다.");
+    } catch (e) {
+      showToast("보스 기록 저장에 실패했습니다. $e");
+      logger.e(e);
+    }
+    saveStatus.value = false;
+  }
+
+  void resetSelected() {
+    selectedBoss.value = null;
+    selectedDiff.value = null;
+    selectedItemList.clear();
+    selectedItemList.refresh();
+    itemList.clear();
+    itemList.refresh();
+    selectedDate.value = DateTime(1900, 01, 01);
   }
 
   @override

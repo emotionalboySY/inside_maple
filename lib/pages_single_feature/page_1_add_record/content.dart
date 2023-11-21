@@ -19,7 +19,7 @@ class PageAddRecord extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           _topItems(),
-          _separator(axis: Axis.horizontal),
+          separator(axis: Axis.horizontal),
           Expanded(
             child: _bottomItems(),
           ),
@@ -30,7 +30,7 @@ class PageAddRecord extends StatelessWidget {
 
   Widget _topItems() {
     return SizedBox(
-      height: 50,
+      height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         mainAxisSize: MainAxisSize.max,
@@ -49,9 +49,12 @@ class PageAddRecord extends StatelessWidget {
       children: [
         Expanded(
           flex: 2,
-          child: BottomItemDropItemList(),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: BottomItemDropItemList(),
+          ),
         ),
-        _separator(axis: Axis.vertical),
+        separator(axis: Axis.vertical),
         Expanded(
           flex: 1,
           child: ContentBottomSelectedList(),
@@ -60,15 +63,4 @@ class PageAddRecord extends StatelessWidget {
     );
   }
 
-  Widget _separator({
-    required Axis axis,
-  }) {
-    return Container(
-      width: (axis == Axis.vertical) ? 1 : double.infinity,
-      height: (axis == Axis.horizontal) ? 1 : double.infinity,
-      decoration: const BoxDecoration(
-        color: Colors.black,
-      ),
-    );
-  }
 }

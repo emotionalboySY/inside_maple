@@ -21,18 +21,28 @@ class BottomItemDropItemList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CheckboxListTile(
-                  title: const Text("아이템 이름 보이기"),
-                  value: recordController.showLabel.value,
-                  onChanged: (bool? value) {
-                    recordController.toggleShowLabel();
-                  },
+                SizedBox(
+                  height: 40,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        "아이템 이름 보이기",
+                      ),
+                      Checkbox(
+                        value: recordController.showLabel.value,
+                        onChanged: (value) {
+                          recordController.showLabel.value = value!;
+                        },
+                      )
+                    ]
+                  )
                 ),
                 Expanded(
                   child: GridView.builder(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.only(right: 20.0),
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: recordController.showLabel.value ? 400 : 60,
+                      maxCrossAxisExtent: recordController.showLabel.value ? 300 : 60,
                       mainAxisExtent: 60,
                       crossAxisSpacing: 3.0,
                       mainAxisSpacing: 3.0,

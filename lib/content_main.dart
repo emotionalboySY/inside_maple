@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/add_record_controller.dart';
 
+import 'controllers/record_controller.dart';
+
 class ContentMain extends StatelessWidget {
   const ContentMain({super.key});
 
@@ -18,8 +20,11 @@ class ContentMain extends StatelessWidget {
             children: [
               Expanded(
                 child: _menuButton(
-                  onPressed: () {
-
+                  onPressed: () async {
+                    Get.put(RecordController());
+                    Get.toNamed("/page/viewRecord")?.then((value) {
+                      Get.delete<RecordController>();
+                    });
                   },
                   title: "보스 리워드 관리",
                 ),
@@ -31,7 +36,9 @@ class ContentMain extends StatelessWidget {
                 child: _menuButton(
                   onPressed: () {
                     Get.put(AddRecordController());
-                    Get.toNamed("/page/addRecord");
+                    Get.toNamed("/page/addRecord")?.then((value) {
+                      Get.delete<AddRecordController>();
+                    });
                   },
                   title: "보스 리워드 기록하기",
                 ),
