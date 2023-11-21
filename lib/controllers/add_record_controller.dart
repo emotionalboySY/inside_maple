@@ -92,7 +92,12 @@ class AddRecordController extends GetxController {
   void addItem(Item item) {
     try {
       SelectedItem selectedItem = selectedItemList.firstWhere((element) => element.itemData == item);
-      selectedItem.increaseCount();
+      if(itemCanDuplicated.contains(selectedItem.itemData)) {
+        selectedItem.increaseCount();
+      }
+      else {
+        showToast("선택한 아이템은 한 개만 드롭됩니다.");
+      }
     } catch (e) {
       selectedItemList.add(SelectedItem(itemData: item, count: 1));
     }
@@ -100,8 +105,14 @@ class AddRecordController extends GetxController {
   }
 
   void increaseItem(int index) {
-    selectedItemList[index].increaseCount();
-    selectedItemList.refresh();
+    logger.d("item can duplicated? ${itemCanDuplicated.contains(selectedItemList[index].itemData)}");
+    if(itemCanDuplicated.contains(selectedItemList[index].itemData)) {
+      selectedItemList[index].increaseCount();
+      selectedItemList.refresh();
+    }
+    else {
+      showToast("선택한 아이템은 한 개만 드롭됩니다.");
+    }
   }
 
   void decreaseItem(int index) {
@@ -120,6 +131,20 @@ class AddRecordController extends GetxController {
       initialDate: DateTime.now(),
       firstDate: DateTime(2021),
       lastDate: DateTime.now(),
+      locale: const Locale('ko', 'KR'),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            dialogTheme: DialogTheme(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if(date != null) {
       setRaidDate(date);

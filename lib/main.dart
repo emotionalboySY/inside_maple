@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
 import 'package:inside_maple/routes.dart';
@@ -99,6 +100,12 @@ class _MyAppState extends State<MyApp> with WindowListener {
       radius: 5.0,
       position: ToastPosition.bottom,
       child: GetMaterialApp(
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('ko', 'KR'),
+        ],
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

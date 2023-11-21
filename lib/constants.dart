@@ -62,6 +62,10 @@ enum Difficulty {
   }
 }
 
+List<Item> itemCanDuplicated = [
+  Item.item1, Item.item2, Item.item3, Item.item4, Item.item5, Item.item6, Item.item7, Item.item8, Item.item9, Item.item10, Item.item11, Item.item12
+];
+
 enum Item {
   item1("추가 경험치 50% 쿠폰", "assets/images/drop_item/extra_experience_50%_coupon.png"),
   item2("반짝이는 파란 별 물약", "assets/images/drop_item/shining_blue_star_portion.png"),

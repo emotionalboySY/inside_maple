@@ -1,8 +1,11 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/controllers/add_record_controller.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import '../../custom_icons_icons.dart';
 
 class ContentBottomSelectedList extends StatelessWidget {
   ContentBottomSelectedList({super.key});
@@ -22,7 +25,7 @@ class ContentBottomSelectedList extends StatelessWidget {
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 7.0),
+                    padding: EdgeInsets.fromLTRB(10.0, 7.0, 10.0, 13.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -63,7 +66,7 @@ class ContentBottomSelectedList extends StatelessWidget {
                   );
                 } else {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 17.0),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -99,29 +102,48 @@ class ContentBottomSelectedList extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  recordController.decreaseItem(index - 1);
-                                },
-                                icon: const Icon(
-                                  Icons.remove,
+                              itemCanDuplicated.contains(recordController.selectedItemList[index - 1].itemData)
+                                  ? IconButton(
+                                      onPressed: recordController.selectedItemList[index - 1].count == 1 ? null : () {
+                                        recordController.decreaseItem(index - 1);
+                                      },
+                                      icon: const Icon(
+                                        Icons.remove,
+                                      ),
+                                      style: IconButton.styleFrom(
+                                        padding: const EdgeInsets.all(0.0),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        hoverColor: Colors.transparent,
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                child: Text(
+                                  recordController.selectedItemList[index - 1].count.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                 ),
                               ),
-                              Text(
-                                recordController.selectedItemList[index - 1].count.toString(),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  recordController.increaseItem(index - 1);
-                                },
-                                icon: const Icon(
-                                  Icons.add,
-                                ),
-                              ),
+                              itemCanDuplicated.contains(recordController.selectedItemList[index - 1].itemData)
+                                  ? IconButton(
+                                      onPressed: () {
+                                        recordController.increaseItem(index - 1);
+                                      },
+                                      icon: const Icon(
+                                        Icons.add,
+                                      ),
+                                      style: IconButton.styleFrom(
+                                        padding: const EdgeInsets.all(0.0),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        hoverColor: Colors.transparent,
+                                      ),
+                                    )
+                                  : const SizedBox(),
                             ],
                           ),
                         ),
@@ -132,12 +154,14 @@ class ContentBottomSelectedList extends StatelessWidget {
                               recordController.removeItem(index - 1);
                             },
                             icon: const Icon(
-                              Icons.delete,
+                              CustomIcons.trashEmpty,
+                              size: 18.0,
                             ),
                             style: IconButton.styleFrom(
                               padding: const EdgeInsets.all(0.0),
                               minimumSize: Size.zero,
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              hoverColor: Colors.transparent,
                             ),
                           ),
                         ),
