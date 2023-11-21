@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:inside_maple/constants.dart';
-import 'package:inside_maple/controllers/record_controller.dart';
 import 'package:inside_maple/utils/logger.dart';
 import 'package:oktoast/oktoast.dart';
 
@@ -163,7 +162,7 @@ class AddRecordController extends GetxController {
     saveStatus.value = true;
     try {
       final box = Hive.box('insideMaple');
-      List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]);
+      List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
       BossRecord singleRecord = BossRecord(
         boss: selectedBoss.value!,
         difficulty: selectedDiff.value!,

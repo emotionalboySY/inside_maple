@@ -176,9 +176,9 @@ class ContentBottomSelectedList extends StatelessWidget {
         _RaidDatePicker(),
         SizedBox(
           width: double.infinity,
-          height: 50,
+          height: 65,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 13.0),
             child: Obx(
               () => ElevatedButton(
                 onPressed: recordController.selectedDate.value != DateTime(1900, 01, 01) && recordController.selectedItemList.isNotEmpty
@@ -216,7 +216,6 @@ class ContentBottomSelectedList extends StatelessWidget {
 }
 
 class _RaidDatePicker extends StatelessWidget {
-  _RaidDatePicker({super.key});
 
   final recordController = Get.find<AddRecordController>();
 
@@ -224,9 +223,8 @@ class _RaidDatePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 50,
       child: Padding(
-        padding: const EdgeInsets.only(left: 10.0),
+        padding: const EdgeInsets.only(left: 15.0),
         child: Row(
           children: [
             const Text("레이드 진행 날짜: "),

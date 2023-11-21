@@ -208,7 +208,7 @@ class TopItemsMenu extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, right: 15.0, left: 5.0),
           child: ElevatedButton(
             onPressed: () {
               Get.back();
