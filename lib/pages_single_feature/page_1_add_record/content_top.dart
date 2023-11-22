@@ -7,7 +7,7 @@ import '../../constants.dart';
 class TopItemsDifficulty extends StatelessWidget {
   TopItemsDifficulty({super.key});
 
-  final recordController = Get.find<AddRecordController>();
+  final addRecordController = Get.find<AddRecordController>();
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +36,8 @@ class TopItemsDifficulty extends StatelessWidget {
                 child: DropdownButton(
                   focusColor: Theme.of(context).scaffoldBackgroundColor,
                   hint: const Text("보스 선택"),
-                  value: recordController.selectedBoss.value,
-                  items: recordController.bossList
+                  value: addRecordController.selectedBoss.value,
+                  items: addRecordController.bossList
                       .map(
                         (element) => DropdownMenuItem(
                           value: element,
@@ -51,10 +51,10 @@ class TopItemsDifficulty extends StatelessWidget {
                       )
                       .toList(),
                   onChanged: (selectedValue) {
-                    recordController.selectBoss(selectedValue!);
+                    addRecordController.selectBoss(selectedValue!);
                   },
                   selectedItemBuilder: (context) {
-                    return recordController.bossList.map((Boss value) {
+                    return addRecordController.bossList.map((Boss value) {
                       return Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -93,10 +93,10 @@ class TopItemsDifficulty extends StatelessWidget {
                   child: DropdownButton<Difficulty>(
                     focusColor: Theme.of(context).scaffoldBackgroundColor,
                     hint: const Text("난이도 선택"),
-                    value: recordController.selectedDiff.value,
-                    items: recordController.diffList.isEmpty
+                    value: addRecordController.selectedDiff.value,
+                    items: addRecordController.diffList.isEmpty
                         ? []
-                        : recordController.diffList
+                        : addRecordController.diffList
                             .map(
                               (Difficulty element) => DropdownMenuItem(
                                 value: element,
@@ -107,10 +107,10 @@ class TopItemsDifficulty extends StatelessWidget {
                             )
                             .toList(),
                     onChanged: (selectedValue) {
-                      recordController.selectDiff(selectedValue!);
+                      addRecordController.selectDiff(selectedValue!);
                     },
                     selectedItemBuilder: (context) {
-                      return recordController.diffList.map((Difficulty value) {
+                      return addRecordController.diffList.map((Difficulty value) {
                         return Align(
                           alignment: Alignment.centerLeft,
                           child: Text(

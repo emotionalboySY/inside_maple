@@ -10,7 +10,7 @@ import '../../custom_icons_icons.dart';
 class ContentBottomSelectedList extends StatelessWidget {
   ContentBottomSelectedList({super.key});
 
-  final recordController = Get.find<AddRecordController>();
+  final addRecordController = Get.find<AddRecordController>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class ContentBottomSelectedList extends StatelessWidget {
           child: Obx(
             () => ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 5.0),
-              itemCount: recordController.selectedItemList.length + 1,
+              itemCount: addRecordController.selectedItemList.length + 1,
               itemBuilder: (context, index) {
                 if (index == 0) {
                   return const Padding(
@@ -77,14 +77,14 @@ class ContentBottomSelectedList extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 ExtendedImage.asset(
-                                  recordController.selectedItemList[index - 1].itemData.imagePath,
+                                  addRecordController.selectedItemList[index - 1].itemData.imagePath,
                                   width: 25,
                                   height: 25,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 5.0),
                                   child: Text(
-                                    recordController.selectedItemList[index - 1].itemData.korLabel,
+                                    addRecordController.selectedItemList[index - 1].itemData.korLabel,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -102,10 +102,10 @@ class ContentBottomSelectedList extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              itemCanDuplicated.contains(recordController.selectedItemList[index - 1].itemData)
+                              itemCanDuplicated.contains(addRecordController.selectedItemList[index - 1].itemData)
                                   ? IconButton(
-                                      onPressed: recordController.selectedItemList[index - 1].count == 1 ? null : () {
-                                        recordController.decreaseItem(index - 1);
+                                      onPressed: addRecordController.selectedItemList[index - 1].count == 1 ? null : () {
+                                        addRecordController.decreaseItem(index - 1);
                                       },
                                       icon: const Icon(
                                         Icons.remove,
@@ -121,17 +121,17 @@ class ContentBottomSelectedList extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                 child: Text(
-                                  recordController.selectedItemList[index - 1].count.toString(),
+                                  addRecordController.selectedItemList[index - 1].count.toString(),
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
-                              itemCanDuplicated.contains(recordController.selectedItemList[index - 1].itemData)
+                              itemCanDuplicated.contains(addRecordController.selectedItemList[index - 1].itemData)
                                   ? IconButton(
                                       onPressed: () {
-                                        recordController.increaseItem(index - 1);
+                                        addRecordController.increaseItem(index - 1);
                                       },
                                       icon: const Icon(
                                         Icons.add,
@@ -151,7 +151,7 @@ class ContentBottomSelectedList extends StatelessWidget {
                           width: 50,
                           child: IconButton(
                             onPressed: () {
-                              recordController.removeItem(index - 1);
+                              addRecordController.removeItem(index - 1);
                             },
                             icon: const Icon(
                               CustomIcons.trashEmpty,
@@ -181,9 +181,9 @@ class ContentBottomSelectedList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 13.0),
             child: Obx(
               () => ElevatedButton(
-                onPressed: recordController.selectedDate.value != DateTime(1900, 01, 01) && recordController.selectedItemList.isNotEmpty
+                onPressed: addRecordController.selectedDate.value != DateTime(1900, 01, 01) && addRecordController.selectedItemList.isNotEmpty
                     ? () {
-                        recordController.saveRecordData();
+                        addRecordController.saveRecordData();
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
@@ -193,7 +193,7 @@ class ContentBottomSelectedList extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                 ),
-                child: recordController.saveStatus.value
+                child: addRecordController.saveStatus.value
                     ? Center(
                         child: LoadingAnimationWidget.prograssiveDots(
                           color: Colors.white,
@@ -203,7 +203,7 @@ class ContentBottomSelectedList extends StatelessWidget {
                     : Text(
                         "저장",
                         style: TextStyle(
-                          color: recordController.selectedDate.value != DateTime(1900, 01, 01) && recordController.selectedItemList.isNotEmpty ? Colors.white : Colors.black54,
+                          color: addRecordController.selectedDate.value != DateTime(1900, 01, 01) && addRecordController.selectedItemList.isNotEmpty ? Colors.white : Colors.black54,
                         ),
                       ),
               ),

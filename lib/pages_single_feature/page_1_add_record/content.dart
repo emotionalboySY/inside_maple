@@ -10,7 +10,7 @@ import 'content_bottom_selected_list.dart';
 class PageAddRecord extends StatelessWidget {
   PageAddRecord({super.key});
 
-  final recordController = Get.find<AddRecordController>();
+  final addRecordController = Get.find<AddRecordController>();
 
   @override
   Widget build(BuildContext context) {

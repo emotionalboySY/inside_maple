@@ -7,7 +7,7 @@ import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/conten
 List<GetPage> routes = [
   GetPage(
     name: '/main',
-    page: () => const ContentMain(),
+    page: () => ContentMain(),
   ),
   GetPage(
     name: '/page',

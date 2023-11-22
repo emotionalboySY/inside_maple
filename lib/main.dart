@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
 import 'package:inside_maple/routes.dart';
@@ -12,6 +13,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:window_size/window_size.dart';
 
 import 'constants.dart';
+import 'controllers/main_controller.dart';
 import 'data.dart';
 
 void main() async {
@@ -52,6 +54,8 @@ void main() async {
   Hive.registerAdapter(ItemAdapter());
 
   await Hive.openBox("insideMaple");
+
+  Get.put(MainController());
 
   runApp(const MyApp());
 }

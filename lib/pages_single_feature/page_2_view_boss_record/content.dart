@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_week_type_list.dart';
+import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_top.dart';
+
+import 'content_bottom_boss_list.dart';
+import 'content_bottom_item_list.dart';
 
 class PageViewBossRecord extends StatelessWidget {
   const PageViewBossRecord({super.key});
@@ -11,9 +14,9 @@ class PageViewBossRecord extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          const _TopWidget(),
+          ViewBossRecordTop(),
           separator(axis: Axis.horizontal),
-          const Expanded(
+          Expanded(
             child: _BottomWidget(),
           ),
         ],
@@ -22,61 +25,31 @@ class PageViewBossRecord extends StatelessWidget {
   }
 }
 
-class _TopWidget extends StatelessWidget {
-  const _TopWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  Get.back();
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  backgroundColor: Colors.deepPurple,
-                ),
-                child: const Center(
-                  child: Text(
-                    "나가기",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _BottomWidget extends StatelessWidget {
-  const _BottomWidget({super.key});
+  _BottomWidget({super.key});
+
+  final listViewController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        ContentBottomWeekTypeList(),
+        Expanded(
+          flex: 2,
+          child: ContentBottomWeekTypeList(),
+        ),
         separator(axis: Axis.vertical),
+        Expanded(
+          flex: 2,
+          child: ContentBottomBossList(),
+        ),
+        separator(axis: Axis.vertical),
+        Expanded(
+          flex: 5,
+          child: ContentBottomItemList(),
+        )
       ],
     );
   }
 }
-

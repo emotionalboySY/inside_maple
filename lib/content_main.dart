@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/add_record_controller.dart';
 
+import 'controllers/main_controller.dart';
 import 'controllers/record_controller.dart';
 
 class ContentMain extends StatelessWidget {
-  const ContentMain({super.key});
+  ContentMain({super.key});
+
+  final mainController = Get.find<MainController>();
 
   @override
   Widget build(BuildContext context) {
@@ -14,33 +17,65 @@ class ContentMain extends StatelessWidget {
         height: double.infinity,
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
+          padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+          child: Column(
             children: [
-              Expanded(
-                child: _menuButton(
-                  onPressed: () async {
-                    Get.put(RecordController());
-                    Get.toNamed("/page/viewRecord")?.then((value) {
-                      Get.delete<RecordController>();
-                    });
-                  },
-                  title: "보스 리워드 관리",
+              SizedBox(
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    PopupMenuButton<int>(
+                      itemBuilder: (context) {
+                        return [
+                          const PopupMenuItem(
+                            value: 1,
+                            child: Text(
+                              "문의하기"
+                            ),
+                          ),
+                        ];
+                      },
+                      onSelected: (value) async {
+                        if (value == 1) {
+                          await mainController.contactUs();
+                        }
+                      },
+                    )
+                  ],
                 ),
               ),
-              const SizedBox(
-                width: 16.0,
-              ),
               Expanded(
-                child: _menuButton(
-                  onPressed: () {
-                    Get.put(AddRecordController());
-                    Get.toNamed("/page/addRecord")?.then((value) {
-                      Get.delete<AddRecordController>();
-                    });
-                  },
-                  title: "보스 리워드 기록하기",
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      child: _menuButton(
+                        onPressed: () async {
+                          Get.put(RecordController());
+                          Get.toNamed("/page/viewRecord")?.then((value) {
+                            Get.delete<RecordController>();
+                          });
+                        },
+                        title: "보스 리워드 관리",
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 16.0,
+                    ),
+                    Expanded(
+                      child: _menuButton(
+                        onPressed: () {
+                          Get.put(AddRecordController());
+                          Get.toNamed("/page/addRecord")?.then((value) {
+                            Get.delete<AddRecordController>();
+                          });
+                        },
+                        title: "보스 리워드 기록하기",
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

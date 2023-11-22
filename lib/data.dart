@@ -16,6 +16,8 @@ class SelectedItem {
   final Item itemData;
   @HiveField(1)
   int count;
+  @HiveField(2)
+  int price = 0;
 
   void increaseCount() {
     count++;
@@ -25,6 +27,10 @@ class SelectedItem {
     if(count > 1) {
       count--;
     }
+  }
+
+  void setPrice(int price) {
+    this.price = price;
   }
 
   @override
@@ -52,6 +58,10 @@ class WeekType {
   @override
   String toString() {
     return "$year년 $month월 $weekNum주차";
+  }
+
+  String getPeriodKorString() {
+    return "${startDate.month}/${startDate.day} ~ ${endDate.month}/${endDate.day}";
   }
 }
 
