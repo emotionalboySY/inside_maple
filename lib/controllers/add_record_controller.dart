@@ -21,6 +21,7 @@ class AddRecordController extends GetxController {
 
   RxList<SelectedItem> selectedItemList = <SelectedItem>[].obs;
   Rx<DateTime> selectedDate = DateTime(1900, 01, 01).obs;
+  RxInt selectedPartyAmount = 1.obs;
 
   RxBool saveStatus = false.obs;
 
@@ -163,14 +164,17 @@ class AddRecordController extends GetxController {
     try {
       final box = Hive.box('insideMaple');
       List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
+      loggerNoStack.d("recordRawList before addition: $recordRawList");
       BossRecord singleRecord = BossRecord(
         boss: selectedBoss.value!,
         difficulty: selectedDiff.value!,
         date: selectedDate.value,
         itemList: selectedItemList,
+        partyAmount: selectedPartyAmount.value,
       );
-      logger.d(singleRecord.toString());
+      loggerNoStack.d("singleRecord: $singleRecord");
       recordRawList.add(singleRecord);
+      loggerNoStack.d("recordRawList after addition: $recordRawList");
       await box.put('bossRecordData', recordRawList);
       resetSelected();
       showToast("보스 기록이 성공적으로 저장되었습니다.");

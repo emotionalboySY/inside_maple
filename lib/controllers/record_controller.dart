@@ -48,11 +48,10 @@ class RecordController extends GetxController {
     recordList.clear();
 
     recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
-    logger.d(recordRawList);
-
-    logger.d(recordList);
     for(var record in recordRawList) {
       WeekType? weekType = getWeekType(record);
+      loggerNoStack.d("record in recordRawList: $record");
+      loggerNoStack.d("weekType in recordRawList: $weekType");
 
       if(weekType == null) {
         continue;
@@ -68,7 +67,6 @@ class RecordController extends GetxController {
 
     weekTypeList.sort((a, b) => a.startDate.compareTo(b.startDate));
 
-    logger.d(recordList);
     recordLoadStatus.value = LoadStatus.success;
     weekTypeList.refresh();
     recordList.refresh();
@@ -101,15 +99,18 @@ class RecordController extends GetxController {
 
   void selectRecord(int index) {
     selectedWeekTypeIndex.value = index;
-    logger.d(selectedWeekTypeIndex.value);
+    loggerNoStack.d(selectedWeekTypeIndex.value);
     selectedRecordList.clear();
     for(var record in recordList) {
+      loggerNoStack.d("record: $record");
       if(record.weekType == weekTypeList[index]) {
+        loggerNoStack.d("record.weekType: ${record.weekType} is same as weekTypeList[index]: ${weekTypeList[index]}");
         selectedRecordList.add(record);
       }
     }
     selectedRecordIndex.value = -1;
     selectedRecordList.refresh();
+    loggerNoStack.d("selectedRecordList after selection of boss: $selectedRecordList");
     recordList.refresh();
   }
 

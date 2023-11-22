@@ -19,17 +19,20 @@ class SelectedItemAdapter extends TypeAdapter<SelectedItem> {
     return SelectedItem(
       itemData: fields[0] as Item,
       count: fields[1] as int,
+      price: fields[2] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, SelectedItem obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.itemData)
       ..writeByte(1)
-      ..write(obj.count);
+      ..write(obj.count)
+      ..writeByte(2)
+      ..write(obj.price);
   }
 
   @override
@@ -58,13 +61,14 @@ class BossRecordAdapter extends TypeAdapter<BossRecord> {
       difficulty: fields[1] as Difficulty,
       date: fields[2] as DateTime,
       itemList: (fields[3] as List).cast<SelectedItem>(),
+      partyAmount: fields[4] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, BossRecord obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.boss)
       ..writeByte(1)
@@ -72,7 +76,9 @@ class BossRecordAdapter extends TypeAdapter<BossRecord> {
       ..writeByte(2)
       ..write(obj.date)
       ..writeByte(3)
-      ..write(obj.itemList);
+      ..write(obj.itemList)
+      ..writeByte(4)
+      ..write(obj.partyAmount);
   }
 
   @override

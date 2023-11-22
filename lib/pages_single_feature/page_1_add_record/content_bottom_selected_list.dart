@@ -174,6 +174,7 @@ class ContentBottomSelectedList extends StatelessWidget {
           ),
         ),
         _RaidDatePicker(),
+        _RaidPartyAmount(),
         SizedBox(
           width: double.infinity,
           height: 65,
@@ -273,3 +274,59 @@ class _RaidDatePicker extends StatelessWidget {
     );
   }
 }
+
+class _RaidPartyAmount extends StatelessWidget {
+  _RaidPartyAmount({super.key});
+
+  final addRecordController = Get.find<AddRecordController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const Text(
+            "파티 인원 수: ",
+          ),
+          Obx(
+            () => DropdownButtonHideUnderline(
+              child: DropdownButton<int>(
+                focusColor: Theme.of(context).scaffoldBackgroundColor,
+                value: addRecordController.selectedPartyAmount.value,
+                icon: const Icon(Icons.arrow_drop_down),
+                iconSize: 24,
+                elevation: 16,
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                underline: Container(
+                  height: 2,
+                  color: Colors.deepPurple,
+                ),
+                onChanged: (newValue) {
+                  addRecordController.selectedPartyAmount.value = newValue!;
+                },
+                items: <int>[1, 2, 3, 4, 5, 6].map<DropdownMenuItem<int>>((int value) {
+                  return DropdownMenuItem<int>(
+                    value: value,
+                    child: Text(
+                      value.toString(),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          const Text(
+            "명",
+          )
+        ],
+      ),
+    );
+  }
+}
+

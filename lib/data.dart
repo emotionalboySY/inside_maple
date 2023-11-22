@@ -10,6 +10,7 @@ class SelectedItem {
   SelectedItem({
     required this.itemData,
     required this.count,
+    this.price = 0,
 });
 
   @HiveField(0)
@@ -73,6 +74,7 @@ class BossRecord {
       required this.difficulty,
       required this.date,
       required this.itemList,
+      required this.partyAmount,
     });
 
     @HiveField(0)
@@ -83,9 +85,11 @@ class BossRecord {
     final DateTime date;
     @HiveField(3)
     final List<SelectedItem> itemList;
+    @HiveField(4)
+    final int partyAmount;
 
     @override
     String toString() {
-      return "${boss.korName} $difficulty $date $itemList";
+      return "${boss.korName}($difficulty) | date: $date | itemList: $itemList | 파티원 수: $partyAmount";
     }
 }
