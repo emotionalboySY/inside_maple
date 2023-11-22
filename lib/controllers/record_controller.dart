@@ -41,23 +41,23 @@ class RecordController extends GetxController {
   RxInt selectedWeekTypeIndex = (-1).obs;
   RxInt selectedRecordIndex = (-1).obs;
 
-  final box = Hive.box('insideMaple');
-
   Future<void> loadRecord() async {
+    final box = await Hive.openBox("insideMaple");
     recordLoadStatus.value = LoadStatus.loading;
     recordList.clear();
 
     recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
     for(var record in recordRawList) {
       WeekType? weekType = getWeekType(record);
-      loggerNoStack.d("record in recordRawList: $record");
-      loggerNoStack.d("weekType in recordRawList: $weekType");
 
       if(weekType == null) {
         continue;
       }
 
       RecordItem singleRecordItem = RecordItem(recordData: record, weekType: weekType);
+      loggerNoStack.d("calculated weekType: $weekType");
+      loggerNoStack.d("existing weekTypeList: $weekTypeList");
+      loggerNoStack.d("is WeekTypeList contains weekType? ${weekTypeList.contains(weekType)}");
       if(!weekTypeList.contains(weekType)) {
         weekTypeList.add(weekType);
       }
@@ -70,6 +70,7 @@ class RecordController extends GetxController {
     recordLoadStatus.value = LoadStatus.success;
     weekTypeList.refresh();
     recordList.refresh();
+    box.close();
   }
 
   WeekType? getWeekType(BossRecord record) {
@@ -99,18 +100,15 @@ class RecordController extends GetxController {
 
   void selectRecord(int index) {
     selectedWeekTypeIndex.value = index;
-    loggerNoStack.d(selectedWeekTypeIndex.value);
     selectedRecordList.clear();
     for(var record in recordList) {
-      loggerNoStack.d("record: $record");
       if(record.weekType == weekTypeList[index]) {
-        loggerNoStack.d("record.weekType: ${record.weekType} is same as weekTypeList[index]: ${weekTypeList[index]}");
         selectedRecordList.add(record);
       }
     }
     selectedRecordIndex.value = -1;
+    weekTypeList.refresh();
     selectedRecordList.refresh();
-    loggerNoStack.d("selectedRecordList after selection of boss: $selectedRecordList");
     recordList.refresh();
   }
 
@@ -121,10 +119,7 @@ class RecordController extends GetxController {
   }
 
   void loadSingleRecord() {
-    logger.d(selectedRecordIndex);
-    logger.d(selectedRecordList[selectedRecordIndex.value].toString());
     selectedRecordData.value = selectedRecordList[selectedRecordIndex.value];
-    logger.d(selectedRecordData);
   }
 
   @override

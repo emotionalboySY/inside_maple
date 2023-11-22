@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:hive/hive.dart';
 import 'package:inside_maple/routes.dart';
 import 'package:inside_maple/utils/logger.dart';
@@ -46,14 +45,12 @@ void main() async {
 
   String documentPathStr = documentPath.path;
 
-  Hive.init("$documentPathStr/InsideMaple");
+  Hive.init("$documentPathStr/Inside Maple");
   Hive.registerAdapter(BossRecordAdapter());
   Hive.registerAdapter(BossAdapter());
   Hive.registerAdapter(SelectedItemAdapter());
   Hive.registerAdapter(DifficultyAdapter());
   Hive.registerAdapter(ItemAdapter());
-
-  await Hive.openBox("insideMaple");
 
   Get.put(MainController());
 
@@ -78,7 +75,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
   }
 
   Future<void> _restoreWindowSize() async {
-    final box = Hive.box("insideMaple");
+    final box = await Hive.openBox("insideMaple");
     final savedSize = await box.get("savedWindowSize", defaultValue: const Size(1280.0, 720.0));
     await windowManager.setSize(savedSize);
   }
@@ -89,11 +86,10 @@ class _MyAppState extends State<MyApp> with WindowListener {
     bool isPreventClose = await windowManager.isPreventClose();
     if(isPreventClose) {
       loggerNoStack.d("onWindowClose");
-      final box = Hive.box("insideMaple");
+      final box = await Hive.openBox("insideMaple");
       final size = await windowManager.getSize();
       box.put("savedSize", size);
       loggerNoStack.d("size Saved");
-
       windowManager.destroy();
     }
   }
@@ -106,6 +102,8 @@ class _MyAppState extends State<MyApp> with WindowListener {
       child: GetMaterialApp(
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
         ],
         supportedLocales: const [
           Locale('ko', 'KR'),

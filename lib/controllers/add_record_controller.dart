@@ -105,7 +105,6 @@ class AddRecordController extends GetxController {
   }
 
   void increaseItem(int index) {
-    logger.d("item can duplicated? ${itemCanDuplicated.contains(selectedItemList[index].itemData)}");
     if(itemCanDuplicated.contains(selectedItemList[index].itemData)) {
       selectedItemList[index].increaseCount();
       selectedItemList.refresh();
@@ -155,16 +154,14 @@ class AddRecordController extends GetxController {
   }
 
   void setRaidDate(DateTime date) {
-    logger.d(date);
     selectedDate.value = date;
   }
 
   Future<void> saveRecordData() async {
     saveStatus.value = true;
     try {
-      final box = Hive.box('insideMaple');
+      final box = await Hive.openBox("insideMaple");
       List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
-      loggerNoStack.d("recordRawList before addition: $recordRawList");
       BossRecord singleRecord = BossRecord(
         boss: selectedBoss.value!,
         difficulty: selectedDiff.value!,
@@ -172,11 +169,10 @@ class AddRecordController extends GetxController {
         itemList: selectedItemList,
         partyAmount: selectedPartyAmount.value,
       );
-      loggerNoStack.d("singleRecord: $singleRecord");
       recordRawList.add(singleRecord);
-      loggerNoStack.d("recordRawList after addition: $recordRawList");
       await box.put('bossRecordData', recordRawList);
       resetSelected();
+      box.close();
       showToast("보스 기록이 성공적으로 저장되었습니다.");
     } catch (e) {
       showToast("보스 기록 저장에 실패했습니다. $e");
@@ -199,6 +195,5 @@ class AddRecordController extends GetxController {
   void onInit() {
     super.onInit();
     bossList = Boss.getKorListAfterCygnus().obs;
-    loggerNoStack.d(bossList);
   }
 }

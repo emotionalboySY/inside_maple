@@ -56,7 +56,7 @@ class ContentBottomWeekTypeList extends StatelessWidget {
               )
             : Obx(
                 () => ListView.builder(
-                  itemCount: recordController.recordList.length,
+                  itemCount: recordController.weekTypeList.length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(

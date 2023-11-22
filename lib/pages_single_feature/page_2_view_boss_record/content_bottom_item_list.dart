@@ -17,22 +17,35 @@ class ContentBottomItemList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 _itemComponent(
-                    height: 40,
-                    leftChild: const Center(
-                      child: Text(
-                        "아이템 이름",
+                  height: 40,
+                  leftChild: const Center(
+                    child: Text(
+                      "아이템 이름",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
                       ),
                     ),
-                    centerChild: const Center(
-                      child: Text(
-                        "획득 개수",
+                  ),
+                  centerChild: const Center(
+                    child: Text(
+                      "획득 개수",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
                       ),
                     ),
-                    rightChild: const Center(
-                      child: Text(
-                        "판매 단가(메소)",
+                  ),
+                  rightChild: const Center(
+                    child: Text(
+                      "판매 단가(메소)",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
                       ),
-                    )),
+                    ),
+                  ),
+                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: recordController.selectedRecordData.value!.recordData!.itemList.length,

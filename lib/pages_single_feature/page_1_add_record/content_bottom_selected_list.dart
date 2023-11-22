@@ -295,18 +295,7 @@ class _RaidPartyAmount extends StatelessWidget {
               child: DropdownButton<int>(
                 focusColor: Theme.of(context).scaffoldBackgroundColor,
                 value: addRecordController.selectedPartyAmount.value,
-                icon: const Icon(Icons.arrow_drop_down),
-                iconSize: 24,
-                elevation: 16,
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-                underline: Container(
-                  height: 2,
-                  color: Colors.deepPurple,
-                ),
+                iconSize: 20,
                 onChanged: (newValue) {
                   addRecordController.selectedPartyAmount.value = newValue!;
                 },
@@ -314,16 +303,18 @@ class _RaidPartyAmount extends StatelessWidget {
                   return DropdownMenuItem<int>(
                     value: value,
                     child: Text(
-                      value.toString(),
+                      "${value.toString()}명",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Pretendard",
+                        fontSize: 14,
+                      ),
                     ),
                   );
                 }).toList(),
               ),
             ),
           ),
-          const Text(
-            "명",
-          )
         ],
       ),
     );

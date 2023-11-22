@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:inside_maple/utils/logger.dart';
 
 import 'constants.dart';
 
@@ -64,6 +65,17 @@ class WeekType {
   String getPeriodKorString() {
     return "${startDate.month}/${startDate.day} ~ ${endDate.month}/${endDate.day}";
   }
+
+  @override
+  bool operator ==(Object other) {
+    if(other is WeekType) {
+      return year == other.year && month == other.month && weekNum == other.weekNum;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => super.hashCode;
 }
 
 @HiveType(typeId: 4)
