@@ -28,6 +28,7 @@ class RecordItem {
 class RecordController extends GetxController {
 
   Rx<int> recordViewType = 1.obs;
+  RxBool isRecordEditMode = false.obs;
 
   Rx<LoadStatus> recordLoadStatus = LoadStatus.empty.obs;
 
@@ -36,10 +37,12 @@ class RecordController extends GetxController {
 
   RxList<WeekType> weekTypeList = <WeekType>[].obs;
   RxList<RecordItem> selectedRecordList = <RecordItem>[].obs;
-  Rx<RecordItem?> selectedRecordData = RecordItem().obs;
 
   RxInt selectedWeekTypeIndex = (-1).obs;
   RxInt selectedRecordIndex = (-1).obs;
+  Rx<RecordItem> selectedRecordData = RecordItem().obs;
+  RxInt totalItemPrice = 0.obs;
+  RxInt totalItemPriceAfterDivision = 0.obs;
 
   Future<void> loadRecord() async {
     final box = await Hive.openBox("insideMaple");
@@ -120,6 +123,42 @@ class RecordController extends GetxController {
 
   void loadSingleRecord() {
     selectedRecordData.value = selectedRecordList[selectedRecordIndex.value];
+  }
+
+  void toggleEditMode() {
+    isRecordEditMode.value = !isRecordEditMode.value;
+  }
+
+  void resetSelections() {
+    selectedRecordData.value = RecordItem();
+    selectedRecordIndex.value = -1;
+    selectedWeekTypeIndex.value = -1;
+    selectedRecordList.refresh();
+    weekTypeList.refresh();
+  }
+
+  void decreaseItemCount() {
+
+  }
+
+  void increaseItemCount() {
+
+  }
+
+  void setItemPrice(int index, int price) {
+    selectedRecordData.value.recordData!.itemList[index].price = price;
+  }
+
+  void calculateTotalPrices() {
+    int total = 0;
+    for(var item in selectedRecordData.value.recordData!.itemList) {
+      total += item.price;
+    }
+    totalItemPrice.value = total;
+    totalItemPriceAfterDivision.value = (total / selectedRecordData.value.recordData!.partyAmount).round();
+
+    loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
+    loggerNoStack.d("calculated totalItemPriceAfterDivision: $totalItemPriceAfterDivision");
   }
 
   @override

@@ -1,8 +1,13 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:inside_maple/constants.dart';
 
 import '../../controllers/record_controller.dart';
+import '../../custom_icons_icons.dart';
+import '../../data.dart';
+import '../../utils/logger.dart';
 
 class ContentBottomItemList extends StatelessWidget {
   ContentBottomItemList({super.key});
@@ -17,6 +22,7 @@ class ContentBottomItemList extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 _itemComponent(
+                  isChild: false,
                   height: 40,
                   leftChild: const Center(
                     child: Text(
@@ -48,9 +54,10 @@ class ContentBottomItemList extends StatelessWidget {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: recordController.selectedRecordData.value!.recordData!.itemList.length,
+                    itemCount: recordController.selectedRecordData.value.recordData!.itemList.length,
                     itemBuilder: (context, index) {
                       return _itemComponent(
+                        isChild: true,
                         height: 50,
                         leftChild: Padding(
                           padding: const EdgeInsets.only(left: 32.0),
@@ -59,7 +66,7 @@ class ContentBottomItemList extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               ExtendedImage.asset(
-                                recordController.selectedRecordData.value!.recordData!.itemList[index].itemData.imagePath,
+                                recordController.selectedRecordData.value.recordData!.itemList[index].itemData.imagePath,
                                 width: 30,
                                 height: 30,
                                 fit: BoxFit.contain,
@@ -67,26 +74,20 @@ class ContentBottomItemList extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  recordController.selectedRecordData.value!.recordData!.itemList[index].itemData.korLabel,
+                                  recordController.selectedRecordData.value.recordData!.itemList[index].itemData.korLabel,
                                 ),
                               )
                             ],
                           ),
                         ),
-                        centerChild: Center(
-                          child: Text(
-                            "${recordController.selectedRecordData.value!.recordData!.itemList[index].count}개",
-                          ),
-                        ),
-                        rightChild: Center(
-                          child: Text(
-                            "${recordController.selectedRecordData.value!.recordData!.itemList[index].price} 메소",
-                          ),
-                        ),
+                        centerChild: _centerChild(index: index),
+                        rightChild: _rightChild(index: index),
                       );
                     },
                   ),
                 ),
+                separator(axis: Axis.horizontal),
+                _bottomComponent(),
               ],
             )
           : const Center(
@@ -98,6 +99,7 @@ class ContentBottomItemList extends StatelessWidget {
   }
 
   Widget _itemComponent({
+    required bool isChild,
     required Widget leftChild,
     required Widget centerChild,
     required Widget rightChild,
@@ -117,7 +119,160 @@ class ContentBottomItemList extends StatelessWidget {
           ),
           Expanded(
             flex: 3,
-            child: rightChild,
+            child: Row(
+              children: [
+                Expanded(
+                  child: rightChild,
+                ),
+                recordController.isRecordEditMode.value
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: IconButton(
+                          icon: Icon(
+                            CustomIcons.trashEmpty,
+                            size: 20,
+                            color: isChild ? Colors.black : Colors.transparent,
+                          ),
+                          onPressed: () {},
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _centerChild({
+    required int index,
+  }) {
+    return Obx(
+      () => Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            recordController.isRecordEditMode.value &&
+                    itemCanDuplicated.contains(recordController.selectedRecordData.value.recordData!.itemList[index].itemData)
+                ? IconButton(
+                    onPressed: recordController.selectedRecordData.value.recordData!.itemList[index].count == 1
+                        ? null
+                        : () {
+                            recordController.decreaseItemCount();
+                          },
+                    icon: const Icon(Icons.remove),
+                    style: IconButton.styleFrom(
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+              child: Text(
+                "${recordController.selectedRecordData.value.recordData!.itemList[index].count}개",
+              ),
+            ),
+            recordController.isRecordEditMode.value &&
+                    itemCanDuplicated.contains(recordController.selectedRecordData.value.recordData!.itemList[index].itemData)
+                ? IconButton(
+                    onPressed: () {
+                      recordController.increaseItemCount();
+                    },
+                    icon: const Icon(Icons.add),
+                    style: IconButton.styleFrom(
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _rightChild({
+    required int index,
+  }) {
+    TextEditingController priceController = TextEditingController();
+    return recordController.isRecordEditMode.value
+        ? Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 150,
+                  height: 30,
+                  child: RawKeyboardListener(
+                    focusNode: FocusNode(),
+                    onKey: (RawKeyEvent event) {
+                      loggerNoStack.d("event: $event");
+                      if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
+                        FocusScope.of(Get.context!).unfocus();
+                        recordController.setItemPrice(index, int.parse(priceController.text));
+                        recordController.calculateTotalPrices();
+                      }
+                    },
+                    child: TextField(
+                      controller: priceController,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.end,
+                      decoration: InputDecoration(
+                        hintText: recordController.selectedRecordData.value.recordData!.itemList[index].price.toString(),
+                      ),
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 5.0),
+                  child: Text(
+                    "메소",
+                  ),
+                ),
+              ],
+            ),
+          )
+        : Center(
+            child: Text(
+              "${recordController.selectedRecordData.value.recordData!.itemList[index].price} 메소",
+            ),
+          );
+  }
+
+  Widget _bottomComponent() {
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: Center(
+              child: Text(
+                "총 합계: ${recordController.totalItemPrice.value} 메소",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          separator(axis: Axis.vertical),
+          Expanded(
+            child: Center(
+              child: Text(
+                "1인당 분배금: ${recordController.totalItemPriceAfterDivision.value} 메소",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+            ),
           ),
         ],
       ),

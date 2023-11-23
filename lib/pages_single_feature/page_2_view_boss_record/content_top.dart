@@ -12,34 +12,13 @@ class ViewBossRecordTop extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 50,
+      height: 60,
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _radioButtons(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Get.back();
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                backgroundColor: Colors.deepPurple,
-              ),
-              child: const Center(
-                child: Text(
-                  "나가기",
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          _topMenus(),
         ],
       ),
     );
@@ -91,6 +70,67 @@ class ViewBossRecordTop extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _topMenus() {
+    return Obx(
+      () => Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          recordController.selectedRecordData.value.recordData != null
+              ? TextButton(
+                  onPressed: () {
+                    recordController.resetSelections();
+                  },
+                  child: const Text(
+                    "선택지 초기화",
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+          recordController.selectedRecordData.value.recordData != null
+              ? TextButton(
+                  onPressed: () {
+                    recordController.toggleEditMode();
+                    if (recordController.isRecordEditMode.value) {
+                    } else {}
+                  },
+                  child: Text(
+                    recordController.isRecordEditMode.value ? "완료" : "수정",
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, right: 15.0, left: 5.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Get.back();
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                backgroundColor: Colors.deepPurple,
+              ),
+              child: const Center(
+                child: Text(
+                  "나가기",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
