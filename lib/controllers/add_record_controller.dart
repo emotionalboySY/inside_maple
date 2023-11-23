@@ -169,6 +169,11 @@ class AddRecordController extends GetxController {
         itemList: selectedItemList,
         partyAmount: selectedPartyAmount.value,
       );
+      if(checkDuplicatedRecord(recordRawList, singleRecord)) {
+        showToast("이미 저장된 기록입니다.");
+        saveStatus.value = false;
+        return;
+      }
       recordRawList.add(singleRecord);
       await box.put('bossRecordData', recordRawList);
       resetSelected();
@@ -179,6 +184,17 @@ class AddRecordController extends GetxController {
       logger.e(e);
     }
     saveStatus.value = false;
+  }
+
+  bool checkDuplicatedRecord(List<BossRecord> recordRawList, BossRecord recordToSave) {
+    bool isDuplicated = false;
+    for(var record in recordRawList) {
+      if(record.boss == recordToSave.boss && record.difficulty == recordToSave.difficulty && record.date == recordToSave.date) {
+        isDuplicated = true;
+        break;
+      }
+    }
+    return isDuplicated;
   }
 
   void resetSelected() {
