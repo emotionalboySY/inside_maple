@@ -182,6 +182,7 @@ class RecordController extends GetxController {
     if (isResetConfirmed == null) {
       return;
     } else if (isResetConfirmed!) {
+      isRecordEditMode.value = false;
       selectedRecordData.value = RecordItem();
       selectedRecordIndex.value = -1;
       selectedWeekTypeIndex.value = -1;
@@ -220,6 +221,75 @@ class RecordController extends GetxController {
     totalItemPriceLocale.value = f.format(totalItemPrice.value);
     totalItemPriceAfterDivision.value = 0;
     totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
+  }
+
+  Future<void> showDivisionHelpDialog() async {
+    await Get.dialog(
+      barrierDismissible: true,
+      AlertDialog(
+        insetPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        actionsPadding: EdgeInsets.zero,
+        actionsAlignment: MainAxisAlignment.center,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        elevation: 0.0,
+        title: null,
+        content: const Padding(
+          padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
+          child: Text(
+            "1인당 분배금은 총 합계를 파티원 수로 나눈 값으로, 소수점에서 올림처리됩니다.\n(정확하지 않을 수 있습니다)",
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 15.0, bottom: 10.0),
+            child: TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: const Text("확인"),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> showTotalHelpDialog() async {
+    await Get.dialog(
+      barrierDismissible: true,
+      AlertDialog(
+        insetPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        actionsPadding: EdgeInsets.zero,
+        actionsAlignment: MainAxisAlignment.center,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        elevation: 0.0,
+        title: null,
+        content: const Padding(
+          padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
+          child: Text(
+            "<각 아이템 별 판매 수익 계산 방법>\n- (각 아이템 별 획득 개수 * 단가) + 2,000(메이플 옥션 판매 보증금 반환분)\n- 반환받은 보증금은 해당 아이템을 판매 슬롯에 등록한 횟수에 따라 다릅니다.\n\n"
+                "- 총 판매 수익(합계)는 각 아이템 별 판매 수익을 모두 합친 값으로, 보증금의 값에 따라 소폭 오차가 발생할 수 있습니다.",
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 15.0, bottom: 10.0),
+            child: TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: const Text("확인"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

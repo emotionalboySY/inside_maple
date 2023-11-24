@@ -252,24 +252,70 @@ class ContentBottomItemList extends StatelessWidget {
         children: [
           Expanded(
             child: Center(
-              child: Text(
-                "총 합계: ${recordController.totalItemPriceLocale.value} 메소",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "총 합계: ${recordController.totalItemPriceLocale.value} 메소",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: IconButton(
+                      onPressed: () async {
+                        await recordController.showTotalHelpDialog();
+                      },
+                      icon: Icon(
+                        Icons.help_outline,
+                        size: 16,
+                        color: Colors.grey.shade500,
+                      ),
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
           ),
           separator(axis: Axis.vertical),
           Expanded(
             child: Center(
-              child: Text(
-                "1인당 분배금: ${recordController.totalItemPriceAfterDivisionLocale.value} 메소",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "1인당 분배금: ${recordController.totalItemPriceAfterDivisionLocale.value} 메소",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: IconButton(
+                      onPressed: () async {
+                        await recordController.showDivisionHelpDialog();
+                      },
+                      icon: Icon(
+                        Icons.help_outline,
+                        size: 16,
+                        color: Colors.grey.shade500,
+                      ),
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
           ),

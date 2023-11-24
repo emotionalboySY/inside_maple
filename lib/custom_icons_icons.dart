@@ -12,6 +12,10 @@
 ///       - asset: fonts/CustomIcons.ttf
 ///
 /// 
+/// * MFG Labs, Copyright (C) 2012 by Daniel Bruce
+///         Author:    MFG Labs
+///         License:   SIL (http://scripts.sil.org/OFL)
+///         Homepage:  http://www.mfglabs.com/
 /// * Font Awesome 4, Copyright (C) 2016 by Dave Gandy
 ///         Author:    Dave Gandy
 ///         License:   SIL ()
@@ -25,5 +29,6 @@ class CustomIcons {
   static const _kFontFam = 'CustomIcons';
   static const String? _kFontPkg = null;
 
-  static const IconData trashEmpty = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData circleHelp = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData trashEmpty = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }
