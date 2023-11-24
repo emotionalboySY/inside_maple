@@ -212,7 +212,6 @@ class ContentBottomItemList extends StatelessWidget {
                   child: RawKeyboardListener(
                     focusNode: FocusNode(),
                     onKey: (RawKeyEvent event) {
-                      loggerNoStack.d("event: $event");
                       if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
                         FocusScope.of(Get.context!).unfocus();
                         recordController.setItemPrice(index, int.parse(priceController.text));
@@ -254,7 +253,7 @@ class ContentBottomItemList extends StatelessWidget {
           Expanded(
             child: Center(
               child: Text(
-                "총 합계: ${recordController.totalItemPrice.value} 메소",
+                "총 합계: ${recordController.totalItemPriceLocale.value} 메소",
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
@@ -266,7 +265,7 @@ class ContentBottomItemList extends StatelessWidget {
           Expanded(
             child: Center(
               child: Text(
-                "1인당 분배금: ${recordController.totalItemPriceAfterDivision.value} 메소",
+                "1인당 분배금: ${recordController.totalItemPriceAfterDivisionLocale.value} 메소",
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 16,

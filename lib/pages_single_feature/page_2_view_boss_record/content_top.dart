@@ -81,8 +81,8 @@ class ViewBossRecordTop extends StatelessWidget {
         children: [
           recordController.selectedRecordData.value.recordData != null
               ? TextButton(
-                  onPressed: () {
-                    recordController.resetSelections();
+                  onPressed: () async {
+                    await recordController.resetSelections();
                   },
                   child: const Text(
                     "선택지 초기화",
@@ -100,7 +100,7 @@ class ViewBossRecordTop extends StatelessWidget {
                     } else {}
                   },
                   child: Text(
-                    recordController.isRecordEditMode.value ? "완료" : "수정",
+                    recordController.isRecordEditMode.value ? "저장" : "수정",
                     style: const TextStyle(
                       fontSize: 16,
                     ),

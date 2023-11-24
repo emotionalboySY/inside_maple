@@ -37,8 +37,13 @@ class SelectedItem {
 
   @override
   String toString() {
-    return "${itemData.korLabel} : $count";
+    return "${itemData.korLabel} : $count, $price메소";
   }
+
+  SelectedItem.clone(SelectedItem item) :
+    itemData = item.itemData,
+    count = item.count,
+    price = item.price;
 }
 
 class WeekType {
@@ -76,6 +81,13 @@ class WeekType {
 
   @override
   int get hashCode => super.hashCode;
+
+  WeekType.clone(WeekType weekType) :
+    year = weekType.year,
+    month = weekType.month,
+    weekNum = weekType.weekNum,
+    startDate = weekType.startDate,
+    endDate = weekType.endDate;
 }
 
 @HiveType(typeId: 4)
@@ -104,4 +116,11 @@ class BossRecord {
     String toString() {
       return "${boss.korName}($difficulty) | date: $date | itemList: $itemList | 파티원 수: $partyAmount";
     }
+
+    BossRecord.clone(BossRecord record) :
+      boss = record.boss,
+      difficulty = record.difficulty,
+      date = record.date,
+      itemList = record.itemList.map((item) => SelectedItem.clone(item)).toList(),
+      partyAmount = record.partyAmount;
 }
