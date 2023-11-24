@@ -36,6 +36,7 @@ class RecordController extends GetxController {
 
   Rx<int> recordViewType = 1.obs;
   RxBool isRecordEditMode = false.obs;
+  RxBool isRecordEdited = false.obs;
 
   Rx<LoadStatus> recordLoadStatus = LoadStatus.empty.obs;
 
@@ -183,6 +184,7 @@ class RecordController extends GetxController {
       return;
     } else if (isResetConfirmed!) {
       isRecordEditMode.value = false;
+      isRecordEdited.value = false;
       selectedRecordData.value = RecordItem();
       selectedRecordIndex.value = -1;
       selectedWeekTypeIndex.value = -1;
@@ -198,8 +200,8 @@ class RecordController extends GetxController {
 
   void setItemPrice(int index, int price) {
     selectedRecordData.value.recordData!.itemList[index].price = price;
-    loggerNoStack.d("original record data: ${selectedRecordList[selectedRecordIndex.value].recordData}");
-    loggerNoStack.d("now record data: ${selectedRecordData.value.recordData}");
+    // loggerNoStack.d("original record data: ${selectedRecordList[selectedRecordIndex.value].recordData}");
+    // loggerNoStack.d("now record data: ${selectedRecordData.value.recordData}");
   }
 
   void calculateTotalPrices() {
@@ -212,8 +214,8 @@ class RecordController extends GetxController {
     totalItemPriceAfterDivision.value = (total / selectedRecordData.value.recordData!.partyAmount).round();
     totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
 
-    loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
-    loggerNoStack.d("calculated totalItemPriceAfterDivision: $totalItemPriceAfterDivision");
+    // loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
+    // loggerNoStack.d("calculated totalItemPriceAfterDivision: $totalItemPriceAfterDivision");
   }
 
   void resetTotalPriceLocale() {
@@ -274,7 +276,7 @@ class RecordController extends GetxController {
           padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
           child: Text(
             "<각 아이템 별 판매 수익 계산 방법>\n- (각 아이템 별 획득 개수 * 단가) + 2,000(메이플 옥션 판매 보증금 반환분)\n- 반환받은 보증금은 해당 아이템을 판매 슬롯에 등록한 횟수에 따라 다릅니다.\n\n"
-                "- 총 판매 수익(합계)는 각 아이템 별 판매 수익을 모두 합친 값으로, 보증금의 값에 따라 소폭 오차가 발생할 수 있습니다.",
+            "- 총 판매 수익(합계)는 각 아이템 별 판매 수익을 모두 합친 값으로, 보증금의 값에 따라 소폭 오차가 발생할 수 있습니다.",
           ),
         ),
         actions: [
@@ -290,6 +292,23 @@ class RecordController extends GetxController {
         ],
       ),
     );
+  }
+
+  void updateIsRecordEdited() {
+    if (isRecordEditMode.value) {
+      RecordItem item = recordList.firstWhere((item) => (item.recordData!.boss == selectedRecordData.value.recordData!.boss &&
+          item.recordData!.difficulty == selectedRecordData.value.recordData!.difficulty &&
+          item.recordData!.date == selectedRecordData.value.recordData!.date));
+      // loggerNoStack.d("selected record data: ${item.recordData}");
+      // loggerNoStack.d("Changed record data: ${selectedRecordData.value.recordData}");
+      if(item.recordData == selectedRecordData.value.recordData) {
+        // loggerNoStack.d("selected record data and changed record data are same");
+        isRecordEdited = false.obs;
+      } else {
+        // loggerNoStack.d("selected record data and changed record data are not same");
+        isRecordEdited = true.obs;
+      }
+    }
   }
 
   @override

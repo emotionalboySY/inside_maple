@@ -6,8 +6,6 @@ import 'package:inside_maple/constants.dart';
 
 import '../../controllers/record_controller.dart';
 import '../../custom_icons_icons.dart';
-import '../../data.dart';
-import '../../utils/logger.dart';
 
 class ContentBottomItemList extends StatelessWidget {
   ContentBottomItemList({super.key});
@@ -86,6 +84,33 @@ class ContentBottomItemList extends StatelessWidget {
                     },
                   ),
                 ),
+                if (recordController.isRecordEdited.value)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 10.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.warning_amber,
+                          color: Colors.red,
+                          size: 14,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 5.0),
+                          child: Text(
+                            "변경된 내용이 있습니다! 저장 여부에 유의하세요!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.red,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 separator(axis: Axis.horizontal),
                 _bottomComponent(),
               ],
@@ -216,6 +241,7 @@ class ContentBottomItemList extends StatelessWidget {
                         FocusScope.of(Get.context!).unfocus();
                         recordController.setItemPrice(index, int.parse(priceController.text));
                         recordController.calculateTotalPrices();
+                        recordController.updateIsRecordEdited();
                       }
                     },
                     child: TextField(
