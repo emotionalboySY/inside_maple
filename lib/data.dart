@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:inside_maple/utils/logger.dart';
 
@@ -6,58 +7,60 @@ import 'constants.dart';
 part 'data.g.dart';
 
 @HiveType(typeId: 3)
-class SelectedItem {
-  SelectedItem({
-    required this.itemData,
+class Item {
+  Item({
+    required this.item,
     required this.count,
-    this.price = 0,
+    required this.price,
   });
 
   @HiveField(0)
-  final Item itemData;
+  final ItemData item;
   @HiveField(1)
-  int count;
+  RxInt count;
   @HiveField(2)
-  int price = 0;
+  RxInt price;
 
   void increaseCount() {
-    count++;
+    count.value++;
   }
 
   void decreaseCount() {
-    if (count > 1) {
-      count--;
+    if (count.value > 1) {
+      count.value--;
     }
   }
 
   void setPrice(int price) {
-    this.price = price;
+    this.price.value = price;
   }
 
   @override
   String toString() {
-    return "${itemData.korLabel} : $count, $price메소";
+    return "${item.korLabel} : $count, $price메소";
   }
 
-  SelectedItem.clone(SelectedItem item)
-      : itemData = item.itemData,
-        count = item.count,
-        price = item.price;
+  Item.clone(Item item)
+      : item = item.item,
+        count = item.count.value.obs,
+        price = item.price.value.obs;
 
   @override
   bool operator ==(Object other) {
-    if (other is SelectedItem) {
-      return itemData == other.itemData && count == other.count && price == other.price;
+    if (other is Item) {
+      return item == other.item && count == other.count && price == other.price;
     }
     return false;
   }
 
   @override
-  // TODO: implement hashCode
-  int get hashCode => super.hashCode;
+  int get hashCode {
+    return Object.hash(item, count.value, price.value);
+  }
 
 }
 
+@HiveType(typeId: 5)
 class WeekType {
   WeekType({
     required this.year,
@@ -67,10 +70,15 @@ class WeekType {
     required this.endDate,
   });
 
+  @HiveField(0)
   final int year;
+  @HiveField(1)
   final int month;
+  @HiveField(2)
   final int weekNum;
+  @HiveField(3)
   final DateTime startDate;
+  @HiveField(4)
   final DateTime endDate;
 
   @override
@@ -91,7 +99,9 @@ class WeekType {
   }
 
   @override
-  int get hashCode => super.hashCode;
+  int get hashCode {
+    return Object.hash(year, month, weekNum);
+  }
 
   WeekType.clone(WeekType weekType)
       : year = weekType.year,
@@ -109,18 +119,21 @@ class BossRecord {
     required this.date,
     required this.itemList,
     required this.partyAmount,
+    required this.weekType,
   });
 
   @HiveField(0)
-  final Boss boss;
+  Boss boss;
   @HiveField(1)
-  final Difficulty difficulty;
+  Difficulty difficulty;
   @HiveField(2)
-  final DateTime date;
+  DateTime date;
   @HiveField(3)
-  final List<SelectedItem> itemList;
+  RxList<Item> itemList;
   @HiveField(4)
-  final int partyAmount;
+  int partyAmount;
+  @HiveField(5)
+  WeekType weekType;
 
   @override
   String toString() {
@@ -128,16 +141,47 @@ class BossRecord {
         "boss: $boss\n"
         "difficulty: $difficulty\n"
         "date: $date\n"
-        "itemList: $itemList\n"
-        "partyAmount: $partyAmount\n";
+        "itemList: ${itemList.value}\n"
+        "partyAmount: $partyAmount\n"
+        "weekType: $weekType\n";
+  }
+
+  void update({
+    Boss? boss,
+    Difficulty? difficulty,
+    DateTime? date,
+    List<Item>? itemList,
+    int? partyAmount,
+    WeekType? weekType,
+}) {
+    if(boss != null) {
+      this.boss = boss;
+    }
+    if(difficulty != null) {
+      this.difficulty = difficulty;
+    }
+    if(date != null) {
+      this.date = date;
+    }
+    if(itemList != null) {
+      this.itemList.clear();
+      this.itemList.addAll(itemList);
+    }
+    if(partyAmount != null) {
+      this.partyAmount = partyAmount;
+    }
+    if(weekType != null) {
+      this.weekType = weekType;
+    }
   }
 
   BossRecord.clone(BossRecord record)
       : boss = record.boss,
         difficulty = record.difficulty,
         date = record.date,
-        itemList = record.itemList.map((item) => SelectedItem.clone(item)).toList(),
-        partyAmount = record.partyAmount;
+        itemList = record.itemList.map((item) => Item.clone(item)).toList().obs,
+        partyAmount = record.partyAmount,
+        weekType = record.weekType;
 
   @override
   bool operator ==(Object other) {
@@ -147,7 +191,7 @@ class BossRecord {
           for(int i = 0; i < itemList.length; i++) {
             if(other.itemList[i] != itemList[i]) {
               loggerNoStack.d("Difference detected: ${other.itemList[i]}\n and ${itemList[i]}");
-              loggerNoStack.d("${other.itemList[i].itemData == itemList[i].itemData}");
+              loggerNoStack.d("${other.itemList[i].item == itemList[i].item}");
               loggerNoStack.d("${other.itemList[i].count == itemList[i].count}");
               loggerNoStack.d("${other.itemList[i].price == itemList[i].price}");
               return false;
@@ -161,6 +205,8 @@ class BossRecord {
   }
 
   @override
-  int get hashCode => super.hashCode;
+  int get hashCode {
+    return Object.hash(boss, difficulty, date, itemList, partyAmount, weekType);
+  }
 
 }

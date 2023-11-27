@@ -18,20 +18,20 @@ class ContentBottomBossList extends StatelessWidget {
         ),
       )
       : ListView.builder(
-        itemCount: recordController.selectedRecordList.length,
+        itemCount: recordController.recordListExactWeekType.length,
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(
-              "${recordController.selectedRecordList[index].recordData!.boss.korName}"
-                  " (${recordController.selectedRecordList[index].recordData!.difficulty.korName})",
+              "${recordController.recordListExactWeekType[index].boss.korName}"
+                  " (${recordController.recordListExactWeekType[index].difficulty.korName})",
             ),
             trailing: const Icon(
               Icons.arrow_forward_ios,
               color: Colors.black,
               size: 16,
             ),
-            onTap: () {
-              recordController.selectRecordItem(index);
+            onTap: recordController.selectedRecordIndex.value == index ? null : () async {
+              await recordController.selectRecord(index);
             },
             selected: index == recordController.selectedRecordIndex.value,
             selectedTileColor: Colors.grey.shade300,

@@ -6,29 +6,29 @@ part of 'data.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class SelectedItemAdapter extends TypeAdapter<SelectedItem> {
+class ItemAdapter extends TypeAdapter<Item> {
   @override
   final int typeId = 3;
 
   @override
-  SelectedItem read(BinaryReader reader) {
+  Item read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return SelectedItem(
-      itemData: fields[0] as Item,
-      count: fields[1] as int,
-      price: fields[2] as int,
+    return Item(
+      item: fields[0] as ItemData,
+      count: fields[1] as RxInt,
+      price: fields[2] as RxInt,
     );
   }
 
   @override
-  void write(BinaryWriter writer, SelectedItem obj) {
+  void write(BinaryWriter writer, Item obj) {
     writer
       ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.itemData)
+      ..write(obj.item)
       ..writeByte(1)
       ..write(obj.count)
       ..writeByte(2)
@@ -41,7 +41,53 @@ class SelectedItemAdapter extends TypeAdapter<SelectedItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SelectedItemAdapter &&
+      other is ItemAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class WeekTypeAdapter extends TypeAdapter<WeekType> {
+  @override
+  final int typeId = 5;
+
+  @override
+  WeekType read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return WeekType(
+      year: fields[0] as int,
+      month: fields[1] as int,
+      weekNum: fields[2] as int,
+      startDate: fields[3] as DateTime,
+      endDate: fields[4] as DateTime,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, WeekType obj) {
+    writer
+      ..writeByte(5)
+      ..writeByte(0)
+      ..write(obj.year)
+      ..writeByte(1)
+      ..write(obj.month)
+      ..writeByte(2)
+      ..write(obj.weekNum)
+      ..writeByte(3)
+      ..write(obj.startDate)
+      ..writeByte(4)
+      ..write(obj.endDate);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is WeekTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -60,15 +106,16 @@ class BossRecordAdapter extends TypeAdapter<BossRecord> {
       boss: fields[0] as Boss,
       difficulty: fields[1] as Difficulty,
       date: fields[2] as DateTime,
-      itemList: (fields[3] as List).cast<SelectedItem>(),
+      itemList: (fields[3] as List).cast<Item>().obs,
       partyAmount: fields[4] as int,
+      weekType: fields[5] as WeekType,
     );
   }
 
   @override
   void write(BinaryWriter writer, BossRecord obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.boss)
       ..writeByte(1)
@@ -78,7 +125,9 @@ class BossRecordAdapter extends TypeAdapter<BossRecord> {
       ..writeByte(3)
       ..write(obj.itemList)
       ..writeByte(4)
-      ..write(obj.partyAmount);
+      ..write(obj.partyAmount)
+      ..writeByte(5)
+      ..write(obj.weekType);
   }
 
   @override
@@ -90,4 +139,35 @@ class BossRecordAdapter extends TypeAdapter<BossRecord> {
       other is BossRecordAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
+}
+
+class RxIntAdapter extends TypeAdapter<RxInt> {
+  @override
+  final int typeId = 6;
+
+  @override
+  RxInt read(BinaryReader reader) {
+    return RxInt(reader.readInt());
+  }
+
+  @override
+  void write(BinaryWriter writer, RxInt obj) {
+    writer.writeInt(obj.value);
+  }
+}
+
+class RxListAdapter extends TypeAdapter<RxList> {
+
+  @override
+  final int typeId = 7;
+
+  @override
+  void write(BinaryWriter writer, RxList obj) {
+    writer.writeList(obj);
+  }
+
+  @override
+  RxList read(BinaryReader reader) {
+    return RxList(reader.readList());
+  }
 }

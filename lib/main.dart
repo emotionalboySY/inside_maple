@@ -47,9 +47,12 @@ void main() async {
   Hive.init("$documentPathStr/Inside Maple");
   Hive.registerAdapter(BossRecordAdapter());
   Hive.registerAdapter(BossAdapter());
-  Hive.registerAdapter(SelectedItemAdapter());
-  Hive.registerAdapter(DifficultyAdapter());
   Hive.registerAdapter(ItemAdapter());
+  Hive.registerAdapter(DifficultyAdapter());
+  Hive.registerAdapter(ItemDataAdapter());
+  Hive.registerAdapter(WeekTypeAdapter());
+  Hive.registerAdapter(RxIntAdapter());
+  Hive.registerAdapter(RxListAdapter());
 
   Get.put(MainController());
 

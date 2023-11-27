@@ -79,7 +79,7 @@ class ViewBossRecordTop extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          recordController.selectedRecordData.value.recordData != null
+          recordController.selectedRecordData.value != null
               ? TextButton(
                   onPressed: () async {
                     await recordController.resetSelections();
@@ -92,7 +92,7 @@ class ViewBossRecordTop extends StatelessWidget {
                   ),
                 )
               : const SizedBox.shrink(),
-          recordController.selectedRecordData.value.recordData != null
+          recordController.selectedRecordData.value != null
               ? TextButton(
                   onPressed: () {
                     recordController.toggleEditMode();

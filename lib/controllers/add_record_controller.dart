@@ -11,7 +11,7 @@ import '../data.dart';
 class AddRecordController extends GetxController {
   late RxList<Boss> bossList;
   RxList<Difficulty> diffList = <Difficulty>[].obs;
-  RxList<Item> itemList = <Item>[].obs;
+  RxList<ItemData> itemList = <ItemData>[].obs;
 
   RxDouble itemListLength = 250.0.obs;
 
@@ -19,7 +19,7 @@ class AddRecordController extends GetxController {
   Rx<Difficulty?> selectedDiff = Rx<Difficulty?>(null);
   RxBool showLabel = true.obs;
 
-  RxList<SelectedItem> selectedItemList = <SelectedItem>[].obs;
+  RxList<Item> selectedItemList = <Item>[].obs;
   Rx<DateTime> selectedDate = DateTime(1900, 01, 01).obs;
   RxInt selectedPartyAmount = 1.obs;
 
@@ -80,7 +80,7 @@ class AddRecordController extends GetxController {
 
     var itemIndexList = dropData[bossName]![diffName]!;
 
-    for (var itemElement in Item.values) {
+    for (var itemElement in ItemData.values) {
       if (itemIndexList.contains(itemElement.index)) {
         itemList.add(itemElement);
       }
@@ -89,23 +89,23 @@ class AddRecordController extends GetxController {
     itemList.refresh();
   }
 
-  void addItem(Item item) {
+  void addItem(ItemData item) {
     try {
-      SelectedItem selectedItem = selectedItemList.firstWhere((element) => element.itemData == item);
-      if(itemCanDuplicated.contains(selectedItem.itemData)) {
+      Item selectedItem = selectedItemList.firstWhere((element) => element.item == item);
+      if(itemCanDuplicated.contains(selectedItem.item)) {
         selectedItem.increaseCount();
       }
       else {
         showToast("선택한 아이템은 한 개만 드롭됩니다.");
       }
     } catch (e) {
-      selectedItemList.add(SelectedItem(itemData: item, count: 1));
+      selectedItemList.add(Item(item: item, count: 1.obs, price: 0.obs));
     }
     selectedItemList.refresh();
   }
 
   void increaseItem(int index) {
-    if(itemCanDuplicated.contains(selectedItemList[index].itemData)) {
+    if(itemCanDuplicated.contains(selectedItemList[index].item)) {
       selectedItemList[index].increaseCount();
       selectedItemList.refresh();
     }
@@ -162,12 +162,14 @@ class AddRecordController extends GetxController {
     try {
       final box = await Hive.openBox("insideMaple");
       List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
+      WeekType? weekType = getWeekType(selectedDate.value);
       BossRecord singleRecord = BossRecord(
         boss: selectedBoss.value!,
         difficulty: selectedDiff.value!,
         date: selectedDate.value,
         itemList: selectedItemList,
         partyAmount: selectedPartyAmount.value,
+        weekType: weekType!,
       );
       if(checkDuplicatedRecord(recordRawList, singleRecord)) {
         showToast("이미 저장된 기록입니다.");
@@ -205,6 +207,33 @@ class AddRecordController extends GetxController {
     itemList.clear();
     itemList.refresh();
     selectedDate.value = DateTime(1900, 01, 01);
+  }
+
+  WeekType getWeekType(DateTime rawDate) {
+    DateTime date = rawDate;
+
+    DateTime firstDayOfMonth = DateTime(date.year, date.month);
+    int daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
+    DateTime firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
+
+    if (date.isBefore(firstThursday)) {
+      firstDayOfMonth = DateTime(date.year, date.month - 1);
+      int daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
+      firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
+    }
+
+    int differenceInDays = date.difference(firstThursday).inDays;
+    int weekNum = (differenceInDays / 7).floor() + 1;
+    DateTime startDateOfWeek = firstThursday.add(Duration(days: (7 * (weekNum - 1))));
+    DateTime endDateOfWeek = startDateOfWeek.add(const Duration(days: 6));
+
+    return WeekType(
+      year: date.year,
+      month: date.month,
+      weekNum: weekNum,
+      startDate: startDateOfWeek,
+      endDate: endDateOfWeek,
+    );
   }
 
   @override

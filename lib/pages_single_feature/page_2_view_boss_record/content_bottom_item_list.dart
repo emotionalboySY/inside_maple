@@ -22,6 +22,7 @@ class ContentBottomItemList extends StatelessWidget {
                 _itemComponent(
                   isChild: false,
                   height: 40,
+                  index: -1,
                   leftChild: const Center(
                     child: Text(
                       "아이템 이름",
@@ -52,11 +53,12 @@ class ContentBottomItemList extends StatelessWidget {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: recordController.selectedRecordData.value.recordData!.itemList.length,
+                    itemCount: recordController.selectedRecordData.value!.itemList.length,
                     itemBuilder: (context, index) {
                       return _itemComponent(
                         isChild: true,
                         height: 50,
+                        index: index,
                         leftChild: Padding(
                           padding: const EdgeInsets.only(left: 32.0),
                           child: Row(
@@ -64,7 +66,7 @@ class ContentBottomItemList extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               ExtendedImage.asset(
-                                recordController.selectedRecordData.value.recordData!.itemList[index].itemData.imagePath,
+                                recordController.selectedRecordData.value!.itemList[index].item.imagePath,
                                 width: 30,
                                 height: 30,
                                 fit: BoxFit.contain,
@@ -72,7 +74,7 @@ class ContentBottomItemList extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  recordController.selectedRecordData.value.recordData!.itemList[index].itemData.korLabel,
+                                  recordController.selectedRecordData.value!.itemList[index].item.korLabel,
                                 ),
                               )
                             ],
@@ -129,6 +131,7 @@ class ContentBottomItemList extends StatelessWidget {
     required Widget centerChild,
     required Widget rightChild,
     required double height,
+    required int index,
   }) {
     return SizedBox(
       height: height,
@@ -158,7 +161,9 @@ class ContentBottomItemList extends StatelessWidget {
                             size: 20,
                             color: isChild ? Colors.black : Colors.transparent,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            recordController.removeItem(index);
+                          },
                         ),
                       )
                     : const SizedBox.shrink(),
@@ -179,33 +184,31 @@ class ContentBottomItemList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            recordController.isRecordEditMode.value &&
-                    itemCanDuplicated.contains(recordController.selectedRecordData.value.recordData!.itemList[index].itemData)
-                ? IconButton(
-                    onPressed: recordController.selectedRecordData.value.recordData!.itemList[index].count == 1
-                        ? null
-                        : () {
-                            recordController.decreaseItemCount();
-                          },
-                    icon: const Icon(Icons.remove),
-                    style: IconButton.styleFrom(
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                    ),
-                  )
+            recordController.isRecordEditMode.value && itemCanDuplicated.contains(recordController.selectedRecordData.value!.itemList[index].item)
+                ? Obx(() => IconButton(
+                      onPressed: recordController.selectedRecordData.value!.itemList[index].count.value == 1
+                          ? null
+                          : () {
+                              recordController.decreaseItemCount(index);
+                            },
+                      icon: const Icon(Icons.remove),
+                      style: IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                      ),
+                    ))
                 : const SizedBox.shrink(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Text(
-                "${recordController.selectedRecordData.value.recordData!.itemList[index].count}개",
+                "${recordController.selectedRecordData.value!.itemList[index].count.value}개",
               ),
             ),
-            recordController.isRecordEditMode.value &&
-                    itemCanDuplicated.contains(recordController.selectedRecordData.value.recordData!.itemList[index].itemData)
+            recordController.isRecordEditMode.value && itemCanDuplicated.contains(recordController.selectedRecordData.value!.itemList[index].item)
                 ? IconButton(
                     onPressed: () {
-                      recordController.increaseItemCount();
+                      recordController.increaseItemCount(index);
                     },
                     icon: const Icon(Icons.add),
                     style: IconButton.styleFrom(
@@ -230,10 +233,11 @@ class ContentBottomItemList extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
                   width: 150,
-                  height: 30,
+                  height: 25,
                   child: RawKeyboardListener(
                     focusNode: FocusNode(),
                     onKey: (RawKeyEvent event) {
@@ -241,7 +245,6 @@ class ContentBottomItemList extends StatelessWidget {
                         FocusScope.of(Get.context!).unfocus();
                         recordController.setItemPrice(index, int.parse(priceController.text));
                         recordController.calculateTotalPrices();
-                        recordController.updateIsRecordEdited();
                       }
                     },
                     child: TextField(
@@ -249,7 +252,10 @@ class ContentBottomItemList extends StatelessWidget {
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.end,
                       decoration: InputDecoration(
-                        hintText: recordController.selectedRecordData.value.recordData!.itemList[index].price.toString(),
+                        hintText: recordController.f.format(recordController.selectedRecordData.value!.itemList[index].price.value),
+                      ),
+                      style: const TextStyle(
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -265,7 +271,7 @@ class ContentBottomItemList extends StatelessWidget {
           )
         : Center(
             child: Text(
-              "${recordController.selectedRecordData.value.recordData!.itemList[index].price} 메소",
+              "${recordController.f.format(recordController.selectedRecordData.value!.itemList[index].price.value)} 메소",
             ),
           );
   }
@@ -282,7 +288,7 @@ class ContentBottomItemList extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "총 합계: ${recordController.totalItemPriceLocale.value} 메소",
+                    "총 수익: ${recordController.totalItemPriceLocale.value} 메소",
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,

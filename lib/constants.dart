@@ -62,11 +62,11 @@ enum Difficulty {
   }
 }
 
-List<Item> itemCanDuplicated = [
-  Item.item1, Item.item2, Item.item3, Item.item4, Item.item5, Item.item6, Item.item7, Item.item8, Item.item9, Item.item10, Item.item11, Item.item12
+List<ItemData> itemCanDuplicated = [
+  ItemData.item1, ItemData.item2, ItemData.item3, ItemData.item4, ItemData.item5, ItemData.item6, ItemData.item7, ItemData.item8, ItemData.item9, ItemData.item10, ItemData.item11, ItemData.item12
 ];
 
-enum Item {
+enum ItemData {
   item1("추가 경험치 50% 쿠폰", "assets/images/drop_item/extra_experience_50%_coupon.png"),
   item2("반짝이는 파란 별 물약", "assets/images/drop_item/shining_blue_star_portion.png"),
   item3("반짝이는 빨간 별 물약", "assets/images/drop_item/shining_red_star_portion.png"),
@@ -116,7 +116,7 @@ enum Item {
   item47("충정의 투구", "assets/images/drop_item/pitch_of_royalty.png"),
   item48("생명의 연마석", "assets/images/drop_item/abrasice_stone_of_life.png");
 
-  const Item(this.korLabel, this.imagePath);
+  const ItemData(this.korLabel, this.imagePath);
   final String korLabel;
   final String imagePath;
 
@@ -234,19 +234,19 @@ class BossAdapter extends TypeAdapter<Boss> {
 
 }
 
-class ItemAdapter extends TypeAdapter<Item> {
+class ItemDataAdapter extends TypeAdapter<ItemData> {
 
   @override
   final typeId = 2;
 
   @override
-  Item read(BinaryReader reader) {
+  ItemData read(BinaryReader reader) {
     var index = reader.readInt();
-    return Item.values[index];
+    return ItemData.values[index];
   }
 
   @override
-  void write(BinaryWriter writer, Item obj) {
+  void write(BinaryWriter writer, ItemData obj) {
     writer.writeInt(obj.index);
   }
 

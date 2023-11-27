@@ -74,7 +74,7 @@ class ContentBottomWeekTypeList extends StatelessWidget {
                         size: 16,
                       ),
                       onTap: () {
-                        recordController.selectRecord(index);
+                        recordController.selectWeekType(index);
                       },
                       selected: index == recordController.selectedWeekTypeIndex.value,
                       selectedTileColor: Colors.grey.shade300,
