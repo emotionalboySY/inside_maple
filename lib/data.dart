@@ -83,6 +83,15 @@ class WeekType {
 
   @override
   String toString() {
+    return "<WeekType instance>\n"
+        "year: $year\n"
+        "month: $month\n"
+        "weekNum: $weekNum\n"
+        "startDate: $startDate\n"
+        "endDate: $endDate\n";
+  }
+
+  String toTitleString() {
     return "$year년 $month월 $weekNum주차";
   }
 
@@ -131,7 +140,7 @@ class BossRecord {
   @HiveField(3)
   RxList<Item> itemList;
   @HiveField(4)
-  int partyAmount;
+  RxInt partyAmount;
   @HiveField(5)
   WeekType weekType;
 
@@ -141,7 +150,7 @@ class BossRecord {
         "boss: $boss\n"
         "difficulty: $difficulty\n"
         "date: $date\n"
-        "itemList: ${itemList.value}\n"
+        "itemList: ${itemList}\n"
         "partyAmount: $partyAmount\n"
         "weekType: $weekType\n";
   }
@@ -168,7 +177,7 @@ class BossRecord {
       this.itemList.addAll(itemList);
     }
     if(partyAmount != null) {
-      this.partyAmount = partyAmount;
+      this.partyAmount.value = partyAmount;
     }
     if(weekType != null) {
       this.weekType = weekType;
@@ -190,10 +199,10 @@ class BossRecord {
         if(other.itemList.length == itemList.length) {
           for(int i = 0; i < itemList.length; i++) {
             if(other.itemList[i] != itemList[i]) {
-              loggerNoStack.d("Difference detected: ${other.itemList[i]}\n and ${itemList[i]}");
-              loggerNoStack.d("${other.itemList[i].item == itemList[i].item}");
-              loggerNoStack.d("${other.itemList[i].count == itemList[i].count}");
-              loggerNoStack.d("${other.itemList[i].price == itemList[i].price}");
+              // loggerNoStack.d("Difference detected: ${other.itemList[i]}\n and ${itemList[i]}");
+              // loggerNoStack.d("${other.itemList[i].item == itemList[i].item}");
+              // loggerNoStack.d("${other.itemList[i].count == itemList[i].count}");
+              // loggerNoStack.d("${other.itemList[i].price == itemList[i].price}");
               return false;
             }
           }

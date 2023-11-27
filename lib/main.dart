@@ -115,6 +115,14 @@ class _MyAppState extends State<MyApp> with WindowListener {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
           fontFamily: "Pretendard",
+          textButtonTheme: TextButtonThemeData(
+            style: ButtonStyle(
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: MaterialStateProperty.all(EdgeInsets.zero),
+              overlayColor: MaterialStateProperty.all(Colors.transparent),
+              minimumSize: MaterialStateProperty.all(Size.zero),
+            ),
+          ),
         ),
         initialRoute: "/main",
         getPages: routes,

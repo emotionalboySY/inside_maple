@@ -143,68 +143,71 @@ class TopItemsMenu extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        TextButton(
-          onPressed: () {
-            Get.defaultDialog(
-              backgroundColor: Colors.white,
-              buttonColor: Colors.white,
-              radius: 5.0,
-              title: "선택지 초기화",
-              content: const Text(
-                "선택한 보스와 난이도를 초기화 하시겠습니까?",
-              ),
-              confirm: SizedBox(
-                height: 30,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.find<AddRecordController>().resetSelected();
-                    Get.back();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0),
+        Padding(
+          padding: const EdgeInsets.only(right: 12.0),
+          child: TextButton(
+            onPressed: () {
+              Get.defaultDialog(
+                backgroundColor: Colors.white,
+                buttonColor: Colors.white,
+                radius: 5.0,
+                title: "선택지 초기화",
+                content: const Text(
+                  "선택한 보스와 난이도를 초기화 하시겠습니까?",
+                ),
+                confirm: SizedBox(
+                  height: 30,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.find<AddRecordController>().resetSelected();
+                      Get.back();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      backgroundColor: Colors.deepPurple,
+                      padding: EdgeInsets.zero,
                     ),
-                    backgroundColor: Colors.deepPurple,
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: const Text(
-                    "초기화",
-                    style: TextStyle(
-                      color: Colors.white,
+                    child: const Text(
+                      "초기화",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              cancel: SizedBox(
-                height: 30,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                      side: const BorderSide(
+                cancel: SizedBox(
+                  height: 30,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                        side: const BorderSide(
+                          color: Colors.black54,
+                        ),
+                      ),
+                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text(
+                      "취소",
+                      style: TextStyle(
                         color: Colors.black54,
                       ),
                     ),
-                    backgroundColor: Colors.white,
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: const Text(
-                    "취소",
-                    style: TextStyle(
-                      color: Colors.black54,
-                    ),
                   ),
                 ),
-              ),
-              textCancel: "취소",
-              barrierDismissible: false,
-            );
-          },
-          child: const Text(
-            "선택지 초기화",
+                textCancel: "취소",
+                barrierDismissible: false,
+              );
+            },
+            child: const Text(
+              "선택지 초기화",
+            ),
           ),
         ),
         Padding(

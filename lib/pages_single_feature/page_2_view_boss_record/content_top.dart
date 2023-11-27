@@ -80,32 +80,38 @@ class ViewBossRecordTop extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           recordController.selectedRecordData.value != null
-              ? TextButton(
-                  onPressed: () async {
-                    await recordController.resetSelections();
-                  },
-                  child: const Text(
-                    "선택지 초기화",
-                    style: TextStyle(
-                      fontSize: 16,
+              ? Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: TextButton(
+                    onPressed: () async {
+                      await recordController.resetSelections();
+                    },
+                    child: const Text(
+                      "처음으로",
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                )
+              )
               : const SizedBox.shrink(),
           recordController.selectedRecordData.value != null
-              ? TextButton(
-                  onPressed: () {
-                    recordController.toggleEditMode();
-                    if (recordController.isRecordEditMode.value) {
-                    } else {}
-                  },
-                  child: Text(
-                    recordController.isRecordEditMode.value ? "저장" : "수정",
-                    style: const TextStyle(
-                      fontSize: 16,
+              ? Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: TextButton(
+                    onPressed: () {
+                      recordController.toggleEditMode();
+                      if (recordController.isRecordEditMode.value) {
+                      } else {}
+                    },
+                    child: Text(
+                      recordController.isRecordEditMode.value ? "저장" : "수정",
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                )
+              )
               : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, right: 15.0, left: 5.0),

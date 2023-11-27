@@ -162,14 +162,14 @@ class AddRecordController extends GetxController {
     try {
       final box = await Hive.openBox("insideMaple");
       List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
-      WeekType? weekType = getWeekType(selectedDate.value);
+      WeekType weekType = getWeekType(selectedDate.value);
       BossRecord singleRecord = BossRecord(
         boss: selectedBoss.value!,
         difficulty: selectedDiff.value!,
         date: selectedDate.value,
         itemList: selectedItemList,
-        partyAmount: selectedPartyAmount.value,
-        weekType: weekType!,
+        partyAmount: selectedPartyAmount.value.obs,
+        weekType: weekType,
       );
       if(checkDuplicatedRecord(recordRawList, singleRecord)) {
         showToast("이미 저장된 기록입니다.");
@@ -191,7 +191,7 @@ class AddRecordController extends GetxController {
   bool checkDuplicatedRecord(List<BossRecord> recordRawList, BossRecord recordToSave) {
     bool isDuplicated = false;
     for(var record in recordRawList) {
-      if(record.boss == recordToSave.boss && record.difficulty == recordToSave.difficulty && record.date == recordToSave.date) {
+      if(record.boss == recordToSave.boss && record.date == recordToSave.date) {
         isDuplicated = true;
         break;
       }
@@ -211,21 +211,36 @@ class AddRecordController extends GetxController {
 
   WeekType getWeekType(DateTime rawDate) {
     DateTime date = rawDate;
+    bool isBeforeThursday = false;
 
     DateTime firstDayOfMonth = DateTime(date.year, date.month);
     int daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
     DateTime firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
 
     if (date.isBefore(firstThursday)) {
+      isBeforeThursday = true;
+      loggerNoStack.d("date is before firstThursday: $date < $firstThursday");
       firstDayOfMonth = DateTime(date.year, date.month - 1);
-      int daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
+      daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
       firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
     }
+
+    loggerNoStack.d("firstThursday: $firstThursday");
 
     int differenceInDays = date.difference(firstThursday).inDays;
     int weekNum = (differenceInDays / 7).floor() + 1;
     DateTime startDateOfWeek = firstThursday.add(Duration(days: (7 * (weekNum - 1))));
     DateTime endDateOfWeek = startDateOfWeek.add(const Duration(days: 6));
+    if(isBeforeThursday) {
+      date = DateTime(date.year, date.month - 1);
+    }
+
+    loggerNoStack.d("WeekType\n"
+        "year: ${date.year}\n"
+        "month: ${date.month}\n"
+        "weekNum: $weekNum\n"
+        "startDate: $startDateOfWeek\n"
+        "endDate: $endDateOfWeek\n");
 
     return WeekType(
       year: date.year,

@@ -60,7 +60,7 @@ class ContentBottomWeekTypeList extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Text(
-                        recordController.weekTypeList[index].toString(),
+                        recordController.weekTypeList[index].toTitleString(),
                       ),
                       subtitle: Text(
                         recordController.weekTypeList[index].getPeriodKorString(),

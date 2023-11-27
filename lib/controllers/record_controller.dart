@@ -10,30 +10,36 @@ import '../utils/logger.dart';
 class RecordController extends GetxController {
   final f = NumberFormat("#,##0");
 
+  List<FocusNode> itemFocusNodes = [];
+  List<TextEditingController> itemPriceControllers = [];
+
+  Rx<LoadStatus> recordLoadStatus = LoadStatus.empty.obs;
+
   Rx<int> recordViewType = 1.obs;
   RxBool isRecordEditMode = false.obs;
   RxBool isRecordEdited = false.obs;
 
-  Rx<LoadStatus> recordLoadStatus = LoadStatus.empty.obs;
-
   List<BossRecord> recordListLoaded = <BossRecord>[];
   RxList<BossRecord> recordListExactWeekType = <BossRecord>[].obs;
-
   RxList<WeekType> weekTypeList = <WeekType>[].obs;
 
   RxInt selectedWeekTypeIndex = (-1).obs;
   RxInt selectedRecordIndex = (-1).obs;
+  Rx<BossRecord?> selectedRecordDataOriginal = Rx<BossRecord?>(null);
   Rx<BossRecord?> selectedRecordData = Rx<BossRecord?>(null);
   RxInt totalItemPrice = 0.obs;
   RxInt totalItemPriceAfterDivision = 0.obs;
   RxString totalItemPriceLocale = "".obs;
   RxString totalItemPriceAfterDivisionLocale = "".obs;
+  RxBool isMvpSilver = false.obs;
 
   Future<void> loadRecord() async {
     final box = await Hive.openBox("insideMaple");
     recordLoadStatus.value = LoadStatus.loading;
+    weekTypeList.clear();
 
     recordListLoaded = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
+    // logger.d(recordListLoaded);
     for (var record in recordListLoaded) {
       if (!weekTypeList.contains(record.weekType)) {
         weekTypeList.add(record.weekType);
@@ -45,6 +51,31 @@ class RecordController extends GetxController {
     recordLoadStatus.value = LoadStatus.success;
     weekTypeList.refresh();
     box.close();
+  }
+
+  void initializeFocusNodesAndControllers() {
+    for (int i = 0; i < selectedRecordData.value!.itemList.length; i++) {
+      itemFocusNodes.add(FocusNode());
+      itemPriceControllers.add(TextEditingController());
+
+      itemFocusNodes[i].addListener(() {
+        if (!itemFocusNodes[i].hasFocus) {
+          applyPrice(i);
+        }
+        if (itemFocusNodes[i].hasFocus) {
+          itemPriceControllers[i].selection = TextSelection(baseOffset: 0, extentOffset: itemPriceControllers[i].text.length);
+        }
+      });
+      itemPriceControllers[i].text = selectedRecordData.value!.itemList[i].price.value.toString();
+    }
+  }
+
+  void applyPrice(int index) {
+    if (itemPriceControllers[index].text.isNotEmpty) {
+      int price = int.tryParse(itemPriceControllers[index].text) ?? 0;
+      setItemPrice(index, price);
+      calculateTotalPrices();
+    }
   }
 
   void selectWeekType(int index) {
@@ -65,7 +96,7 @@ class RecordController extends GetxController {
 
   Future<void> selectRecord(int index) async {
     bool selectConfirmed = false;
-    if(isRecordEditMode.value == true && isRecordEdited.value == true) {
+    if (isRecordEditMode.value == true && isRecordEdited.value == true) {
       await Get.dialog(
         barrierDismissible: false,
         AlertDialog(
@@ -101,12 +132,14 @@ class RecordController extends GetxController {
         ),
       );
     }
-    if(selectedRecordData.value == null || selectConfirmed == true || isRecordEdited.value == false) {
-      loggerNoStack.d("selectConfirmed: true so move selection");
+    if (selectedRecordData.value == null || selectConfirmed == true || isRecordEdited.value == false) {
+      // loggerNoStack.d("selectConfirmed: true so move selection");
       selectedRecordIndex.value = index;
+      selectedRecordDataOriginal.value = recordListExactWeekType[selectedRecordIndex.value];
       selectedRecordData.value = BossRecord.clone(recordListExactWeekType[selectedRecordIndex.value]);
-      loggerNoStack.d("all record data: $recordListLoaded");
-      loggerNoStack.d("selectedRecordData: $selectedRecordData");
+      initializeFocusNodesAndControllers();
+      // loggerNoStack.d("all record data: $recordListLoaded");
+      // loggerNoStack.d("selectedRecordData: $selectedRecordData");
       recordListExactWeekType.refresh();
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
@@ -116,6 +149,10 @@ class RecordController extends GetxController {
 
   void toggleEditMode() {
     isRecordEditMode.value = !isRecordEditMode.value;
+  }
+
+  void toggleMVP() {
+    isMvpSilver.value = !isMvpSilver.value;
   }
 
   Future<void> resetSelections() async {
@@ -167,6 +204,7 @@ class RecordController extends GetxController {
     } else {
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
+      selectedRecordDataOriginal.value = null;
       selectedRecordData.value = null;
       selectedRecordIndex.value = -1;
       selectedWeekTypeIndex.value = -1;
@@ -196,11 +234,11 @@ class RecordController extends GetxController {
   void calculateTotalPrices() {
     int total = 0;
     for (var item in selectedRecordData.value!.itemList) {
-      total += ((item.price * item.count.value) * 0.95).round();
+      total += ((item.price * item.count.value) * (isMvpSilver.value ? 0.97 : 0.95)).round();
     }
     totalItemPrice.value = total;
     totalItemPriceLocale.value = f.format(total);
-    totalItemPriceAfterDivision.value = (total / selectedRecordData.value!.partyAmount).round();
+    totalItemPriceAfterDivision.value = (total / selectedRecordData.value!.partyAmount.value).round();
     totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
 
     // loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
@@ -291,12 +329,11 @@ class RecordController extends GetxController {
 
   void updateIsRecordEdited() {
     if (isRecordEditMode.value) {
-      BossRecord record = recordListExactWeekType.firstWhere((item) => (item.boss == selectedRecordData.value!.boss &&
-          item.difficulty == selectedRecordData.value!.difficulty &&
-          item.date == selectedRecordData.value!.date));
+      BossRecord record = recordListExactWeekType
+          .firstWhere((item) => (item.boss == selectedRecordData.value!.boss && item.difficulty == selectedRecordData.value!.difficulty && item.date == selectedRecordData.value!.date));
       // loggerNoStack.d("selected record data: ${item.recordData}");
       // loggerNoStack.d("Changed record data: ${selectedRecordData.value.recordData}");
-      if(record == selectedRecordData.value) {
+      if (record == selectedRecordData.value) {
         // loggerNoStack.d("selected record data and changed record data are same");
         isRecordEdited = false.obs;
       } else {
@@ -306,9 +343,85 @@ class RecordController extends GetxController {
     }
   }
 
+  Future<void> removeBossRecord() async {
+    bool removeConfirm = false;
+
+    await Get.dialog(
+      barrierDismissible: false,
+      AlertDialog(
+        elevation: 0.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        title: const Text(
+          "보스 데이터 삭제",
+        ),
+        content: Text("<현재 보스>\n"
+            "- 보스 이름: ${selectedRecordData.value!.boss.korName}\n"
+            "- 난이도: ${selectedRecordData.value!.difficulty.korName}\n"
+            "- 날짜: ${DateFormat('yyyy-MM-dd').format(selectedRecordData.value!.date)}\n"
+            "\n이 보스에 대한 기록을 지울까요? (삭제된 기록은 복구할 수 없습니다.)"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextButton(
+              onPressed: () {
+                removeConfirm = false;
+                Get.back();
+              },
+              child: const Text("취소"),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: TextButton(
+              onPressed: () {
+                removeConfirm = true;
+                Get.back();
+              },
+              child: const Text(
+                "삭제",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if(removeConfirm) {
+      recordListLoaded.remove(selectedRecordDataOriginal.value);
+      final box = await Hive.openBox("insideMaple");
+      await box.put('bossRecordData', recordListLoaded);
+      recordListExactWeekType.clear();
+      selectedRecordDataOriginal.value = null;
+      selectedRecordData.value = null;
+      selectedRecordIndex.value = -1;
+      selectedWeekTypeIndex.value = -1;
+      recordListExactWeekType.refresh();
+      weekTypeList.refresh();
+      resetTotalPriceLocale();
+      isRecordEditMode.value = false;
+      isRecordEdited.value = false;
+      await loadRecord();
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();
     loadRecord();
+  }
+
+  @override
+  void onClose() {
+    for (int i = 0; i < itemFocusNodes.length; i++) {
+      itemFocusNodes[i].dispose();
+      itemPriceControllers[i].dispose();
+    }
+    super.onClose();
   }
 }

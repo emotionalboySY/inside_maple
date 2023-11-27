@@ -86,33 +86,7 @@ class ContentBottomItemList extends StatelessWidget {
                     },
                   ),
                 ),
-                if (recordController.isRecordEdited.value)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 10.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.warning_amber,
-                          color: Colors.red,
-                          size: 14,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 5.0),
-                          child: Text(
-                            "변경된 내용이 있습니다! 저장 여부에 유의하세요!",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.red,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                _bottomParameters(),
                 separator(axis: Axis.horizontal),
                 _bottomComponent(),
               ],
@@ -203,6 +177,11 @@ class ContentBottomItemList extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Text(
                 "${recordController.selectedRecordData.value!.itemList[index].count.value}개",
+                style: TextStyle(
+                  color: recordController.selectedRecordData.value!.itemList[index].count.value == recordController.selectedRecordDataOriginal.value!.itemList[index].count.value
+                      ? Colors.black
+                      : Colors.red,
+                ),
               ),
             ),
             recordController.isRecordEditMode.value && itemCanDuplicated.contains(recordController.selectedRecordData.value!.itemList[index].item)
@@ -227,7 +206,6 @@ class ContentBottomItemList extends StatelessWidget {
   Widget _rightChild({
     required int index,
   }) {
-    TextEditingController priceController = TextEditingController();
     return recordController.isRecordEditMode.value
         ? Center(
             child: Row(
@@ -243,27 +221,42 @@ class ContentBottomItemList extends StatelessWidget {
                     onKey: (RawKeyEvent event) {
                       if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
                         FocusScope.of(Get.context!).unfocus();
-                        recordController.setItemPrice(index, int.parse(priceController.text));
-                        recordController.calculateTotalPrices();
+                        recordController.applyPrice(index);
                       }
                     },
                     child: TextField(
-                      controller: priceController,
+                      controller: recordController.itemPriceControllers[index],
+                      focusNode: recordController.itemFocusNodes[index],
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.end,
                       decoration: InputDecoration(
                         hintText: recordController.f.format(recordController.selectedRecordData.value!.itemList[index].price.value),
+                        enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: recordController.selectedRecordData.value!.itemList[index].price.value == recordController.selectedRecordDataOriginal.value!.itemList[index].price.value
+                                ? Colors.black
+                                : Colors.red,
+                          ),
+                        ),
                       ),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
+                        color: recordController.selectedRecordData.value!.itemList[index].price.value == recordController.selectedRecordDataOriginal.value!.itemList[index].price.value
+                            ? Colors.black
+                            : Colors.red,
                       ),
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 5.0),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
                   child: Text(
                     "메소",
+                    style: TextStyle(
+                      color: recordController.selectedRecordData.value!.itemList[index].price.value == recordController.selectedRecordDataOriginal.value!.itemList[index].price.value
+                          ? Colors.black
+                          : Colors.red,
+                    ),
                   ),
                 ),
               ],
@@ -274,6 +267,107 @@ class ContentBottomItemList extends StatelessWidget {
               "${recordController.f.format(recordController.selectedRecordData.value!.itemList[index].price.value)} 메소",
             ),
           );
+  }
+
+  Widget _bottomParameters() {
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text(
+                  "파티 인원: ",
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              recordController.isRecordEditMode.value
+                  ? DropdownButtonHideUnderline(
+                child: DropdownButton<int>(
+                  focusColor: Theme.of(Get.context!).scaffoldBackgroundColor,
+                  value: recordController.selectedRecordData.value!.partyAmount.value,
+                  iconSize: 20,
+                  onChanged: (newValue) {
+                    recordController.selectedRecordData.value!.partyAmount.value = newValue!;
+                  },
+                  items: <int>[1, 2, 3, 4, 5, 6].map<DropdownMenuItem<int>>((int value) {
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text(
+                        "${value.toString()}명",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Pretendard",
+                          fontSize: 14,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              )
+                  : Text(
+                "${recordController.selectedRecordData.value!.partyAmount.value}명",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Pretendard",
+                  fontSize: 14,
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text(
+                  "MVP:",
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              recordController.isRecordEditMode.value
+                  ? _radioButtonsForMVP()
+                  : Padding(
+                padding: const EdgeInsets.only(left: 5.0),
+                child: Text(
+                  recordController.isMvpSilver.value ? "실버 이상" : "브론즈 이하",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Pretendard",
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 14.0),
+            child: TextButton(
+              onPressed: () async {
+                await recordController.removeBossRecord();
+              },
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Colors.transparent),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                padding: MaterialStateProperty.all(EdgeInsets.zero),
+                minimumSize: MaterialStateProperty.all(Size.zero),
+              ),
+              child: const Text(
+                "삭제하기",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget _bottomComponent() {
@@ -353,6 +447,64 @@ class ContentBottomItemList extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _radioButtonsForMVP() {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 5.0),
+          child: _radioComponent(
+            title: "브론즈 이하",
+            value: false,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 15.0),
+          child: _radioComponent(
+            title: "실버 이상",
+            value: true,
+          ),
+        ),
+      ],
+    );
+  }
+  Widget _radioComponent({
+    required String title,
+    required bool value,
+  }) {
+    return Row(
+      children: [
+        Transform.scale(
+          scale: 0.8,
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: Radio<bool>(
+              value: value,
+              groupValue: recordController.isMvpSilver.value,
+              onChanged: (value) {
+                recordController.isMvpSilver.value = value!;
+                recordController.calculateTotalPrices();
+              },
+              splashRadius: 0.0,
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            recordController.isMvpSilver.value = value;
+          },
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: recordController.isMvpSilver.value == value ? FontWeight.w700 : FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

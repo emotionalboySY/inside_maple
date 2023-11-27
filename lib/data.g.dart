@@ -107,7 +107,7 @@ class BossRecordAdapter extends TypeAdapter<BossRecord> {
       difficulty: fields[1] as Difficulty,
       date: fields[2] as DateTime,
       itemList: (fields[3] as List).cast<Item>().obs,
-      partyAmount: fields[4] as int,
+      partyAmount: fields[4] as RxInt,
       weekType: fields[5] as WeekType,
     );
   }
