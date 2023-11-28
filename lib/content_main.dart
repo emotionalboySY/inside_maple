@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:inside_maple/controllers/add_record_controller.dart';
 
 import 'controllers/main_controller.dart';
-import 'controllers/record_controller.dart';
+import 'controllers/record_manage_controller.dart';
+import 'controllers/record_ui_controller.dart';
 
 class ContentMain extends StatelessWidget {
   ContentMain({super.key});
@@ -53,9 +54,10 @@ class ContentMain extends StatelessWidget {
                     Expanded(
                       child: _menuButton(
                         onPressed: () async {
-                          Get.put(RecordController());
+                          Get.put(RecordUIController());
+                          Get.put(RecordManageController());
                           Get.toNamed("/page/viewRecord")?.then((value) {
-                            Get.delete<RecordController>();
+                            Get.delete<RecordUIController>();
                           });
                         },
                         title: "보스 리워드 관리",

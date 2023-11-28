@@ -1,12 +1,15 @@
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inside_maple/controllers/record_manage_controller.dart';
 
-import '../../controllers/record_controller.dart';
+import '../../controllers/record_ui_controller.dart';
 
 class ViewBossRecordTop extends StatelessWidget {
   ViewBossRecordTop({super.key});
 
-  final recordController = Get.find<RecordController>();
+  final recordUIController = Get.find<RecordUIController>();
+  final recordManageController = Get.find<RecordManageController>();
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +43,67 @@ class ViewBossRecordTop extends StatelessWidget {
           title: "여러 날짜, 여러 보스 모아보기",
           value: 2,
         ),
+        Obx(
+          () => Padding(
+            padding: const EdgeInsets.only(left: 32.0),
+            child: AnimatedToggleSwitch.dual(
+              current: recordUIController.isMvpSilver.value,
+              first: false,
+              second: true,
+              onChanged: (value) {
+                recordUIController.toggleMVP();
+              },
+              height: 30,
+              spacing: 10,
+              indicatorSize: const Size.fromWidth(40),
+              borderWidth: 3.0,
+              style: const ToggleStyle(
+                borderColor: Colors.transparent,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    spreadRadius: 1,
+                    blurRadius: 2,
+                    offset: Offset(0, 1.5),
+                  ),
+                ],
+                indicatorColor: Colors.white,
+              ),
+              styleBuilder: (value) => ToggleStyle(backgroundColor: value ? Colors.grey.shade500 : Colors.brown),
+              textBuilder: (value) => value
+                  ? const Center(
+                      child: Text(
+                        "실버▲",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    )
+                  : const Center(
+                      child: Text(
+                        "브론즈",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+              customIconBuilder: (context, local, global) {
+                return const Text(
+                  "MVP",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                );
+              },
+              iconAnimationCurve: Curves.easeInOut,
+              indicatorTransition: const ForegroundIndicatorTransition.fading(),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -53,16 +117,16 @@ class ViewBossRecordTop extends StatelessWidget {
         Obx(
           () => Radio<int>(
             value: value,
-            groupValue: recordController.recordViewType.value,
+            groupValue: recordUIController.recordViewType.value,
             onChanged: (value) {
-              recordController.recordViewType.value = value!;
+              recordUIController.recordViewType.value = value!;
             },
             splashRadius: 0.0,
           ),
         ),
         GestureDetector(
           onTap: () {
-            recordController.recordViewType.value = value;
+            recordUIController.recordViewType.value = value;
           },
           child: Text(
             title,
@@ -79,39 +143,40 @@ class ViewBossRecordTop extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          recordController.selectedRecordData.value != null
+          recordManageController.selectedRecordData.value != null &&
+                  recordUIController.isRecordEditMode.value &&
+                  recordUIController.isRecordEdited.value
               ? Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: TextButton(
-                    onPressed: () async {
-                      await recordController.resetSelections();
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: TextButton(
+                    onPressed: () {
+                      recordManageController.revertChanges();
                     },
                     child: const Text(
-                      "처음으로",
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
+                      "수정 내역 초기화",
                     ),
                   ),
-              )
+                )
               : const SizedBox.shrink(),
-          recordController.selectedRecordData.value != null
+          recordManageController.selectedRecordData.value != null
               ? Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: TextButton(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: TextButton(
                     onPressed: () {
-                      recordController.toggleEditMode();
-                      if (recordController.isRecordEditMode.value) {
-                      } else {}
+                      if (recordUIController.isRecordEditMode.value) {
+                        recordManageController.saveChanges();
+                      } else {
+                        recordUIController.toggleEditMode();
+                      }
                     },
                     child: Text(
-                      recordController.isRecordEditMode.value ? "저장" : "수정",
+                      recordUIController.isRecordEditMode.value ? "저장" : "수정",
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                       ),
                     ),
                   ),
-              )
+                )
               : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, right: 15.0, left: 5.0),
@@ -130,6 +195,7 @@ class ViewBossRecordTop extends StatelessWidget {
                   "나가기",
                   style: TextStyle(
                     color: Colors.white,
+                    fontSize: 14,
                   ),
                 ),
               ),

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:inside_maple/controllers/record_manage_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:oktoast/oktoast.dart';
 
 import '../constants.dart';
 import '../data.dart';
 import '../utils/logger.dart';
 
-class RecordController extends GetxController {
+class RecordUIController extends GetxController {
   final f = NumberFormat("#,##0");
+
+  RecordManageController get recordManageController => Get.find<RecordManageController>();
 
   List<FocusNode> itemFocusNodes = [];
   List<TextEditingController> itemPriceControllers = [];
@@ -26,7 +30,6 @@ class RecordController extends GetxController {
   RxInt selectedWeekTypeIndex = (-1).obs;
   RxInt selectedRecordIndex = (-1).obs;
   Rx<BossRecord?> selectedRecordDataOriginal = Rx<BossRecord?>(null);
-  Rx<BossRecord?> selectedRecordData = Rx<BossRecord?>(null);
   RxInt totalItemPrice = 0.obs;
   RxInt totalItemPriceAfterDivision = 0.obs;
   RxString totalItemPriceLocale = "".obs;
@@ -53,31 +56,6 @@ class RecordController extends GetxController {
     box.close();
   }
 
-  void initializeFocusNodesAndControllers() {
-    for (int i = 0; i < selectedRecordData.value!.itemList.length; i++) {
-      itemFocusNodes.add(FocusNode());
-      itemPriceControllers.add(TextEditingController());
-
-      itemFocusNodes[i].addListener(() {
-        if (!itemFocusNodes[i].hasFocus) {
-          applyPrice(i);
-        }
-        if (itemFocusNodes[i].hasFocus) {
-          itemPriceControllers[i].selection = TextSelection(baseOffset: 0, extentOffset: itemPriceControllers[i].text.length);
-        }
-      });
-      itemPriceControllers[i].text = selectedRecordData.value!.itemList[i].price.value.toString();
-    }
-  }
-
-  void applyPrice(int index) {
-    if (itemPriceControllers[index].text.isNotEmpty) {
-      int price = int.tryParse(itemPriceControllers[index].text) ?? 0;
-      setItemPrice(index, price);
-      calculateTotalPrices();
-    }
-  }
-
   void selectWeekType(int index) {
     selectedWeekTypeIndex.value = index;
     recordListExactWeekType.clear();
@@ -87,7 +65,7 @@ class RecordController extends GetxController {
       }
     }
     selectedRecordIndex.value = -1;
-    selectedRecordData.value = null;
+    recordManageController.resetSelectedData();
     isRecordEditMode.value = false;
     isRecordEdited.value = false;
     weekTypeList.refresh();
@@ -132,11 +110,11 @@ class RecordController extends GetxController {
         ),
       );
     }
-    if (selectedRecordData.value == null || selectConfirmed == true || isRecordEdited.value == false) {
+    if (recordManageController.selectedRecordData.value == null || selectConfirmed == true || isRecordEdited.value == false) {
       // loggerNoStack.d("selectConfirmed: true so move selection");
       selectedRecordIndex.value = index;
       selectedRecordDataOriginal.value = recordListExactWeekType[selectedRecordIndex.value];
-      selectedRecordData.value = BossRecord.clone(recordListExactWeekType[selectedRecordIndex.value]);
+      recordManageController.selectedRecordData.value = BossRecord.clone(recordListExactWeekType[selectedRecordIndex.value]);
       initializeFocusNodesAndControllers();
       // loggerNoStack.d("all record data: $recordListLoaded");
       // loggerNoStack.d("selectedRecordData: $selectedRecordData");
@@ -144,6 +122,26 @@ class RecordController extends GetxController {
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
       resetTotalPriceLocale();
+      calculateTotalPrices();
+    }
+  }
+
+  void initializeFocusNodesAndControllers() {
+    disposeFocusNodes();
+    disposeControllers();
+    for (int i = 0; i < recordManageController.selectedRecordData.value!.itemList.length; i++) {
+      itemFocusNodes.add(FocusNode());
+      itemPriceControllers.add(TextEditingController());
+
+      itemFocusNodes[i].addListener(() {
+        if (!itemFocusNodes[i].hasFocus) {
+          recordManageController.applyPrice(i);
+        }
+        if (itemFocusNodes[i].hasFocus) {
+          itemPriceControllers[i].selection = TextSelection(baseOffset: 0, extentOffset: itemPriceControllers[i].text.length);
+        }
+      });
+      itemPriceControllers[i].text = recordManageController.selectedRecordData.value!.itemList[i].price.value.toString();
     }
   }
 
@@ -153,6 +151,35 @@ class RecordController extends GetxController {
 
   void toggleMVP() {
     isMvpSilver.value = !isMvpSilver.value;
+    calculateTotalPrices();
+  }
+
+  void calculateTotalPrices() {
+    int total = 0;
+    for (var item in recordManageController.selectedRecordData.value!.itemList) {
+      total += ((item.price * item.count.value) * (isMvpSilver.value ? 0.97 : 0.95)).round();
+    }
+    totalItemPrice.value = total;
+    totalItemPriceLocale.value = f.format(total);
+    totalItemPriceAfterDivision.value = (total / recordManageController.selectedRecordData.value!.partyAmount.value).round();
+    totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
+
+    // loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
+    // loggerNoStack.d("calculated totalItemPriceAfterDivision: $totalItemPriceAfterDivision");
+  }
+
+  void updateIsRecordEdited() {
+    if (isRecordEditMode.value) {
+      loggerNoStack.d("selected record data: ${selectedRecordDataOriginal.value}");
+      loggerNoStack.d("Changed record data: ${recordManageController.selectedRecordData.value}");
+      if (selectedRecordDataOriginal.value == recordManageController.selectedRecordData.value) {
+        loggerNoStack.d("selected record data and changed record data are same");
+        isRecordEdited.value = false;
+      } else {
+        loggerNoStack.d("selected record data and changed record data are not same");
+        isRecordEdited.value = true;
+      }
+    }
   }
 
   Future<void> resetSelections() async {
@@ -205,7 +232,7 @@ class RecordController extends GetxController {
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
       selectedRecordDataOriginal.value = null;
-      selectedRecordData.value = null;
+      recordManageController.resetSelectedData();
       selectedRecordIndex.value = -1;
       selectedWeekTypeIndex.value = -1;
       recordListExactWeekType.refresh();
@@ -214,48 +241,11 @@ class RecordController extends GetxController {
     }
   }
 
-  void decreaseItemCount(int index) {
-    selectedRecordData.value!.itemList[index].count--;
-    updateIsRecordEdited();
-  }
-
-  void increaseItemCount(int index) {
-    selectedRecordData.value!.itemList[index].count++;
-    updateIsRecordEdited();
-  }
-
-  void setItemPrice(int index, int price) {
-    selectedRecordData.value!.itemList[index].price.value = price;
-    updateIsRecordEdited();
-    // loggerNoStack.d("original record data: ${selectedRecordList[selectedRecordIndex.value].recordData}");
-    // loggerNoStack.d("now record data: ${selectedRecordData.value.recordData}");
-  }
-
-  void calculateTotalPrices() {
-    int total = 0;
-    for (var item in selectedRecordData.value!.itemList) {
-      total += ((item.price * item.count.value) * (isMvpSilver.value ? 0.97 : 0.95)).round();
-    }
-    totalItemPrice.value = total;
-    totalItemPriceLocale.value = f.format(total);
-    totalItemPriceAfterDivision.value = (total / selectedRecordData.value!.partyAmount.value).round();
-    totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
-
-    // loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
-    // loggerNoStack.d("calculated totalItemPriceAfterDivision: $totalItemPriceAfterDivision");
-  }
-
   void resetTotalPriceLocale() {
     totalItemPrice.value = 0;
     totalItemPriceLocale.value = f.format(totalItemPrice.value);
     totalItemPriceAfterDivision.value = 0;
     totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
-  }
-
-  void removeItem(int index) {
-    selectedRecordData.value!.itemList.removeAt(index);
-    selectedRecordData.value!.itemList.refresh();
-    updateIsRecordEdited();
   }
 
   Future<void> showDivisionHelpDialog() async {
@@ -274,7 +264,7 @@ class RecordController extends GetxController {
         content: const Padding(
           padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
           child: Text(
-            "1인당 분배금은 총 합계를 파티원 수로 나눈 값으로, 소수점에서 올림처리됩니다.\n(정확하지 않을 수 있습니다)",
+            "1인당 분배금은 총 수익을 파티원 수로 나눈 값으로, 소수점에서 올림처리됩니다.\n(정확하지 않을 수 있습니다)",
           ),
         ),
         actions: [
@@ -308,7 +298,10 @@ class RecordController extends GetxController {
         content: const Padding(
           padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
           child: Text(
-            "<각 아이템 별 판매 수익 계산 방법>\n- (각 아이템 별 획득 개수 * 단가) * (1 - 판매수수료율)\n- 반환받은 보증금은 해당 아이템을 판매 슬롯에 등록한 횟수에 따라 다릅니다.\n\n"
+            "<각 아이템 별 판매 수익 계산 방법>\n"
+            "- (각 아이템 별 획득 개수 * 단가) * (1 - 판매수수료율)\n"
+            "- 예시: [MVP 브론즈일 때] 반짝이는 파란 별 물약 2개를 각 4,500,000메소에 판매 = 9,000,000메소 * (1 - 0.05) = 8,550,000메소\n\n"
+            "- 판매수수료율은 MVP 등급에 따라 3% 또는 5%로 적용됩니다.(브론즈 이하: 5%, 실버 이상: 3%)\n\n"
             "- 총 판매 수익(합계)는 각 아이템 별 판매 수익을 모두 합친 후 판매수수료를 제한 값으로, 소수점에서 반올림처리됩니다.\n(정확하지 않을 수 있습니다)",
           ),
         ),
@@ -327,20 +320,45 @@ class RecordController extends GetxController {
     );
   }
 
-  void updateIsRecordEdited() {
-    if (isRecordEditMode.value) {
-      BossRecord record = recordListExactWeekType
-          .firstWhere((item) => (item.boss == selectedRecordData.value!.boss && item.difficulty == selectedRecordData.value!.difficulty && item.date == selectedRecordData.value!.date));
-      // loggerNoStack.d("selected record data: ${item.recordData}");
-      // loggerNoStack.d("Changed record data: ${selectedRecordData.value.recordData}");
-      if (record == selectedRecordData.value) {
-        // loggerNoStack.d("selected record data and changed record data are same");
-        isRecordEdited = false.obs;
-      } else {
-        // loggerNoStack.d("selected record data and changed record data are not same");
-        isRecordEdited = true.obs;
-      }
-    }
+  Future<bool> showRevertChangesConfirmDialog() async {
+    bool isConfirmed = false;
+    await Get.dialog(
+      barrierDismissible: false,
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        elevation: 0.0,
+        title: const Text("수정 내역 초기화"),
+        content: const Text("현재까지 수정한 모든 내역을 초기화합니다.\n계속하시겠습니까?\n(이 과정은 되돌릴 수 없습니다.)"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: TextButton(
+              onPressed: () {
+                isConfirmed = false;
+                Get.back();
+              },
+              child: const Text("취소"),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              isConfirmed = true;
+              Get.back();
+            },
+            child: const Text(
+              "초기화",
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return isConfirmed;
   }
 
   Future<void> removeBossRecord() async {
@@ -357,9 +375,9 @@ class RecordController extends GetxController {
           "보스 데이터 삭제",
         ),
         content: Text("<현재 보스>\n"
-            "- 보스 이름: ${selectedRecordData.value!.boss.korName}\n"
-            "- 난이도: ${selectedRecordData.value!.difficulty.korName}\n"
-            "- 날짜: ${DateFormat('yyyy-MM-dd').format(selectedRecordData.value!.date)}\n"
+            "- 보스 이름: ${recordManageController.selectedRecordData.value!.boss.korName}\n"
+            "- 난이도: ${recordManageController.selectedRecordData.value!.difficulty.korName}\n"
+            "- 날짜: ${DateFormat('yyyy-MM-dd').format(recordManageController.selectedRecordData.value!.date)}\n"
             "\n이 보스에 대한 기록을 지울까요? (삭제된 기록은 복구할 수 없습니다.)"),
         actions: [
           Padding(
@@ -392,13 +410,13 @@ class RecordController extends GetxController {
       ),
     );
 
-    if(removeConfirm) {
+    if (removeConfirm) {
       recordListLoaded.remove(selectedRecordDataOriginal.value);
       final box = await Hive.openBox("insideMaple");
       await box.put('bossRecordData', recordListLoaded);
       recordListExactWeekType.clear();
       selectedRecordDataOriginal.value = null;
-      selectedRecordData.value = null;
+      recordManageController.resetSelectedData();
       selectedRecordIndex.value = -1;
       selectedWeekTypeIndex.value = -1;
       recordListExactWeekType.refresh();
@@ -406,7 +424,48 @@ class RecordController extends GetxController {
       resetTotalPriceLocale();
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
+      await box.close();
       await loadRecord();
+    }
+  }
+
+  Future<void> saveData(BossRecord recordToSave) async {
+    if(isRecordEdited.value == false) {
+      toggleEditMode();
+      return;
+    }
+    try {
+      final box = await Hive.openBox("insideMaple");
+      recordListLoaded.remove(selectedRecordDataOriginal.value);
+      recordListLoaded.add(recordToSave);
+      await box.put('bossRecordData', recordListLoaded);
+      await loadRecord();
+      isRecordEditMode.value = false;
+      isRecordEdited.value = false;
+      selectedRecordDataOriginal.value = recordListLoaded.last;
+      recordManageController.selectedRecordData.value!.itemList.refresh();
+      showToast("변경된 데이터가 저장되었습니다.");
+    } catch (e) {
+      showToast("데이터 저장에 실패했습니다. e: $e");
+      loggerNoStack.e(e);
+    }
+  }
+
+  void disposeFocusNodes() {
+    if (itemFocusNodes.isNotEmpty) {
+      for (int i = 0; i < itemFocusNodes.length; i++) {
+        itemFocusNodes[i].dispose();
+      }
+      itemFocusNodes.clear();
+    }
+  }
+
+  void disposeControllers() {
+    if (itemPriceControllers.isNotEmpty) {
+      for (int i = 0; i < itemPriceControllers.length; i++) {
+        itemPriceControllers[i].dispose();
+      }
+      itemPriceControllers.clear();
     }
   }
 
@@ -418,10 +477,8 @@ class RecordController extends GetxController {
 
   @override
   void onClose() {
-    for (int i = 0; i < itemFocusNodes.length; i++) {
-      itemFocusNodes[i].dispose();
-      itemPriceControllers[i].dispose();
-    }
+    disposeFocusNodes();
+    disposeControllers();
     super.onClose();
   }
 }

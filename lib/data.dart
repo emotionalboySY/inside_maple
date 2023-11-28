@@ -192,6 +192,13 @@ class BossRecord {
         partyAmount = record.partyAmount,
         weekType = record.weekType;
 
+  bool isSameData(BossRecord item) {
+    if(item.boss == boss && item.difficulty == difficulty && item.date == date) {
+      return true;
+    }
+    return false;
+  }
+
   @override
   bool operator ==(Object other) {
     if (other is BossRecord) {

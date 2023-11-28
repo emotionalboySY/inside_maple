@@ -159,7 +159,7 @@ class TopItemsMenu extends StatelessWidget {
                   height: 30,
                   child: ElevatedButton(
                     onPressed: () {
-                      Get.find<AddRecordController>().resetSelected();
+                      Get.find<AddRecordController>().resetAll();
                       Get.back();
                     },
                     style: ElevatedButton.styleFrom(

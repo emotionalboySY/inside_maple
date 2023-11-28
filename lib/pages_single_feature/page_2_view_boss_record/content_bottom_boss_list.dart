@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/record_controller.dart';
+import '../../controllers/record_ui_controller.dart';
 
 class ContentBottomBossList extends StatelessWidget {
   ContentBottomBossList({super.key});
 
-  final recordController = Get.find<RecordController>();
+  final recordController = Get.find<RecordUIController>();
 
   @override
   Widget build(BuildContext context) {

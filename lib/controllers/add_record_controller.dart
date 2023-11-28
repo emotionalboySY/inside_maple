@@ -56,11 +56,13 @@ class AddRecordController extends GetxController {
 
   void selectBoss(Boss selectValue) {
     selectedBoss.value = selectValue;
+    resetSelectedData();
     loadDifficulty();
   }
 
   void selectDiff(Difficulty diff) {
     selectedDiff.value = diff;
+    resetSelectedData();
     loadItemList();
   }
 
@@ -157,6 +159,12 @@ class AddRecordController extends GetxController {
     selectedDate.value = date;
   }
 
+  void resetSelectedData() {
+    selectedItemList.clear();
+    selectedDate.value = DateTime(1900, 01, 01);
+    selectedPartyAmount.value = 1;
+  }
+
   Future<void> saveRecordData() async {
     saveStatus.value = true;
     try {
@@ -178,7 +186,7 @@ class AddRecordController extends GetxController {
       }
       recordRawList.add(singleRecord);
       await box.put('bossRecordData', recordRawList);
-      resetSelected();
+      resetAll();
       box.close();
       showToast("보스 기록이 성공적으로 저장되었습니다.");
     } catch (e) {
@@ -199,7 +207,7 @@ class AddRecordController extends GetxController {
     return isDuplicated;
   }
 
-  void resetSelected() {
+  void resetAll() {
     selectedBoss.value = null;
     selectedDiff.value = null;
     selectedItemList.clear();
