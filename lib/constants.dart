@@ -114,7 +114,7 @@ enum ItemData {
   item45("그라비티 모듈", "assets/images/drop_item/gravity_module.png"),
   item46("파멸의 징표", "assets/images/drop_item/sign_of_destruction.png"),
   item47("충정의 투구", "assets/images/drop_item/pitch_of_royalty.png"),
-  item48("생명의 연마석", "assets/images/drop_item/abrasice_stone_of_life.png");
+  item48("생명의 연마석", "assets/images/drop_item/abrasive_stone_of_life.png");
 
   const ItemData(this.korLabel, this.imagePath);
   final String korLabel;
