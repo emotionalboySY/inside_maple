@@ -27,9 +27,8 @@ class RecordUIController extends GetxController {
   RxList<BossRecord> recordListExactWeekType = <BossRecord>[].obs;
   RxList<WeekType> weekTypeList = <WeekType>[].obs;
 
-  RxInt selectedWeekTypeIndex = (-1).obs;
-  RxInt selectedRecordIndex = (-1).obs;
-  Rx<BossRecord?> selectedRecordDataOriginal = Rx<BossRecord?>(null);
+  Rx<WeekType?> selectedWeekType = Rx<WeekType?>(null);
+  Rx<BossRecord?> selectedRecordData = Rx<BossRecord?>(null);
   RxInt totalItemPrice = 0.obs;
   RxInt totalItemPriceAfterDivision = 0.obs;
   RxString totalItemPriceLocale = "".obs;
@@ -57,14 +56,23 @@ class RecordUIController extends GetxController {
   }
 
   void selectWeekType(int index) {
-    selectedWeekTypeIndex.value = index;
+    selectedWeekType.value = weekTypeList[index];
     recordListExactWeekType.clear();
     for (var record in recordListLoaded) {
-      if (record.weekType == weekTypeList[index]) {
+      if (record.weekType == selectedWeekType.value) {
         recordListExactWeekType.add(record);
       }
     }
-    selectedRecordIndex.value = -1;
+    recordListExactWeekType.sort((a, b) {
+      if(Boss.values.indexWhere((element) => element == a.boss) > Boss.values.indexWhere((element) => element == b.boss)) {
+        return 1;
+      } else if(Boss.values.indexWhere((element) => element == a.boss) < Boss.values.indexWhere((element) => element == b.boss)) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+    selectedRecordData.value = null;
     recordManageController.resetSelectedData();
     isRecordEditMode.value = false;
     isRecordEdited.value = false;
@@ -112,9 +120,9 @@ class RecordUIController extends GetxController {
     }
     if (recordManageController.selectedRecordData.value == null || selectConfirmed == true || isRecordEdited.value == false) {
       // loggerNoStack.d("selectConfirmed: true so move selection");
-      selectedRecordIndex.value = index;
-      selectedRecordDataOriginal.value = recordListExactWeekType[selectedRecordIndex.value];
-      recordManageController.selectedRecordData.value = BossRecord.clone(recordListExactWeekType[selectedRecordIndex.value]);
+      selectedRecordData.value = recordListExactWeekType[index];
+      // selectedRecordDataOriginal.value = recordListExactWeekType[selectedRecordIndex.value];
+      recordManageController.setRecordData(BossRecord.clone(selectedRecordData.value!));
       initializeFocusNodesAndControllers();
       // loggerNoStack.d("all record data: $recordListLoaded");
       // loggerNoStack.d("selectedRecordData: $selectedRecordData");
@@ -170,9 +178,9 @@ class RecordUIController extends GetxController {
 
   void updateIsRecordEdited() {
     if (isRecordEditMode.value) {
-      loggerNoStack.d("selected record data: ${selectedRecordDataOriginal.value}");
+      loggerNoStack.d("selected record data: ${selectedRecordData.value}");
       loggerNoStack.d("Changed record data: ${recordManageController.selectedRecordData.value}");
-      if (selectedRecordDataOriginal.value == recordManageController.selectedRecordData.value) {
+      if (selectedRecordData.value == recordManageController.selectedRecordData.value) {
         loggerNoStack.d("selected record data and changed record data are same");
         isRecordEdited.value = false;
       } else {
@@ -231,10 +239,10 @@ class RecordUIController extends GetxController {
     } else {
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
-      selectedRecordDataOriginal.value = null;
+      selectedRecordData.value = null;
       recordManageController.resetSelectedData();
-      selectedRecordIndex.value = -1;
-      selectedWeekTypeIndex.value = -1;
+      // selectedRecordIndex.value = -1;
+      // selectedWeekTypeIndex.value = -1;
       recordListExactWeekType.refresh();
       weekTypeList.refresh();
       resetTotalPriceLocale();
@@ -411,21 +419,17 @@ class RecordUIController extends GetxController {
     );
 
     if (removeConfirm) {
-      recordListLoaded.remove(selectedRecordDataOriginal.value);
+      recordListLoaded.remove(selectedRecordData.value);
       final box = await Hive.openBox("insideMaple");
       await box.put('bossRecordData', recordListLoaded);
-      recordListExactWeekType.clear();
-      selectedRecordDataOriginal.value = null;
+      await box.close();
+      await loadRecord();
+      selectWeekType(weekTypeList.indexOf(selectedWeekType.value!));
+      selectedRecordData.value = null;
       recordManageController.resetSelectedData();
-      selectedRecordIndex.value = -1;
-      selectedWeekTypeIndex.value = -1;
-      recordListExactWeekType.refresh();
-      weekTypeList.refresh();
       resetTotalPriceLocale();
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
-      await box.close();
-      await loadRecord();
     }
   }
 
@@ -436,16 +440,20 @@ class RecordUIController extends GetxController {
     }
     try {
       final box = await Hive.openBox("insideMaple");
-      recordListLoaded.remove(selectedRecordDataOriginal.value);
+      recordListLoaded.remove(selectedRecordData.value);
       recordListLoaded.add(recordToSave);
       await box.put('bossRecordData', recordListLoaded);
+      await box.close();
       await loadRecord();
+      selectWeekType(weekTypeList.indexOf(selectedWeekType.value!));
+      selectedRecordData.value = recordListLoaded.last;
+      selectRecord(recordListExactWeekType.indexOf(selectedRecordData.value!));
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
-      selectedRecordDataOriginal.value = recordListLoaded.last;
       recordManageController.selectedRecordData.value!.itemList.refresh();
       showToast("변경된 데이터가 저장되었습니다.");
     } catch (e) {
+      e.printInfo();
       showToast("데이터 저장에 실패했습니다. e: $e");
       loggerNoStack.e(e);
     }

@@ -171,6 +171,7 @@ class AddRecordController extends GetxController {
       final box = await Hive.openBox("insideMaple");
       List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
       WeekType weekType = getWeekType(selectedDate.value);
+      sortItemList();
       BossRecord singleRecord = BossRecord(
         boss: selectedBoss.value!,
         difficulty: selectedDiff.value!,
@@ -194,6 +195,18 @@ class AddRecordController extends GetxController {
       logger.e(e);
     }
     saveStatus.value = false;
+  }
+
+  void sortItemList() {
+    selectedItemList.sort((a, b) {
+      if(a.item.korLabel.compareTo(b.item.korLabel) < 0) {
+        return -1;
+      } else if(a.item.korLabel.compareTo(b.item.korLabel) > 0) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   bool checkDuplicatedRecord(List<BossRecord> recordRawList, BossRecord recordToSave) {

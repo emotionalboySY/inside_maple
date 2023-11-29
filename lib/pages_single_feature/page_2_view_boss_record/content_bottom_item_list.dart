@@ -17,7 +17,7 @@ class ContentBottomItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => recordUIController.selectedWeekTypeIndex.value != -1 && recordUIController.selectedRecordIndex.value != -1
+      () => recordUIController.selectedWeekType.value != null && recordManageController.selectedRecordData.value != null
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -182,7 +182,7 @@ class ContentBottomItemList extends StatelessWidget {
                 "${recordManageController.selectedRecordData.value!.itemList[index].count.value}개",
                 style: TextStyle(
                   color: recordManageController.selectedRecordData.value!.itemList[index].count.value ==
-                          recordUIController.selectedRecordDataOriginal.value!.itemList[index].count.value
+                          recordUIController.selectedRecordData.value!.itemList[index].count.value
                       ? Colors.black
                       : Colors.red,
                 ),
@@ -239,7 +239,7 @@ class ContentBottomItemList extends StatelessWidget {
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: recordManageController.selectedRecordData.value!.itemList[index].price.value ==
-                                    recordUIController.selectedRecordDataOriginal.value!.itemList[index].price.value
+                                    recordUIController.selectedRecordData.value!.itemList[index].price.value
                                 ? Colors.black
                                 : Colors.red,
                           ),
@@ -248,7 +248,7 @@ class ContentBottomItemList extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         color: recordManageController.selectedRecordData.value!.itemList[index].price.value ==
-                                recordUIController.selectedRecordDataOriginal.value!.itemList[index].price.value
+                                recordUIController.selectedRecordData.value!.itemList[index].price.value
                             ? Colors.black
                             : Colors.red,
                       ),
@@ -261,7 +261,7 @@ class ContentBottomItemList extends StatelessWidget {
                     "메소",
                     style: TextStyle(
                       color: recordManageController.selectedRecordData.value!.itemList[index].price.value ==
-                              recordUIController.selectedRecordDataOriginal.value!.itemList[index].price.value
+                              recordUIController.selectedRecordData.value!.itemList[index].price.value
                           ? Colors.black
                           : Colors.red,
                     ),

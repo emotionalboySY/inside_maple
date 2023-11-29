@@ -73,14 +73,14 @@ class ContentBottomWeekTypeList extends StatelessWidget {
                         color: Colors.black,
                         size: 16,
                       ),
-                      onTap: () {
+                      onTap: recordController.weekTypeList.indexOf(recordController.selectedWeekType.value!) == index ? null : () {
                         recordController.selectWeekType(index);
                       },
-                      selected: index == recordController.selectedWeekTypeIndex.value,
+                      selected: recordController.weekTypeList[index] == recordController.selectedWeekType.value,
                       selectedTileColor: Colors.grey.shade300,
                       selectedColor: Colors.black,
                       titleTextStyle: TextStyle(
-                        fontWeight: index == recordController.selectedWeekTypeIndex.value ? FontWeight.w700 : FontWeight.w400,
+                        fontWeight: recordController.weekTypeList[index] == recordController.selectedWeekType.value ? FontWeight.w700 : FontWeight.w400,
                         color: Colors.black,
                         fontSize: 16,
                         fontFamily: "Pretendard",

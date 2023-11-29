@@ -11,7 +11,7 @@ class ContentBottomBossList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => recordController.selectedWeekTypeIndex.value == -1
+      () => recordController.selectedWeekType.value == null
       ? const Center(
         child: Text(
           "주차를 먼저 선택해 주세요.",
@@ -30,14 +30,14 @@ class ContentBottomBossList extends StatelessWidget {
               color: Colors.black,
               size: 16,
             ),
-            onTap: recordController.selectedRecordIndex.value == index ? null : () async {
+            onTap: recordController.selectedRecordData.value == recordController.recordListExactWeekType[index] ? null : () async {
               await recordController.selectRecord(index);
             },
-            selected: index == recordController.selectedRecordIndex.value,
+            selected: recordController.selectedRecordData.value == recordController.recordListExactWeekType[index],
             selectedTileColor: Colors.grey.shade300,
             selectedColor: Colors.black,
             titleTextStyle: TextStyle(
-              fontWeight: index == recordController.selectedRecordIndex.value ? FontWeight.w700 : FontWeight.w400,
+              fontWeight: recordController.selectedRecordData.value == recordController.recordListExactWeekType[index] ? FontWeight.w700 : FontWeight.w400,
               color: Colors.black,
               fontSize: 16,
               fontFamily: "Pretendard",
