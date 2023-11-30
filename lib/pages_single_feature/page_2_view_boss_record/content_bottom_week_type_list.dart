@@ -21,7 +21,7 @@ class ContentBottomWeekTypeList extends StatelessWidget {
         LoadStatus.loading => Center(
             child: LoadingAnimationWidget.prograssiveDots(
               color: Colors.deepPurple,
-              size: 12.0,
+              size: 24.0,
             ),
           ),
         LoadStatus.failed => const Center(
@@ -73,11 +73,11 @@ class ContentBottomWeekTypeList extends StatelessWidget {
                         color: Colors.black,
                         size: 16,
                       ),
-                      onTap: recordController.weekTypeList.indexOf(recordController.selectedWeekType.value!) == index ? null : () {
+                      onTap: recordController.weekTypeList.indexOf(recordController.selectedWeekType.value) == index ? null : () {
                         recordController.selectWeekType(index);
                       },
                       selected: recordController.weekTypeList[index] == recordController.selectedWeekType.value,
-                      selectedTileColor: Colors.grey.shade300,
+                      selectedTileColor: Colors.deepPurple.shade100.withOpacity(0.7),
                       selectedColor: Colors.black,
                       titleTextStyle: TextStyle(
                         fontWeight: recordController.weekTypeList[index] == recordController.selectedWeekType.value ? FontWeight.w700 : FontWeight.w400,

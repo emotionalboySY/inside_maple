@@ -34,7 +34,7 @@ class ContentBottomBossList extends StatelessWidget {
               await recordController.selectRecord(index);
             },
             selected: recordController.selectedRecordData.value == recordController.recordListExactWeekType[index],
-            selectedTileColor: Colors.grey.shade300,
+            selectedTileColor: Colors.deepPurple.shade100.withOpacity(0.7),
             selectedColor: Colors.black,
             titleTextStyle: TextStyle(
               fontWeight: recordController.selectedRecordData.value == recordController.recordListExactWeekType[index] ? FontWeight.w700 : FontWeight.w400,

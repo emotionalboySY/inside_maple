@@ -32,12 +32,15 @@ class ViewBossRecordTop extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        _radioComponent(
-          title: "단일 기록만 보기(판매금액 관리 가능)",
-          value: 1,
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: _radioComponent(
+            title: "단일 기록만 보기",
+            value: 1,
+          ),
         ),
         const SizedBox(
-          width: 20,
+          width: 16,
         ),
         _radioComponent(
           title: "여러 날짜, 여러 보스 모아보기",

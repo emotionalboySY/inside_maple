@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_week_type_list.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_top.dart';
 
+import '../../controllers/record_ui_controller.dart';
+import 'content_bottom_2_boss_list.dart';
 import 'content_bottom_boss_list.dart';
 import 'content_bottom_item_list.dart';
 
 class PageViewBossRecord extends StatelessWidget {
-  const PageViewBossRecord({super.key});
+  PageViewBossRecord({super.key});
+
+  final recordUIController = Get.find<RecordUIController>();
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +21,10 @@ class PageViewBossRecord extends StatelessWidget {
         children: [
           ViewBossRecordTop(),
           separator(axis: Axis.horizontal),
-          Expanded(
-            child: _BottomWidget(),
+          Obx(
+            () => Expanded(
+              child: recordUIController.recordViewType.value == 1 ? const _BottomWidgetSingle() : _BottomWidgetMulti(),
+            ),
           ),
         ],
       ),
@@ -25,10 +32,8 @@ class PageViewBossRecord extends StatelessWidget {
   }
 }
 
-class _BottomWidget extends StatelessWidget {
-  _BottomWidget({super.key});
-
-  final listViewController = ScrollController();
+class _BottomWidgetSingle extends StatelessWidget {
+  const _BottomWidgetSingle({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +53,21 @@ class _BottomWidget extends StatelessWidget {
         Expanded(
           flex: 5,
           child: ContentBottomItemList(),
+        )
+      ],
+    );
+  }
+}
+
+class _BottomWidgetMulti extends StatelessWidget {
+  const _BottomWidgetMulti({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ContentBottom2BossList(),
         )
       ],
     );
