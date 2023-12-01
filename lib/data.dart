@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:inside_maple/utils/logger.dart';
 
 import 'constants.dart';
 
@@ -150,7 +149,7 @@ class BossRecord {
         "boss: $boss\n"
         "difficulty: $difficulty\n"
         "date: $date\n"
-        "itemList: ${itemList}\n"
+        "itemList: $itemList\n"
         "partyAmount: $partyAmount\n"
         "weekType: $weekType\n";
   }

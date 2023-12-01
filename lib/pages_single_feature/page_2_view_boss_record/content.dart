@@ -23,7 +23,7 @@ class PageViewBossRecord extends StatelessWidget {
           separator(axis: Axis.horizontal),
           Obx(
             () => Expanded(
-              child: recordUIController.recordViewType.value == 1 ? const _BottomWidgetSingle() : _BottomWidgetMulti(),
+              child: recordUIController.recordViewType.value == 1 ? const _BottomWidgetSingle() : const _BottomWidgetMulti(),
             ),
           ),
         ],
@@ -33,7 +33,7 @@ class PageViewBossRecord extends StatelessWidget {
 }
 
 class _BottomWidgetSingle extends StatelessWidget {
-  const _BottomWidgetSingle({super.key});
+  const _BottomWidgetSingle();
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +60,7 @@ class _BottomWidgetSingle extends StatelessWidget {
 }
 
 class _BottomWidgetMulti extends StatelessWidget {
-  const _BottomWidgetMulti({super.key});
+  const _BottomWidgetMulti();
 
   @override
   Widget build(BuildContext context) {

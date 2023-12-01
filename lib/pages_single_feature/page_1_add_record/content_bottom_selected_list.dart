@@ -276,7 +276,7 @@ class _RaidDatePicker extends StatelessWidget {
 }
 
 class _RaidPartyAmount extends StatelessWidget {
-  _RaidPartyAmount({super.key});
+  _RaidPartyAmount();
 
   final addRecordController = Get.find<AddRecordController>();
 

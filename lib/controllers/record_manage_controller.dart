@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:inside_maple/controllers/record_ui_controller.dart';
