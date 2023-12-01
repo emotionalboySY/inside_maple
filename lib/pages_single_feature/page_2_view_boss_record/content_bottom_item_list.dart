@@ -4,9 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/controllers/record_manage_controller.dart';
+import 'package:intl/intl.dart';
 
 import '../../controllers/record_ui_controller.dart';
 import '../../custom_icons_icons.dart';
+import '../../utils/logger.dart';
 
 class ContentBottomItemList extends StatelessWidget {
   ContentBottomItemList({super.key});
@@ -278,79 +280,110 @@ class ContentBottomItemList extends StatelessWidget {
   }
 
   Widget _bottomParameters() {
-    return SizedBox(
-      height: 50,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
+      child: Column(
         children: [
           Row(
-            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 16.0),
-                child: Text(
-                  "파티 인원: ",
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              recordUIController.isRecordEditMode.value
-                  ? DropdownButtonHideUnderline(
-                      child: DropdownButton<int>(
-                        focusColor: Theme.of(Get.context!).scaffoldBackgroundColor,
-                        value: recordManageController.selectedRecordData.value!.partyAmount.value,
-                        iconSize: 20,
-                        onChanged: (newValue) {
-                          recordManageController.selectedRecordData.value!.partyAmount.value = newValue!;
-                        },
-                        items: <int>[1, 2, 3, 4, 5, 6].map<DropdownMenuItem<int>>((int value) {
-                          return DropdownMenuItem<int>(
-                            value: value,
-                            child: Text(
-                              "${value.toString()}명",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontFamily: "Pretendard",
-                                fontSize: 14,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    )
-                  : Text(
-                      "${recordManageController.selectedRecordData.value!.partyAmount.value}명",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Pretendard",
-                        fontSize: 14,
-                      ),
-                    ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 14.0),
-            child: TextButton(
-              onPressed: () async {
-                await recordUIController.removeBossRecord();
-              },
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(Colors.transparent),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                padding: MaterialStateProperty.all(EdgeInsets.zero),
-                minimumSize: MaterialStateProperty.all(Size.zero),
-              ),
-              child: const Text(
-                "삭제하기",
+              const Text(
+                "날짜: ",
                 style: TextStyle(
-                  color: Colors.red,
                   fontSize: 14,
                 ),
               ),
+              Text(
+                DateFormat('yyyy년 MM월 dd일').format(recordManageController.selectedRecordData.value!.date),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 24,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "파티 인원: ",
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                    ),
+                    recordUIController.isRecordEditMode.value
+                        ? DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              elevation: 0,
+                              padding: EdgeInsets.zero,
+                              isDense: true,
+                              focusColor: Theme.of(Get.context!).scaffoldBackgroundColor,
+                              value: recordManageController.selectedRecordData.value!.partyAmount.value,
+                              iconSize: 20,
+                              onChanged: (newValue) {
+                                loggerNoStack.d("before update(Existing): ${recordUIController.selectedRecordData.value!}");
+                                loggerNoStack.d("before update(cloned): ${recordManageController.selectedRecordData.value!}");
+                                recordManageController.selectedRecordData.value!.partyAmount.value = newValue!;
+                                loggerNoStack.d("after update(Existing): ${recordUIController.selectedRecordData.value!}");
+                                loggerNoStack.d("after update(cloned): ${recordManageController.selectedRecordData.value!}");
+                                recordUIController.updateIsRecordEdited();
+                              },
+                              items: <int>[1, 2, 3, 4, 5, 6].map<DropdownMenuItem<int>>((int value) {
+                                return DropdownMenuItem<int>(
+                                  value: value,
+                                  child: Text(
+                                    "${value.toString()}명",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: "Pretendard",
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          )
+                        : Text(
+                            "${recordManageController.selectedRecordData.value!.partyAmount.value}명",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Pretendard",
+                              fontSize: 14,
+                            ),
+                          ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 14.0),
+                  child: TextButton(
+                    onPressed: () async {
+                      await recordUIController.removeBossRecord();
+                    },
+                    style: ButtonStyle(
+                      overlayColor: MaterialStateProperty.all(Colors.transparent),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      minimumSize: MaterialStateProperty.all(Size.zero),
+                    ),
+                    child: const Text(
+                      "삭제하기",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -433,65 +466,6 @@ class ContentBottomItemList extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _radioButtonsForMVP() {
-    return Row(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 5.0),
-          child: _radioComponent(
-            title: "브론즈 이하",
-            value: false,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 15.0),
-          child: _radioComponent(
-            title: "실버 이상",
-            value: true,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _radioComponent({
-    required String title,
-    required bool value,
-  }) {
-    return Row(
-      children: [
-        Transform.scale(
-          scale: 0.8,
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: Radio<bool>(
-              value: value,
-              groupValue: recordUIController.isMvpSilver.value,
-              onChanged: (value) {
-                recordUIController.isMvpSilver.value = value!;
-                recordUIController.calculateTotalPrices();
-              },
-              splashRadius: 0.0,
-            ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () {
-            recordUIController.isMvpSilver.value = value;
-          },
-          child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: recordUIController.isMvpSilver.value == value ? FontWeight.w700 : FontWeight.w400,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

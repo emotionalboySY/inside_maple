@@ -189,7 +189,7 @@ class BossRecord {
         difficulty = record.difficulty,
         date = record.date,
         itemList = record.itemList.map((item) => Item.clone(item)).toList().obs,
-        partyAmount = record.partyAmount,
+        partyAmount = (record.partyAmount.value).obs,
         weekType = record.weekType;
 
   bool isSameData(BossRecord item) {
