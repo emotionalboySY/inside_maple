@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
+import 'package:inside_maple/controllers/record_manage_2_controller.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../controllers/record_ui_controller.dart';
@@ -9,6 +10,7 @@ class ContentBottom2BossList extends StatelessWidget {
   ContentBottom2BossList({super.key});
 
   final recordUIController = Get.find<RecordUIController>();
+  final recordManageController = Get.find<RecordManage2Controller>();
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +25,11 @@ class ContentBottom2BossList extends StatelessWidget {
         itemCount: recordUIController.recordedBossList.length,
         itemBuilder: (context, index) {
           return Obx(
-            () => ListTile(
+            () => CheckboxListTile(
+              value: recordManageController.selectedBossList.contains(recordUIController.recordedBossList[index]),
               title: Text(recordUIController.recordedBossList[index].key.korName),
-              onTap: () {
+              onChanged: (value) {
+                recordManageController.setSelectedBossList(recordUIController.recordedBossList[index], value!);
               },
             ),
           );

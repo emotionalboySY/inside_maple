@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
+import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_2_date_range_picker.dart';
+import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_2_item_list.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_week_type_list.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_top.dart';
 
@@ -67,8 +69,19 @@ class _BottomWidgetMulti extends StatelessWidget {
     return Row(
       children: [
         Expanded(
+          flex: 2,
           child: ContentBottom2BossList(),
-        )
+        ),
+        separator(axis: Axis.vertical),
+        Expanded(
+          flex: 2,
+          child: ContentBottom2DateRangePicker(),
+        ),
+        separator(axis: Axis.vertical),
+        Expanded(
+          flex: 5,
+          child: ContentBottom2ItemList(),
+        ),
       ],
     );
   }
