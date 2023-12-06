@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -24,7 +26,7 @@ class RecordUIController extends GetxController {
   RxBool isRecordEdited = false.obs;
 
   List<BossRecord> recordListLoaded = <BossRecord>[];
-  RxList<MapEntry<Boss, Difficulty>> recordedBossList = <MapEntry<Boss, Difficulty>>[].obs;
+  RxMap<Boss, List<Difficulty>> recordedBossList = <Boss, List<Difficulty>>{}.obs;
   RxList<BossRecord> recordListExactWeekType = <BossRecord>[].obs;
   RxList<WeekType> weekTypeList = <WeekType>[].obs;
 
@@ -41,6 +43,7 @@ class RecordUIController extends GetxController {
     recordLoadStatus.value = LoadStatus.loading;
     weekTypeList.clear();
     recordedBossList.clear();
+    Map<Boss, List<Difficulty>> tempRecordedBossList = {};
 
     recordListLoaded = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
     // logger.d(recordListLoaded);
@@ -48,28 +51,38 @@ class RecordUIController extends GetxController {
       if (!weekTypeList.contains(record.weekType)) {
         weekTypeList.add(record.weekType);
       }
-      var singleEntry = MapEntry(record.boss, record.difficulty);
-      if(!recordedBossList.contains(singleEntry)) {
-        recordedBossList.add(singleEntry);
+      if (!tempRecordedBossList.containsKey(record.boss)) {
+        tempRecordedBossList[record.boss] = [record.difficulty];
+      } else {
+        if (!tempRecordedBossList[record.boss]!.contains(record.difficulty)) {
+          tempRecordedBossList[record.boss]!.add(record.difficulty);
+          tempRecordedBossList[record.boss]!.sort((a, b) {
+            if (Difficulty.values.indexOf(a) > Difficulty.values.indexOf(b)) {
+              return 1;
+            } else if (Difficulty.values.indexOf(a) < Difficulty.values.indexOf(b)) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+        }
       }
     }
 
-    weekTypeList.sort((a, b) => a.startDate.compareTo(b.startDate));
-    recordedBossList.sort((a, b) {
-      if(Boss.values.indexOf(a.key) > Boss.values.indexOf(b.key)) {
-        return 1;
-      } else if(Boss.values.indexOf(a.key) < Boss.values.indexOf(b.key)) {
-        return -1;
-      } else {
-        if(Difficulty.values.indexOf(a.value) > Difficulty.values.indexOf(b.value)) {
+    recordedBossList.value = SplayTreeMap<Boss, List<Difficulty>>.from(
+      tempRecordedBossList,
+      (key1, key2) {
+        if (Boss.values.indexOf(key1) > Boss.values.indexOf(key2)) {
           return 1;
-        } else if(Difficulty.values.indexOf(a.value) < Difficulty.values.indexOf(b.value)) {
+        } else if (Boss.values.indexOf(key1) < Boss.values.indexOf(key2)) {
           return -1;
         } else {
           return 0;
         }
-      }
-    });
+      },
+    );
+
+    weekTypeList.sort((a, b) => a.startDate.compareTo(b.startDate));
 
     recordLoadStatus.value = LoadStatus.success;
     weekTypeList.refresh();
@@ -85,9 +98,9 @@ class RecordUIController extends GetxController {
       }
     }
     recordListExactWeekType.sort((a, b) {
-      if(Boss.values.indexWhere((element) => element == a.boss) > Boss.values.indexWhere((element) => element == b.boss)) {
+      if (Boss.values.indexWhere((element) => element == a.boss) > Boss.values.indexWhere((element) => element == b.boss)) {
         return 1;
-      } else if(Boss.values.indexWhere((element) => element == a.boss) < Boss.values.indexWhere((element) => element == b.boss)) {
+      } else if (Boss.values.indexWhere((element) => element == a.boss) < Boss.values.indexWhere((element) => element == b.boss)) {
         return -1;
       } else {
         return 0;
@@ -180,7 +193,9 @@ class RecordUIController extends GetxController {
 
   void toggleMVP() {
     isMvpSilver.value = !isMvpSilver.value;
-    calculateTotalPrices();
+    if (recordManageController.selectedRecordData.value != null) {
+      calculateTotalPrices();
+    }
   }
 
   void calculateTotalPrices() {
@@ -455,7 +470,7 @@ class RecordUIController extends GetxController {
   }
 
   Future<void> saveData(BossRecord recordToSave) async {
-    if(isRecordEdited.value == false) {
+    if (isRecordEdited.value == false) {
       toggleEditMode();
       return;
     }

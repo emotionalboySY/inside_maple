@@ -1,3 +1,4 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/record_ui_controller.dart';
@@ -19,13 +20,33 @@ class ContentBottom2DateRangePicker extends StatelessWidget {
       children: [
         Expanded(
           child: Center(
-            child: Text("시작 날짜 칸"),
+            child: Obx(
+              () => CalendarDatePicker2(
+                config: CalendarDatePicker2Config(
+                  calendarType: CalendarDatePicker2Type.single,
+                ),
+                value: recordManageController.startDate,
+                onValueChanged: (value) {
+                  recordManageController.setStartDate(value);
+                },
+              ),
+            ),
           ),
         ),
         separator(axis: Axis.horizontal),
         Expanded(
           child: Center(
-            child: Text("끝 날짜 칸"),
+            child: Obx(
+                  () => CalendarDatePicker2(
+                config: CalendarDatePicker2Config(
+                  calendarType: CalendarDatePicker2Type.single,
+                ),
+                value: recordManageController.endDate,
+                onValueChanged: (value) {
+                  recordManageController.setEndDate(value);
+                },
+              ),
+            ),
           ),
         ),
         separator(axis: Axis.horizontal),
@@ -45,7 +66,7 @@ class ContentBottom2DateRangePicker extends StatelessWidget {
                 onPressed: () {
                   showToast("정보 보기 버튼 눌림.");
                 },
-                child: Center(
+                child: const Center(
                   child: Text(
                     "정보 보기",
                     style: TextStyle(
