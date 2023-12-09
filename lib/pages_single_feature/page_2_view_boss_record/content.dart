@@ -78,7 +78,7 @@ class _BottomWidgetMulti extends StatelessWidget {
           child: ContentBottomMultiDateRangePicker(),
         ),
         separator(axis: Axis.vertical),
-        const Expanded(
+        Expanded(
           flex: 5,
           child: ContentBottomMultiItemList(),
         ),

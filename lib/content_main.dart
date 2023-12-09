@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/add_record_controller.dart';
 import 'package:inside_maple/controllers/record_manage_data_controller.dart';
+import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
 
 import 'controllers/main_controller.dart';
 import 'controllers/record_manage_multi_controller.dart';
@@ -59,12 +60,14 @@ class ContentMain extends StatelessWidget {
                           Get.put(RecordManageSingleController());
                           Get.put(RecordManageSingleEditController());
                           Get.put(RecordManageMultiController());
+                          Get.put(RecordManageMultiEditController());
                           Get.put(RecordManageDataController());
                           Get.toNamed("/page/viewRecord")?.then((value) {
                             Get.delete<RecordManageSingleController>();
                             Get.delete<RecordManageSingleEditController>();
                             Get.delete<RecordManageMultiController>();
                             Get.delete<RecordManageDataController>();
+                            Get.delete<RecordManageMultiEditController>();
                           });
                         },
                         title: "보스 리워드 관리",

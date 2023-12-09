@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:get/get.dart';
+import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
 import 'package:oktoast/oktoast.dart';
 
 import '../constants.dart';
@@ -8,6 +9,8 @@ import '../data.dart';
 import '../utils/logger.dart';
 
 class RecordManageMultiController extends GetxController {
+
+  RecordManageMultiEditController get recordManageMultiEditController => Get.find<RecordManageMultiEditController>();
 
   Rx<LoadStatus> recordSetStatus = LoadStatus.empty.obs;
 
@@ -139,6 +142,12 @@ class RecordManageMultiController extends GetxController {
     }
     endDate.refresh();
     loggerNoStack.d("startDate changed: $endDate");
+  }
+
+  void loadItemData() {
+    DateTime startDate = this.startDate[0]!;
+    DateTime endDate = this.endDate[0]!;
+    recordManageMultiEditController.loadBossRecords(selectedBossList, startDate, endDate);
   }
 
   @override

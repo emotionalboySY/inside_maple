@@ -1,8 +1,6 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_manage_single_controller.dart';
-import 'package:oktoast/oktoast.dart';
 
 import '../../../constants.dart';
 import '../../../controllers/record_manage_multi_controller.dart';
@@ -10,8 +8,7 @@ import '../../../controllers/record_manage_multi_controller.dart';
 class ContentBottomMultiDateRangePicker extends StatelessWidget {
   ContentBottomMultiDateRangePicker({super.key});
 
-  final recordUIController = Get.find<RecordManageSingleController>();
-  final recordManageController = Get.find<RecordManageMultiController>();
+  final recordManageMultiController = Get.find<RecordManageMultiController>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +30,9 @@ class ContentBottomMultiDateRangePicker extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
-                      if (recordManageController.startDate.isNotEmpty)
+                      if (recordManageMultiController.startDate.isNotEmpty)
                         Text(
-                          "${recordManageController.startDate[0]!.year}년 ${recordManageController.startDate[0]!.month}월 ${recordManageController.startDate[0]!.day}일",
+                          "${recordManageMultiController.startDate[0]!.year}년 ${recordManageMultiController.startDate[0]!.month}월 ${recordManageMultiController.startDate[0]!.day}일",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -52,9 +49,9 @@ class ContentBottomMultiDateRangePicker extends StatelessWidget {
                       calendarType: CalendarDatePicker2Type.single,
                       lastDate: DateTime.now(),
                     ),
-                    value: recordManageController.startDate,
+                    value: recordManageMultiController.startDate,
                     onValueChanged: (value) {
-                      recordManageController.setStartDate(value);
+                      recordManageMultiController.setStartDate(value);
                     },
                   ),
                 ),
@@ -78,9 +75,9 @@ class ContentBottomMultiDateRangePicker extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
-                      if (recordManageController.endDate.isNotEmpty)
+                      if (recordManageMultiController.endDate.isNotEmpty)
                         Text(
-                          "${recordManageController.endDate[0]!.year}년 ${recordManageController.endDate[0]!.month}월 ${recordManageController.endDate[0]!.day}일",
+                          "${recordManageMultiController.endDate[0]!.year}년 ${recordManageMultiController.endDate[0]!.month}월 ${recordManageMultiController.endDate[0]!.day}일",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -97,9 +94,9 @@ class ContentBottomMultiDateRangePicker extends StatelessWidget {
                       calendarType: CalendarDatePicker2Type.single,
                       lastDate: DateTime.now(),
                     ),
-                    value: recordManageController.endDate,
+                    value: recordManageMultiController.endDate,
                     onValueChanged: (value) {
-                      recordManageController.setEndDate(value);
+                      recordManageMultiController.setEndDate(value);
                     },
                   ),
                 ),
@@ -122,7 +119,7 @@ class ContentBottomMultiDateRangePicker extends StatelessWidget {
                   backgroundColor: Colors.deepPurple,
                 ),
                 onPressed: () {
-                  showToast("정보 보기 버튼 눌림.");
+                  recordManageMultiController.loadItemData();
                 },
                 child: const Center(
                   child: Text(
