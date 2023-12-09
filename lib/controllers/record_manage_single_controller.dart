@@ -1,9 +1,7 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
-import 'package:inside_maple/controllers/record_manage_controller.dart';
+import 'package:inside_maple/controllers/record_manage_data_controller.dart';
+import 'package:inside_maple/controllers/record_manage_single_edit_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 
@@ -11,22 +9,22 @@ import '../constants.dart';
 import '../data.dart';
 import '../utils/logger.dart';
 
-class RecordUIController extends GetxController {
+class RecordManageSingleController extends GetxController {
   final f = NumberFormat("#,##0");
 
-  RecordManageController get recordManageController => Get.find<RecordManageController>();
+  RecordManageSingleEditController get recordManageSingleEditController => Get.find<RecordManageSingleEditController>();
+  RecordManageDataController get recordManageDataController => Get.find<RecordManageDataController>();
 
   List<FocusNode> itemFocusNodes = [];
   List<TextEditingController> itemPriceControllers = [];
 
   Rx<LoadStatus> recordLoadStatus = LoadStatus.empty.obs;
+  Rx<LoadStatus> recordSetStatus = LoadStatus.empty.obs;
 
   Rx<int> recordViewType = 1.obs;
   RxBool isRecordEditMode = false.obs;
   RxBool isRecordEdited = false.obs;
 
-  List<BossRecord> recordListLoaded = <BossRecord>[];
-  RxMap<Boss, List<Difficulty>> recordedBossList = <Boss, List<Difficulty>>{}.obs;
   RxList<BossRecord> recordListExactWeekType = <BossRecord>[].obs;
   RxList<WeekType> weekTypeList = <WeekType>[].obs;
 
@@ -38,63 +36,27 @@ class RecordUIController extends GetxController {
   RxString totalItemPriceAfterDivisionLocale = "".obs;
   RxBool isMvpSilver = false.obs;
 
-  Future<void> loadRecord() async {
-    final box = await Hive.openBox("insideMaple");
-    recordLoadStatus.value = LoadStatus.loading;
-    weekTypeList.clear();
-    recordedBossList.clear();
-    Map<Boss, List<Difficulty>> tempRecordedBossList = {};
+  void setDataFromRaw(List<BossRecord> loadedData) {
+    recordSetStatus.value = LoadStatus.loading;
 
-    recordListLoaded = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
-    // logger.d(recordListLoaded);
-    for (var record in recordListLoaded) {
+    for(var record in loadedData) {
       if (!weekTypeList.contains(record.weekType)) {
         weekTypeList.add(record.weekType);
       }
-      if (!tempRecordedBossList.containsKey(record.boss)) {
-        tempRecordedBossList[record.boss] = [record.difficulty];
-      } else {
-        if (!tempRecordedBossList[record.boss]!.contains(record.difficulty)) {
-          tempRecordedBossList[record.boss]!.add(record.difficulty);
-          tempRecordedBossList[record.boss]!.sort((a, b) {
-            if (Difficulty.values.indexOf(a) > Difficulty.values.indexOf(b)) {
-              return 1;
-            } else if (Difficulty.values.indexOf(a) < Difficulty.values.indexOf(b)) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
-        }
-      }
     }
 
-    recordedBossList.value = SplayTreeMap<Boss, List<Difficulty>>.from(
-      tempRecordedBossList,
-      (key1, key2) {
-        if (Boss.values.indexOf(key1) > Boss.values.indexOf(key2)) {
-          return 1;
-        } else if (Boss.values.indexOf(key1) < Boss.values.indexOf(key2)) {
-          return -1;
-        } else {
-          return 0;
-        }
-      },
-    );
-
     weekTypeList.sort((a, b) => a.startDate.compareTo(b.startDate));
+    weekTypeList.refresh();
 
     recordLoadStatus.value = LoadStatus.success;
-    weekTypeList.refresh();
-    box.close();
   }
 
   void selectWeekType(int index) {
     selectedWeekType.value = weekTypeList[index];
     recordListExactWeekType.clear();
-    for (var record in recordListLoaded) {
+    for (var record in recordManageDataController.loadedBossRecords) {
       if (record.weekType == selectedWeekType.value) {
-        recordListExactWeekType.add(record);
+        recordListExactWeekType.add(BossRecord.clone(record));
       }
     }
     recordListExactWeekType.sort((a, b) {
@@ -107,7 +69,7 @@ class RecordUIController extends GetxController {
       }
     });
     selectedRecordData.value = null;
-    recordManageController.resetSelectedData();
+    recordManageSingleEditController.resetSelectedData();
     isRecordEditMode.value = false;
     isRecordEdited.value = false;
     weekTypeList.refresh();
@@ -152,11 +114,11 @@ class RecordUIController extends GetxController {
         ),
       );
     }
-    if (recordManageController.selectedRecordData.value == null || selectConfirmed == true || isRecordEdited.value == false) {
+    if (recordManageSingleEditController.selectedRecordData.value == null || selectConfirmed == true || isRecordEdited.value == false) {
       // loggerNoStack.d("selectConfirmed: true so move selection");
       selectedRecordData.value = recordListExactWeekType[index];
       // selectedRecordDataOriginal.value = recordListExactWeekType[selectedRecordIndex.value];
-      recordManageController.setRecordData(BossRecord.clone(selectedRecordData.value!));
+      recordManageSingleEditController.setRecordData(BossRecord.clone(selectedRecordData.value!));
       initializeFocusNodesAndControllers();
       // loggerNoStack.d("all record data: $recordListLoaded");
       // loggerNoStack.d("selectedRecordData: $selectedRecordData");
@@ -171,19 +133,19 @@ class RecordUIController extends GetxController {
   void initializeFocusNodesAndControllers() {
     disposeFocusNodes();
     disposeControllers();
-    for (int i = 0; i < recordManageController.selectedRecordData.value!.itemList.length; i++) {
+    for (int i = 0; i < recordManageSingleEditController.selectedRecordData.value!.itemList.length; i++) {
       itemFocusNodes.add(FocusNode());
       itemPriceControllers.add(TextEditingController());
 
       itemFocusNodes[i].addListener(() {
         if (!itemFocusNodes[i].hasFocus) {
-          recordManageController.applyPrice(i);
+          recordManageSingleEditController.applyPrice(i);
         }
         if (itemFocusNodes[i].hasFocus) {
           itemPriceControllers[i].selection = TextSelection(baseOffset: 0, extentOffset: itemPriceControllers[i].text.length);
         }
       });
-      itemPriceControllers[i].text = recordManageController.selectedRecordData.value!.itemList[i].price.value.toString();
+      itemPriceControllers[i].text = recordManageSingleEditController.selectedRecordData.value!.itemList[i].price.value.toString();
     }
   }
 
@@ -193,19 +155,19 @@ class RecordUIController extends GetxController {
 
   void toggleMVP() {
     isMvpSilver.value = !isMvpSilver.value;
-    if (recordManageController.selectedRecordData.value != null) {
+    if (recordManageSingleEditController.selectedRecordData.value != null) {
       calculateTotalPrices();
     }
   }
 
   void calculateTotalPrices() {
     int total = 0;
-    for (var item in recordManageController.selectedRecordData.value!.itemList) {
+    for (var item in recordManageSingleEditController.selectedRecordData.value!.itemList) {
       total += ((item.price * item.count.value) * (isMvpSilver.value ? 0.97 : 0.95)).round();
     }
     totalItemPrice.value = total;
     totalItemPriceLocale.value = f.format(total);
-    totalItemPriceAfterDivision.value = (total / recordManageController.selectedRecordData.value!.partyAmount.value).round();
+    totalItemPriceAfterDivision.value = (total / recordManageSingleEditController.selectedRecordData.value!.partyAmount.value).round();
     totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
 
     // loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
@@ -215,8 +177,8 @@ class RecordUIController extends GetxController {
   void updateIsRecordEdited() {
     if (isRecordEditMode.value) {
       loggerNoStack.d("selected record data: ${selectedRecordData.value}");
-      loggerNoStack.d("Changed record data: ${recordManageController.selectedRecordData.value}");
-      if (selectedRecordData.value == recordManageController.selectedRecordData.value) {
+      loggerNoStack.d("Changed record data: ${recordManageSingleEditController.selectedRecordData.value}");
+      if (selectedRecordData.value == recordManageSingleEditController.selectedRecordData.value) {
         loggerNoStack.d("selected record data and changed record data are same");
         isRecordEdited.value = false;
       } else {
@@ -276,9 +238,7 @@ class RecordUIController extends GetxController {
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
       selectedRecordData.value = null;
-      recordManageController.resetSelectedData();
-      // selectedRecordIndex.value = -1;
-      // selectedWeekTypeIndex.value = -1;
+      recordManageSingleEditController.resetSelectedData();
       recordListExactWeekType.refresh();
       weekTypeList.refresh();
       resetTotalPriceLocale();
@@ -419,9 +379,9 @@ class RecordUIController extends GetxController {
           "보스 데이터 삭제",
         ),
         content: Text("<현재 보스>\n"
-            "- 보스 이름: ${recordManageController.selectedRecordData.value!.boss.korName}\n"
-            "- 난이도: ${recordManageController.selectedRecordData.value!.difficulty.korName}\n"
-            "- 날짜: ${DateFormat('yyyy-MM-dd').format(recordManageController.selectedRecordData.value!.date)}\n"
+            "- 보스 이름: ${recordManageSingleEditController.selectedRecordData.value!.boss.korName}\n"
+            "- 난이도: ${recordManageSingleEditController.selectedRecordData.value!.difficulty.korName}\n"
+            "- 날짜: ${DateFormat('yyyy-MM-dd').format(recordManageSingleEditController.selectedRecordData.value!.date)}\n"
             "\n이 보스에 대한 기록을 지울까요? (삭제된 기록은 복구할 수 없습니다.)"),
         actions: [
           Padding(
@@ -455,14 +415,10 @@ class RecordUIController extends GetxController {
     );
 
     if (removeConfirm) {
-      recordListLoaded.remove(selectedRecordData.value);
-      final box = await Hive.openBox("insideMaple");
-      await box.put('bossRecordData', recordListLoaded);
-      await box.close();
-      await loadRecord();
+      await recordManageDataController.removeSingleRecord(selectedRecordData.value!);
       selectWeekType(weekTypeList.indexOf(selectedWeekType.value!));
       selectedRecordData.value = null;
-      recordManageController.resetSelectedData();
+      recordManageSingleEditController.resetSelectedData();
       resetTotalPriceLocale();
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
@@ -475,18 +431,13 @@ class RecordUIController extends GetxController {
       return;
     }
     try {
-      final box = await Hive.openBox("insideMaple");
-      recordListLoaded.remove(selectedRecordData.value);
-      recordListLoaded.add(recordToSave);
-      await box.put('bossRecordData', recordListLoaded);
-      await box.close();
-      await loadRecord();
+      await recordManageDataController.updateSingleRecord(selectedRecordData.value!, recordToSave);
       selectWeekType(weekTypeList.indexOf(selectedWeekType.value!));
-      selectedRecordData.value = recordListLoaded.last;
+      selectedRecordData.value = recordManageDataController.loadedBossRecords.last;
       selectRecord(recordListExactWeekType.indexOf(selectedRecordData.value!));
       isRecordEditMode.value = false;
       isRecordEdited.value = false;
-      recordManageController.selectedRecordData.value!.itemList.refresh();
+      recordManageSingleEditController.selectedRecordData.value!.itemList.refresh();
       showToast("변경된 데이터가 저장되었습니다.");
     } catch (e) {
       e.printInfo();
@@ -511,12 +462,6 @@ class RecordUIController extends GetxController {
       }
       itemPriceControllers.clear();
     }
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-    loadRecord();
   }
 
   @override

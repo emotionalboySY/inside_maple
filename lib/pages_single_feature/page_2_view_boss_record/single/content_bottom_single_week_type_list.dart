@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import '../../constants.dart';
-import '../../controllers/add_record_controller.dart';
-import '../../controllers/record_ui_controller.dart';
+import '../../../constants.dart';
+import '../../../controllers/add_record_controller.dart';
+import '../../../controllers/record_manage_single_controller.dart';
 
-class ContentBottomWeekTypeList extends StatelessWidget {
-  ContentBottomWeekTypeList({super.key});
+class ContentBottomSingleWeekTypeList extends StatelessWidget {
+  ContentBottomSingleWeekTypeList({super.key});
 
-  final recordController = Get.find<RecordUIController>();
+  final recordController = Get.find<RecordManageSingleController>();
 
   @override
   Widget build(BuildContext context) {

@@ -1,17 +1,17 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_ui_controller.dart';
+import 'package:inside_maple/controllers/record_manage_single_controller.dart';
 import 'package:oktoast/oktoast.dart';
 
-import '../../constants.dart';
-import '../../controllers/record_manage_2_controller.dart';
+import '../../../constants.dart';
+import '../../../controllers/record_manage_multi_controller.dart';
 
-class ContentBottom2DateRangePicker extends StatelessWidget {
-  ContentBottom2DateRangePicker({super.key});
+class ContentBottomMultiDateRangePicker extends StatelessWidget {
+  ContentBottomMultiDateRangePicker({super.key});
 
-  final recordUIController = Get.find<RecordUIController>();
-  final recordManageController = Get.find<RecordManage2Controller>();
+  final recordUIController = Get.find<RecordManageSingleController>();
+  final recordManageController = Get.find<RecordManageMultiController>();
 
   @override
   Widget build(BuildContext context) {

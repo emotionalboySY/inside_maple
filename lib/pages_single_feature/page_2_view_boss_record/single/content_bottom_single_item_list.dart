@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
-import 'package:inside_maple/controllers/record_manage_controller.dart';
+import 'package:inside_maple/controllers/record_manage_single_edit_controller.dart';
 import 'package:intl/intl.dart';
 
-import '../../controllers/record_ui_controller.dart';
-import '../../custom_icons_icons.dart';
-import '../../utils/logger.dart';
+import '../../../controllers/record_manage_single_controller.dart';
+import '../../../custom_icons_icons.dart';
+import '../../../utils/logger.dart';
 
-class ContentBottomItemList extends StatelessWidget {
-  ContentBottomItemList({super.key});
+class ContentBottomSingleItemList extends StatelessWidget {
+  ContentBottomSingleItemList({super.key});
 
-  final recordUIController = Get.find<RecordUIController>();
-  final recordManageController = Get.find<RecordManageController>();
+  final recordUIController = Get.find<RecordManageSingleController>();
+  final recordManageController = Get.find<RecordManageSingleEditController>();
 
   @override
   Widget build(BuildContext context) {

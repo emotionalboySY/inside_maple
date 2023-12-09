@@ -1,15 +1,15 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_manage_controller.dart';
+import 'package:inside_maple/controllers/record_manage_single_edit_controller.dart';
 
-import '../../controllers/record_ui_controller.dart';
+import '../../controllers/record_manage_single_controller.dart';
 
 class ViewBossRecordTop extends StatelessWidget {
   ViewBossRecordTop({super.key});
 
-  final recordUIController = Get.find<RecordUIController>();
-  final recordManageController = Get.find<RecordManageController>();
+  final recordUIController = Get.find<RecordManageSingleController>();
+  final recordManageController = Get.find<RecordManageSingleEditController>();
 
   @override
   Widget build(BuildContext context) {

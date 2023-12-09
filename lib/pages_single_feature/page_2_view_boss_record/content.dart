@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
-import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_2_date_range_picker.dart';
-import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_2_item_list.dart';
-import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_bottom_week_type_list.dart';
+import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/multi/content_bottom_multi_item_list.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_top.dart';
+import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/single/content_bottom_single_item_list.dart';
+import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/single/content_bottom_single_week_type_list.dart';
 
-import '../../controllers/record_ui_controller.dart';
-import 'content_bottom_2_boss_list.dart';
-import 'content_bottom_boss_list.dart';
-import 'content_bottom_item_list.dart';
+import '../../controllers/record_manage_single_controller.dart';
+import 'multi/content_bottom_multi_boss_list.dart';
+import 'multi/content_bottom_multi_date_range_picker.dart';
+import 'single/content_bottom_single_boss_list.dart';
 
 class PageViewBossRecord extends StatelessWidget {
   PageViewBossRecord({super.key});
 
-  final recordUIController = Get.find<RecordUIController>();
+  final recordUIController = Get.find<RecordManageSingleController>();
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +44,17 @@ class _BottomWidgetSingle extends StatelessWidget {
       children: [
         Expanded(
           flex: 2,
-          child: ContentBottomWeekTypeList(),
+          child: ContentBottomSingleWeekTypeList(),
         ),
         separator(axis: Axis.vertical),
         Expanded(
           flex: 2,
-          child: ContentBottomBossList(),
+          child: ContentBottomSingleBossList(),
         ),
         separator(axis: Axis.vertical),
         Expanded(
           flex: 5,
-          child: ContentBottomItemList(),
+          child: ContentBottomSingleItemList(),
         )
       ],
     );
@@ -70,17 +70,17 @@ class _BottomWidgetMulti extends StatelessWidget {
       children: [
         Expanded(
           flex: 2,
-          child: ContentBottom2BossList(),
+          child: ContentBottomMultiBossList(),
         ),
         separator(axis: Axis.vertical),
         Expanded(
           flex: 2,
-          child: ContentBottom2DateRangePicker(),
+          child: ContentBottomMultiDateRangePicker(),
         ),
         separator(axis: Axis.vertical),
         const Expanded(
           flex: 5,
-          child: ContentBottom2ItemList(),
+          child: ContentBottomMultiItemList(),
         ),
       ],
     );

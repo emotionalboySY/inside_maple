@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
-import 'package:inside_maple/controllers/record_manage_2_controller.dart';
+import 'package:inside_maple/controllers/record_manage_multi_controller.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import '../../controllers/record_ui_controller.dart';
-import '../../utils/logger.dart';
+import '../../../controllers/record_manage_single_controller.dart';
+import '../../../utils/logger.dart';
 
-class ContentBottom2BossList extends StatelessWidget {
-  ContentBottom2BossList({super.key});
+class ContentBottomMultiBossList extends StatelessWidget {
+  ContentBottomMultiBossList({super.key});
 
-  final recordUIController = Get.find<RecordUIController>();
-  final recordManageController = Get.find<RecordManage2Controller>();
+  final recordManageSingleController = Get.find<RecordManageSingleController>();
+  final recordManageMultiController = Get.find<RecordManageMultiController>();
 
   @override
   Widget build(BuildContext context) {
-    return switch (recordUIController.recordLoadStatus.value) {
+    return switch (recordManageSingleController.recordLoadStatus.value) {
       LoadStatus.loading => Center(
           child: LoadingAnimationWidget.prograssiveDots(
             color: Colors.deepPurple,
@@ -46,11 +46,11 @@ class ContentBottom2BossList extends StatelessWidget {
             Expanded(
               child: Obx(
                 () => ListView.builder(
-                  itemCount: recordUIController.recordedBossList.length,
+                  itemCount: recordManageMultiController.recordedBossList.length,
                   itemBuilder: (context, index) {
-                    Boss boss = recordUIController.recordedBossList.keys.elementAt(index);
-                    List<Difficulty> diffList = recordUIController.recordedBossList[boss]!;
-                    bool? checkedStatus = recordManageController.checkStatus(boss);
+                    Boss boss = recordManageMultiController.recordedBossList.keys.elementAt(index);
+                    List<Difficulty> diffList = recordManageMultiController.recordedBossList[boss]!;
+                    bool? checkedStatus = recordManageMultiController.checkStatus(boss);
                     return ExpansionTile(
                       shape: Border.all(color: Colors.transparent),
                       childrenPadding: const EdgeInsets.only(left: 55.0),
@@ -69,7 +69,7 @@ class ContentBottom2BossList extends StatelessWidget {
                               } else {
                                 setStatus = false;
                               }
-                              recordManageController.setSelectedBossListGrouped(boss, setStatus);
+                              recordManageMultiController.setSelectedBossListGrouped(boss, setStatus);
                             },
                             value: checkedStatus,
                             tristate: true,
@@ -78,18 +78,16 @@ class ContentBottom2BossList extends StatelessWidget {
                       ),
                       controlAffinity: ListTileControlAffinity.leading,
                       children: diffList.map((diff) {
-                        loggerNoStack.d("boss name contained? ${recordManageController.selectedBossList.containsKey(boss)}");
-                        loggerNoStack.d("diff name contained in boss? ${recordManageController.selectedBossList[boss]?.contains(diff)}");
                         return Obx(
                           () => ListTile(
                             title: Text(diff.korName),
                             trailing: Checkbox(
                               tristate: false,
                               onChanged: (value) {
-                                recordManageController.setSelectedBossList(boss, diff, value!);
+                                recordManageMultiController.setSelectedBossList(boss, diff, value!);
                               },
-                              value: recordManageController.selectedBossList.containsKey(boss)
-                                  ? recordManageController.selectedBossList[boss]!.contains(diff)
+                              value: recordManageMultiController.selectedBossList.containsKey(boss)
+                                  ? recordManageMultiController.selectedBossList[boss]!.contains(diff)
                                   : false,
                             ),
                           ),
@@ -133,7 +131,7 @@ class ContentBottom2BossList extends StatelessWidget {
           padding: EdgeInsets.zero,
         ),
         onPressed: () {
-          recordManageController.setParamsByPressingPrefix(bossList);
+          recordManageMultiController.setParamsByPressingPrefix(bossList);
         },
         child: Center(
           child: Text(

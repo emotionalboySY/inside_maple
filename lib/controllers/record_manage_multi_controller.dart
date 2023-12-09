@@ -1,25 +1,62 @@
+import 'dart:collection';
+
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_ui_controller.dart';
 import 'package:oktoast/oktoast.dart';
 
 import '../constants.dart';
+import '../data.dart';
 import '../utils/logger.dart';
 
-class RecordManage2Controller extends GetxController {
-  final recordUIController = Get.find<RecordUIController>();
+class RecordManageMultiController extends GetxController {
 
+  Rx<LoadStatus> recordSetStatus = LoadStatus.empty.obs;
+
+  RxMap<Boss, List<Difficulty>> recordedBossList = <Boss, List<Difficulty>>{}.obs;
   RxMap<Boss, List<Difficulty>> selectedBossList = <Boss, List<Difficulty>>{}.obs;
+  RxList<Item> itemList = <Item>[].obs;
 
   RxBool isParameterSet = false.obs;
   RxList<DateTime?> startDate = <DateTime?>[].obs;
   RxList<DateTime?> endDate = <DateTime?>[].obs;
 
-  @override
-  void onInit() {
-    ever(selectedBossList, (value) {
-      checkIfParameterIsSet();
-    });
-    super.onInit();
+  void setDataFromRaw(List<BossRecord> loadedData) {
+    recordSetStatus.value = LoadStatus.loading;
+
+    Map<Boss, List<Difficulty>> tempRecordedBossList = {};
+
+    for(var record in loadedData) {
+      if (!tempRecordedBossList.containsKey(record.boss)) {
+        tempRecordedBossList[record.boss] = [record.difficulty];
+      } else {
+        if (!tempRecordedBossList[record.boss]!.contains(record.difficulty)) {
+          tempRecordedBossList[record.boss]!.add(record.difficulty);
+          tempRecordedBossList[record.boss]!.sort((a, b) {
+            if (Difficulty.values.indexOf(a) > Difficulty.values.indexOf(b)) {
+              return 1;
+            } else if (Difficulty.values.indexOf(a) < Difficulty.values.indexOf(b)) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+        }
+      }
+    }
+
+    recordedBossList.value = SplayTreeMap<Boss, List<Difficulty>>.from(
+      tempRecordedBossList,
+          (key1, key2) {
+        if (Boss.values.indexOf(key1) > Boss.values.indexOf(key2)) {
+          return 1;
+        } else if (Boss.values.indexOf(key1) < Boss.values.indexOf(key2)) {
+          return -1;
+        } else {
+          return 0;
+        }
+      },
+    );
+
+    recordSetStatus.value = LoadStatus.success;
   }
 
   void setSelectedBossList(Boss boss, Difficulty diff, bool checkStatus) {
@@ -37,11 +74,11 @@ class RecordManage2Controller extends GetxController {
     }
     loggerNoStack.d("boss list update: $selectedBossList, value: $checkStatus");
     selectedBossList.refresh();
-    recordUIController.recordedBossList.refresh();
+    recordedBossList.refresh();
   }
 
   void setSelectedBossListGrouped(Boss boss, bool checkStatus) {
-    int length = recordUIController.recordedBossList[boss]!.length;
+    int length = recordedBossList[boss]!.length;
     if (checkStatus == false) {
       selectedBossList.remove(boss);
     } else {
@@ -49,17 +86,17 @@ class RecordManage2Controller extends GetxController {
         selectedBossList.addAll({boss: <Difficulty>[]});
       }
       for (int i = 0; i < length; i++) {
-        selectedBossList[boss]!.add(recordUIController.recordedBossList[boss]![i]);
+        selectedBossList[boss]!.add(recordedBossList[boss]![i]);
       }
     }
     // loggerNoStack.d("selectedBossList after setGroup: $selectedBossList");
     selectedBossList.refresh();
-    recordUIController.recordedBossList.refresh();
+    recordedBossList.refresh();
   }
 
   void setParamsByPressingPrefix(List<Boss> bossList) {
     for (int i = 0; i < bossList.length; i++) {
-      if (recordUIController.recordedBossList.containsKey(bossList[i])) {
+      if (recordedBossList.containsKey(bossList[i])) {
         setSelectedBossListGrouped(bossList[i], true);
       }
     }
@@ -74,7 +111,7 @@ class RecordManage2Controller extends GetxController {
   bool? checkStatus(Boss boss) {
     loggerNoStack.d("Check status of $boss");
     if (selectedBossList.containsKey(boss)) {
-      if (recordUIController.recordedBossList[boss]!.length == selectedBossList[boss]!.length) {
+      if (recordedBossList[boss]!.length == selectedBossList[boss]!.length) {
         return true;
       } else {
         return null;
@@ -102,5 +139,13 @@ class RecordManage2Controller extends GetxController {
     }
     endDate.refresh();
     loggerNoStack.d("startDate changed: $endDate");
+  }
+
+  @override
+  void onInit() {
+    ever(selectedBossList, (value) {
+      checkIfParameterIsSet();
+    });
+    super.onInit();
   }
 }

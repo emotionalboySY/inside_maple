@@ -1,14 +1,14 @@
 import 'package:get/get.dart';
 
-import 'package:inside_maple/controllers/record_ui_controller.dart';
+import 'package:inside_maple/controllers/record_manage_single_controller.dart';
 
 import '../constants.dart';
 import '../data.dart';
 import '../utils/logger.dart';
 
-class RecordManageController extends GetxController {
+class RecordManageSingleEditController extends GetxController {
 
-  RecordUIController get recordUIController => Get.find<RecordUIController>();
+  RecordManageSingleController get recordManageSingleController => Get.find<RecordManageSingleController>();
 
   Rx<BossRecord?> selectedRecordData = Rx<BossRecord?>(null);
 
@@ -18,11 +18,11 @@ class RecordManageController extends GetxController {
   }
 
   void applyPrice(int index) {
-    if (recordUIController.itemPriceControllers[index].text.isNotEmpty) {
-      int price = int.tryParse(recordUIController.itemPriceControllers[index].text) ?? 0;
+    if (recordManageSingleController.itemPriceControllers[index].text.isNotEmpty) {
+      int price = int.tryParse(recordManageSingleController.itemPriceControllers[index].text) ?? 0;
       selectedRecordData.value!.itemList[index].price.value = price;
-      recordUIController.updateIsRecordEdited();
-      recordUIController.calculateTotalPrices();
+      recordManageSingleController.updateIsRecordEdited();
+      recordManageSingleController.calculateTotalPrices();
     }
   }
 
@@ -44,34 +44,34 @@ class RecordManageController extends GetxController {
 
   void decreaseItemCount(int index) {
     selectedRecordData.value!.itemList[index].count--;
-    recordUIController.updateIsRecordEdited();
+    recordManageSingleController.updateIsRecordEdited();
   }
 
   void increaseItemCount(int index) {
     selectedRecordData.value!.itemList[index].count++;
-    recordUIController.updateIsRecordEdited();
+    recordManageSingleController.updateIsRecordEdited();
   }
 
   void deleteItem(int index) {
     selectedRecordData.value!.itemList.removeAt(index);
     selectedRecordData.value!.itemList.refresh();
-    recordUIController.updateIsRecordEdited();
+    recordManageSingleController.updateIsRecordEdited();
   }
 
   Future<void> revertChanges() async {
-    if(await recordUIController.showRevertChangesConfirmDialog()) {
+    if(await recordManageSingleController.showRevertChangesConfirmDialog()) {
       loggerNoStack.d("before revert: $selectedRecordData");
-      selectedRecordData.value = BossRecord.clone(recordUIController.selectedRecordData.value!);
+      selectedRecordData.value = BossRecord.clone(recordManageSingleController.selectedRecordData.value!);
       loggerNoStack.d("after revert: $selectedRecordData");
       for(int i = 0; i < selectedRecordData.value!.itemList.length; i++) {
-        recordUIController.itemPriceControllers[i].text = selectedRecordData.value!.itemList[i].price.value.toString();
+        recordManageSingleController.itemPriceControllers[i].text = selectedRecordData.value!.itemList[i].price.value.toString();
       }
       selectedRecordData.value!.itemList.refresh();
-      recordUIController.updateIsRecordEdited();
+      recordManageSingleController.updateIsRecordEdited();
     }
   }
 
   Future<void> saveChanges() async {
-    await recordUIController.saveData(selectedRecordData.value!);
+    await recordManageSingleController.saveData(selectedRecordData.value!);
   }
 }
