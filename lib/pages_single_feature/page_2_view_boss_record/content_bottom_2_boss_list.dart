@@ -5,6 +5,7 @@ import 'package:inside_maple/controllers/record_manage_2_controller.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../controllers/record_ui_controller.dart';
+import '../../utils/logger.dart';
 
 class ContentBottom2BossList extends StatelessWidget {
   ContentBottom2BossList({super.key});
@@ -34,11 +35,10 @@ class ContentBottom2BossList extends StatelessWidget {
                   spacing: 5,
                   runSpacing: 5,
                   children: [
-                    _selectPrefixButton(title: "스데"),
-                    _selectPrefixButton(title: "루윌"),
-                    _selectPrefixButton(title: "스데루윌"),
-                    _selectPrefixButton(title: "진듄더슬"),
-                    _selectPrefixButton(title: "검세칼"),
+                    _selectPrefixButton(title: "스데", bossList: [Boss.lotus, Boss.damien]),
+                    _selectPrefixButton(title: "루윌", bossList: [Boss.lucid, Boss.will]),
+                    _selectPrefixButton(title: "진듄더슬", bossList: [Boss.jinhila, Boss.dunkel, Boss.dusk, Boss.gas]),
+                    _selectPrefixButton(title: "검세칼", bossList: [Boss.blackmage, Boss.seren, Boss.kalos]),
                   ],
                 ),
               ),
@@ -52,6 +52,8 @@ class ContentBottom2BossList extends StatelessWidget {
                     List<Difficulty> diffList = recordUIController.recordedBossList[boss]!;
                     bool? checkedStatus = recordManageController.checkStatus(boss);
                     return ExpansionTile(
+                      shape: Border.all(color: Colors.transparent),
+                      childrenPadding: const EdgeInsets.only(left: 55.0),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -60,9 +62,14 @@ class ContentBottom2BossList extends StatelessWidget {
                           ),
                           Checkbox(
                             onChanged: (value) {
-                              if (value != null) {
-                                recordManageController.setSelectedBossListGrouped(boss, value);
+                              // loggerNoStack.d("Change boss check status of ${boss.korName}: $value");
+                              bool setStatus = true;
+                              if (value == true) {
+                                setStatus = true;
+                              } else {
+                                setStatus = false;
                               }
+                              recordManageController.setSelectedBossListGrouped(boss, setStatus);
                             },
                             value: checkedStatus,
                             tristate: true,
@@ -71,16 +78,20 @@ class ContentBottom2BossList extends StatelessWidget {
                       ),
                       controlAffinity: ListTileControlAffinity.leading,
                       children: diffList.map((diff) {
-                        return ListTile(
-                          title: Text(diff.korName),
-                          trailing: Checkbox(
-                            tristate: false,
-                            onChanged: (value) {
-                              recordManageController.setSelectedBossList(boss, diff, value!);
-                            },
-                            value: recordManageController.selectedBossList.containsKey(boss)
-                                ? recordManageController.selectedBossList[boss]!.contains(diff)
-                                : false,
+                        loggerNoStack.d("boss name contained? ${recordManageController.selectedBossList.containsKey(boss)}");
+                        loggerNoStack.d("diff name contained in boss? ${recordManageController.selectedBossList[boss]?.contains(diff)}");
+                        return Obx(
+                          () => ListTile(
+                            title: Text(diff.korName),
+                            trailing: Checkbox(
+                              tristate: false,
+                              onChanged: (value) {
+                                recordManageController.setSelectedBossList(boss, diff, value!);
+                              },
+                              value: recordManageController.selectedBossList.containsKey(boss)
+                                  ? recordManageController.selectedBossList[boss]!.contains(diff)
+                                  : false,
+                            ),
                           ),
                         );
                       }).toList(),
@@ -88,21 +99,6 @@ class ContentBottom2BossList extends StatelessWidget {
                   },
                 ),
               ),
-              // child: ListView.builder(
-              //   itemCount: recordUIController.recordedBossList.length,
-              //   itemBuilder: (context, index) {
-              //     return Obx(
-              //       () => CheckboxListTile(
-              //         value: recordManageController.selectedBossList.contains(recordUIController.recordedBossList[index]),
-              //         title: Text(recordUIController.recordedBossList[index].key.korName),
-              //         onChanged: (value) {
-              //           recordManageController.setSelectedBossList(recordUIController.recordedBossList[index], value!);
-              //         },
-              //         tristate: true,
-              //       ),
-              //     );
-              //   },
-              // ),
             ),
           ],
         ),
@@ -119,6 +115,7 @@ class ContentBottom2BossList extends StatelessWidget {
 
   Widget _selectPrefixButton({
     required String title,
+    required List<Boss> bossList,
   }) {
     return ConstrainedBox(
       constraints: const BoxConstraints(
@@ -135,7 +132,9 @@ class ContentBottom2BossList extends StatelessWidget {
           ),
           padding: EdgeInsets.zero,
         ),
-        onPressed: () {},
+        onPressed: () {
+          recordManageController.setParamsByPressingPrefix(bossList);
+        },
         child: Center(
           child: Text(
             title,

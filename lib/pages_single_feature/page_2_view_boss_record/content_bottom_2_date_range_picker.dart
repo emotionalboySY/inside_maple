@@ -19,34 +19,92 @@ class ContentBottom2DateRangePicker extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Expanded(
-          child: Center(
-            child: Obx(
-              () => CalendarDatePicker2(
-                config: CalendarDatePicker2Config(
-                  calendarType: CalendarDatePicker2Type.single,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "언제부터? ",
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (recordManageController.startDate.isNotEmpty)
+                        Text(
+                          "${recordManageController.startDate[0]!.year}년 ${recordManageController.startDate[0]!.month}월 ${recordManageController.startDate[0]!.day}일",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-                value: recordManageController.startDate,
-                onValueChanged: (value) {
-                  recordManageController.setStartDate(value);
-                },
               ),
-            ),
+              Expanded(
+                child: Obx(
+                  () => CalendarDatePicker2(
+                    config: CalendarDatePicker2Config(
+                      calendarType: CalendarDatePicker2Type.single,
+                      lastDate: DateTime.now(),
+                    ),
+                    value: recordManageController.startDate,
+                    onValueChanged: (value) {
+                      recordManageController.setStartDate(value);
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         separator(axis: Axis.horizontal),
         Expanded(
-          child: Center(
-            child: Obx(
-                  () => CalendarDatePicker2(
-                config: CalendarDatePicker2Config(
-                  calendarType: CalendarDatePicker2Type.single,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Obx(
+                  () => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "언제까지? ",
+                        style: TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      if (recordManageController.endDate.isNotEmpty)
+                        Text(
+                          "${recordManageController.endDate[0]!.year}년 ${recordManageController.endDate[0]!.month}월 ${recordManageController.endDate[0]!.day}일",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-                value: recordManageController.endDate,
-                onValueChanged: (value) {
-                  recordManageController.setEndDate(value);
-                },
               ),
-            ),
+              Expanded(
+                child: Obx(
+                  () => CalendarDatePicker2(
+                    config: CalendarDatePicker2Config(
+                      calendarType: CalendarDatePicker2Type.single,
+                      lastDate: DateTime.now(),
+                    ),
+                    value: recordManageController.endDate,
+                    onValueChanged: (value) {
+                      recordManageController.setEndDate(value);
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         separator(axis: Axis.horizontal),
