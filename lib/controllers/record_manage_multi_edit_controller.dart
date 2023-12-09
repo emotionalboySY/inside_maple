@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../constants.dart';
 import '../data.dart';
-import '../utils/logger.dart';
 
 class RecordManageMultiEditController extends GetxController {
   final f = NumberFormat("#,##0");

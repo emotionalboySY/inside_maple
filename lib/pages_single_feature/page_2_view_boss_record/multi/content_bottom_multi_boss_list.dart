@@ -5,7 +5,6 @@ import 'package:inside_maple/controllers/record_manage_multi_controller.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../controllers/record_manage_single_controller.dart';
-import '../../../utils/logger.dart';
 
 class ContentBottomMultiBossList extends StatelessWidget {
   ContentBottomMultiBossList({super.key});
