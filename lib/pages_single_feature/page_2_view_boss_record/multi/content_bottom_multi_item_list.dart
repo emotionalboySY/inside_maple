@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
+import 'package:oktoast/oktoast.dart';
 
 class ContentBottomMultiItemList extends StatelessWidget {
   ContentBottomMultiItemList({super.key});
@@ -152,69 +153,34 @@ class ContentBottomMultiItemList extends StatelessWidget {
   Widget _rightChild({
     required int index,
   }) {
-    return recordManageMultiEditController.isRecordEditMode.value
-        ? Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 150,
-                  height: 25,
-                  child: RawKeyboardListener(
-                    focusNode: FocusNode(),
-                    onKey: (RawKeyEvent event) {
-                      if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
-                        FocusScope.of(Get.context!).unfocus();
-                        recordManageMultiEditController.applyPrice(index);
-                      }
-                    },
-                    child: TextField(
-                      controller: recordManageMultiEditController.itemPriceControllers[index],
-                      focusNode: recordManageMultiEditController.itemFocusNodes[index],
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.end,
-                      decoration: InputDecoration(
-                        hintText: recordManageMultiEditController.f.format(recordManageMultiEditController.itemsList[index].price.value),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(
-                            color: recordManageMultiEditController.itemsList[index].price.value ==
-                                    recordManageMultiEditController.itemsListEdited[index].price.value
-                                ? Colors.black
-                                : Colors.red,
-                          ),
-                        ),
-                      ),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: recordManageMultiEditController.itemsList[index].price.value ==
-                                recordManageMultiEditController.itemsListEdited[index].price.value
-                            ? Colors.black
-                            : Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 5.0),
-                  child: Text(
-                    "메소",
-                    style: TextStyle(
-                      color: recordManageMultiEditController.itemsList[index].price.value ==
-                              recordManageMultiEditController.itemsListEdited[index].price.value
-                          ? Colors.black
-                          : Colors.red,
-                    ),
-                  ),
-                ),
-              ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "${recordManageMultiEditController.f.format(recordManageMultiEditController.itemsList[index].price.value)} 메소",
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 5.0),
+          child: IconButton(
+            onPressed: () {
+              showToast("단가 수정 버튼 눌림.");
+            },
+            style: IconButton.styleFrom(
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              minimumSize: Size.zero,
+              hoverColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              highlightColor: Colors.transparent,
             ),
-          )
-        : Center(
-            child: Text(
-              "${recordManageMultiEditController.f.format(recordManageMultiEditController.itemsList[index].price.value)} 메소",
+            icon: const Icon(
+              Icons.edit,
+              color: Colors.grey,
+              size: 16,
             ),
-          );
+          ),
+        )
+      ],
+    );
   }
 }

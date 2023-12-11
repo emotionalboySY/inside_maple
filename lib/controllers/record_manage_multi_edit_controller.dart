@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/record_manage_data_controller.dart';
 import 'package:intl/intl.dart';
@@ -15,13 +16,22 @@ class RecordManageMultiEditController extends GetxController {
   List<TextEditingController> itemPriceControllers = [];
 
   RxList<BossRecord> bossRecords = <BossRecord>[].obs;
+  Map<ItemData, List<Item>> itemsListRaw = {};
   RxList<Item> itemsList = <Item>[].obs;
+  RxList<ItemData> flagList = <ItemData>[].obs;
   RxList<Item> itemsListEdited = <Item>[].obs;
 
   RxBool isRecordEditMode = false.obs;
   RxBool isRecordEdited = false.obs;
 
   void loadBossRecords(Map<Boss, List<Difficulty>> selectedBossAndDiff, DateTime startDate, DateTime endDate) {
+    disposeControllers();
+    disposeFocusNodes();
+    bossRecords.clear();
+    itemsList.clear();
+    itemsListEdited.clear();
+    itemsListRaw.clear();
+    flagList.clear();
     for(var record in recordManageDataController.loadedBossRecords) {
       if(selectedBossAndDiff.containsKey(record.boss)) {
         if(selectedBossAndDiff[record.boss]!.contains(record.difficulty)) {
@@ -34,15 +44,31 @@ class RecordManageMultiEditController extends GetxController {
 
     for(var record in bossRecords) {
       for(var item in record.itemList) {
-        if(itemsList.any((element) => element.item == item.item)) {
-          itemsList.firstWhere((element) => element.item == item.item).count.value += item.count.value;
+        if(itemsListRaw.containsKey(item.item)) {
+          itemsListRaw[item.item]!.add(item);
         } else {
-          itemsList.add(item);
+          itemsListRaw[item.item] = [item];
         }
-        itemsListEdited.add(Item.clone(item));
       }
     }
+
+    itemsListRaw.forEach((itemData, itemList) {
+      if(itemList.any((element) => element.price.value == 0) || itemList.any((element) => element.price.value != itemList[0].price.value)) {
+        flagList.add(itemData);
+      }
+      int totalCount = 0;
+      int totalPrice = 0;
+      for (var element in itemList) {
+        totalCount += element.count.value;
+        totalPrice += element.price.value;
+      }
+
+      int avgPrice = (totalPrice / totalCount).round();
+      itemsList.add(Item(item: itemData, count: totalCount.obs, price: avgPrice.obs));
+      itemsListEdited.add(Item(item: itemData, count: totalCount.obs, price: avgPrice.obs));
+    });
     itemsList.refresh();
+    itemsListEdited.refresh();
   }
 
   void applyPrice(int index) {

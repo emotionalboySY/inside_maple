@@ -157,7 +157,7 @@ class ViewBossRecordTop extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          recordManageDataController.viewMode.value == 1 ? _topMenuSingle() : _topMenuMulti(),
+          recordManageDataController.viewMode.value == 1 ? _topMenuSingle() : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, right: 15.0, left: 5.0),
             child: ElevatedButton(
@@ -217,47 +217,6 @@ class ViewBossRecordTop extends StatelessWidget {
                   },
                   child: Text(
                     recordManageSingleController.isRecordEditMode.value ? "저장" : "수정",
-                    style: const TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              )
-            : const SizedBox.shrink(),
-      ],
-    );
-  }
-
-  Widget _topMenuMulti() {
-    return Row(
-      children: [
-        recordManageMultiEditController.bossRecords.isNotEmpty &&
-                recordManageMultiEditController.isRecordEditMode.value &&
-                recordManageMultiEditController.isRecordEdited.value
-            ? Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: TextButton(
-                  onPressed: () {
-                    // recordManageMultiEditController.revertChanges();
-                  },
-                  child: const Text(
-                    "수정 내역 초기화",
-                  ),
-                ),
-              )
-            : const SizedBox.shrink(),
-        recordManageMultiEditController.bossRecords.isNotEmpty
-            ? Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: TextButton(
-                  onPressed: () {
-                    if (recordManageMultiEditController.isRecordEditMode.value) {
-                    } else {
-                      recordManageMultiEditController.toggleEditMode();
-                    }
-                  },
-                  child: Text(
-                    recordManageMultiEditController.isRecordEditMode.value ? "저장" : "수정",
                     style: const TextStyle(
                       fontSize: 14,
                     ),
