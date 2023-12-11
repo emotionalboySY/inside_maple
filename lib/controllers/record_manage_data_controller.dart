@@ -14,6 +14,8 @@ class RecordManageDataController extends GetxController {
 
   List<BossRecord> _loadedBossRecords = <BossRecord>[];
 
+  RxInt viewMode = 1.obs;
+
   Future<void> readBossRecords() async {
     final box = await Hive.openBox("insideMaple");
     _loadedBossRecords.clear();

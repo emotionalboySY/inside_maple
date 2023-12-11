@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
+import 'package:inside_maple/controllers/record_manage_data_controller.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/multi/content_bottom_multi_item_list.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/content_top.dart';
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/single/content_bottom_single_item_list.dart';
@@ -14,7 +15,7 @@ import 'single/content_bottom_single_boss_list.dart';
 class PageViewBossRecord extends StatelessWidget {
   PageViewBossRecord({super.key});
 
-  final recordUIController = Get.find<RecordManageSingleController>();
+  final recordManageDataController = Get.find<RecordManageDataController>();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class PageViewBossRecord extends StatelessWidget {
           separator(axis: Axis.horizontal),
           Obx(
             () => Expanded(
-              child: recordUIController.recordViewType.value == 1 ? const _BottomWidgetSingle() : const _BottomWidgetMulti(),
+              child: recordManageDataController.viewMode.value == 1 ? const _BottomWidgetSingle() : const _BottomWidgetMulti(),
             ),
           ),
         ],

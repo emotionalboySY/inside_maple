@@ -1,6 +1,9 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inside_maple/controllers/record_manage_data_controller.dart';
+import 'package:inside_maple/controllers/record_manage_multi_controller.dart';
+import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
 import 'package:inside_maple/controllers/record_manage_single_edit_controller.dart';
 
 import '../../controllers/record_manage_single_controller.dart';
@@ -8,8 +11,11 @@ import '../../controllers/record_manage_single_controller.dart';
 class ViewBossRecordTop extends StatelessWidget {
   ViewBossRecordTop({super.key});
 
-  final recordUIController = Get.find<RecordManageSingleController>();
-  final recordManageController = Get.find<RecordManageSingleEditController>();
+  final recordManageDataController = Get.find<RecordManageDataController>();
+  final recordManageSingleController = Get.find<RecordManageSingleController>();
+  final recordManageSingleEditController = Get.find<RecordManageSingleEditController>();
+  final recordManageMultiController = Get.find<RecordManageMultiController>();
+  final recordManageMultiEditController = Get.find<RecordManageMultiEditController>();
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +56,11 @@ class ViewBossRecordTop extends StatelessWidget {
           () => Padding(
             padding: const EdgeInsets.only(left: 32.0),
             child: AnimatedToggleSwitch.dual(
-              current: recordUIController.isMvpSilver.value,
+              current: recordManageSingleController.isMvpSilver.value,
               first: false,
               second: true,
               onChanged: (value) {
-                recordUIController.toggleMVP();
+                recordManageSingleController.toggleMVP();
               },
               height: 30,
               spacing: 10,
@@ -120,16 +126,21 @@ class ViewBossRecordTop extends StatelessWidget {
         Obx(
           () => Radio<int>(
             value: value,
-            groupValue: recordUIController.recordViewType.value,
+            groupValue: recordManageDataController.viewMode.value,
             onChanged: (value) {
-              recordUIController.recordViewType.value = value!;
+              recordManageDataController.viewMode.value = value!;
+              if(value == 1) {
+                recordManageMultiController.resetAll();
+              }
+              else if(value == 2) {
+              }
             },
             splashRadius: 0.0,
           ),
         ),
         GestureDetector(
           onTap: () {
-            recordUIController.recordViewType.value = value;
+            recordManageDataController.viewMode.value = value;
           },
           child: Text(
             title,
@@ -146,41 +157,7 @@ class ViewBossRecordTop extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
-          recordManageController.selectedRecordData.value != null &&
-                  recordUIController.isRecordEditMode.value &&
-                  recordUIController.isRecordEdited.value
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: TextButton(
-                    onPressed: () {
-                      recordManageController.revertChanges();
-                    },
-                    child: const Text(
-                      "수정 내역 초기화",
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(),
-          recordManageController.selectedRecordData.value != null
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: TextButton(
-                    onPressed: () {
-                      if (recordUIController.isRecordEditMode.value) {
-                        recordManageController.saveChanges();
-                      } else {
-                        recordUIController.toggleEditMode();
-                      }
-                    },
-                    child: Text(
-                      recordUIController.isRecordEditMode.value ? "저장" : "수정",
-                      style: const TextStyle(
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink(),
+          recordManageDataController.viewMode.value == 1 ? _topMenuSingle() : _topMenuMulti(),
           Padding(
             padding: const EdgeInsets.only(top: 10.0, bottom: 10.0, right: 15.0, left: 5.0),
             child: ElevatedButton(
@@ -206,6 +183,89 @@ class ViewBossRecordTop extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _topMenuSingle() {
+    return Row(
+      children: [
+        recordManageSingleEditController.selectedRecordData.value != null &&
+                recordManageSingleController.isRecordEditMode.value &&
+                recordManageSingleController.isRecordEdited.value
+            ? Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton(
+                  onPressed: () {
+                    recordManageSingleEditController.revertChanges();
+                  },
+                  child: const Text(
+                    "수정 내역 초기화",
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+        recordManageSingleEditController.selectedRecordData.value != null
+            ? Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton(
+                  onPressed: () {
+                    if (recordManageSingleController.isRecordEditMode.value) {
+                      recordManageSingleEditController.saveChanges();
+                    } else {
+                      recordManageSingleController.toggleEditMode();
+                    }
+                  },
+                  child: Text(
+                    recordManageSingleController.isRecordEditMode.value ? "저장" : "수정",
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ],
+    );
+  }
+
+  Widget _topMenuMulti() {
+    return Row(
+      children: [
+        recordManageMultiEditController.bossRecords.isNotEmpty &&
+                recordManageMultiEditController.isRecordEditMode.value &&
+                recordManageMultiEditController.isRecordEdited.value
+            ? Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton(
+                  onPressed: () {
+                    // recordManageMultiEditController.revertChanges();
+                  },
+                  child: const Text(
+                    "수정 내역 초기화",
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+        recordManageMultiEditController.bossRecords.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: TextButton(
+                  onPressed: () {
+                    if (recordManageMultiEditController.isRecordEditMode.value) {
+                    } else {
+                      recordManageMultiEditController.toggleEditMode();
+                    }
+                  },
+                  child: Text(
+                    recordManageMultiEditController.isRecordEditMode.value ? "저장" : "수정",
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ],
     );
   }
 }

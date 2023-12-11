@@ -21,7 +21,6 @@ class RecordManageSingleController extends GetxController {
   Rx<LoadStatus> recordLoadStatus = LoadStatus.empty.obs;
   Rx<LoadStatus> recordSetStatus = LoadStatus.empty.obs;
 
-  Rx<int> recordViewType = 1.obs;
   RxBool isRecordEditMode = false.obs;
   RxBool isRecordEdited = false.obs;
 

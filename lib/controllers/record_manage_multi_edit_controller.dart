@@ -85,6 +85,20 @@ class RecordManageMultiEditController extends GetxController {
     }
   }
 
+  void toggleEditMode() {
+    isRecordEditMode.value = !isRecordEditMode.value;
+  }
+
+  void resetAll() {
+    disposeFocusNodes();
+    disposeControllers();
+    itemsListEdited.clear();
+    itemsList.clear();
+    bossRecords.clear();
+    isRecordEditMode.value = false;
+    isRecordEdited.value = false;
+  }
+
   void disposeFocusNodes() {
     if (itemFocusNodes.isNotEmpty) {
       for (int i = 0; i < itemFocusNodes.length; i++) {

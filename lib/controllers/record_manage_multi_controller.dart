@@ -150,6 +150,13 @@ class RecordManageMultiController extends GetxController {
     recordManageMultiEditController.loadBossRecords(selectedBossList, startDate, endDate);
   }
 
+  void resetAll() {
+    selectedBossList.clear();
+    startDate.clear();
+    endDate.clear();
+    recordManageMultiEditController.resetAll();
+  }
+
   @override
   void onInit() {
     ever(selectedBossList, (value) {

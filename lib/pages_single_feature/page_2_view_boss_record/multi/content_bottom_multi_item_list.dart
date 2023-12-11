@@ -14,80 +14,80 @@ class ContentBottomMultiItemList extends StatelessWidget {
     return Obx(
       () => recordManageMultiEditController.itemsList.isNotEmpty
           ? Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _itemComponent(
-            isChild: false,
-            height: 40,
-            index: -1,
-            leftChild: const Center(
-              child: Text(
-                "아이템 이름",
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-            centerChild: const Center(
-              child: Text(
-                "획득 개수",
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-            rightChild: const Center(
-              child: Text(
-                "판매 단가(메소)",
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: recordManageMultiEditController.itemsList.length,
-              itemBuilder: (context, index) {
-                return _itemComponent(
-                  isChild: true,
-                  height: 50,
-                  index: index,
-                  leftChild: Padding(
-                    padding: const EdgeInsets.only(left: 32.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ExtendedImage.asset(
-                          recordManageMultiEditController.itemsList[index].item.imagePath,
-                          width: 30,
-                          height: 30,
-                          fit: BoxFit.contain,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Text(
-                            recordManageMultiEditController.itemsList[index].item.korLabel,
-                          ),
-                        )
-                      ],
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _itemComponent(
+                  isChild: false,
+                  height: 40,
+                  index: -1,
+                  leftChild: const Center(
+                    child: Text(
+                      "아이템 이름",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
-                  centerChild: _centerChild(index: index),
-                  rightChild: _rightChild(index: index),
-                );
-              },
-            ),
-          ),
-          // _bottomParameters(),
-          // separator(axis: Axis.horizontal),
-          // _bottomComponent(),
-        ],
-      )
+                  centerChild: const Center(
+                    child: Text(
+                      "획득 개수",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                  rightChild: const Center(
+                    child: Text(
+                      "판매 단가(메소)",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: recordManageMultiEditController.itemsList.length,
+                    itemBuilder: (context, index) {
+                      return _itemComponent(
+                        isChild: true,
+                        height: 50,
+                        index: index,
+                        leftChild: Padding(
+                          padding: const EdgeInsets.only(left: 32.0),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              ExtendedImage.asset(
+                                recordManageMultiEditController.itemsList[index].item.imagePath,
+                                width: 30,
+                                height: 30,
+                                fit: BoxFit.contain,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Text(
+                                  recordManageMultiEditController.itemsList[index].item.korLabel,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        centerChild: _centerChild(index: index),
+                        rightChild: _rightChild(index: index),
+                      );
+                    },
+                  ),
+                ),
+                // _bottomParameters(),
+                // separator(axis: Axis.horizontal),
+                // _bottomComponent(),
+              ],
+            )
           : const Center(
               child: Text(
                 "왼쪽에서 검색할 보스 및 날짜 범위를 모두 선택해 주세요.",
@@ -179,7 +179,8 @@ class ContentBottomMultiItemList extends StatelessWidget {
                         hintText: recordManageMultiEditController.f.format(recordManageMultiEditController.itemsList[index].price.value),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                            color: recordManageMultiEditController.itemsList[index].price.value == recordManageMultiEditController.itemsListEdited[index].price.value
+                            color: recordManageMultiEditController.itemsList[index].price.value ==
+                                    recordManageMultiEditController.itemsListEdited[index].price.value
                                 ? Colors.black
                                 : Colors.red,
                           ),
@@ -201,7 +202,7 @@ class ContentBottomMultiItemList extends StatelessWidget {
                     "메소",
                     style: TextStyle(
                       color: recordManageMultiEditController.itemsList[index].price.value ==
-                          recordManageMultiEditController.itemsListEdited[index].price.value
+                              recordManageMultiEditController.itemsListEdited[index].price.value
                           ? Colors.black
                           : Colors.red,
                     ),
