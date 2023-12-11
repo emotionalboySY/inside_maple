@@ -56,11 +56,11 @@ class ViewBossRecordTop extends StatelessWidget {
           () => Padding(
             padding: const EdgeInsets.only(left: 32.0),
             child: AnimatedToggleSwitch.dual(
-              current: recordManageSingleController.isMvpSilver.value,
+              current: recordManageDataController.isMVPSilver.value,
               first: false,
               second: true,
               onChanged: (value) {
-                recordManageSingleController.toggleMVP();
+                recordManageDataController.toggleMVP();
               },
               height: 30,
               spacing: 10,

@@ -33,7 +33,6 @@ class RecordManageSingleController extends GetxController {
   RxInt totalItemPriceAfterDivision = 0.obs;
   RxString totalItemPriceLocale = "".obs;
   RxString totalItemPriceAfterDivisionLocale = "".obs;
-  RxBool isMvpSilver = false.obs;
 
   void setDataFromRaw(List<BossRecord> loadedData) {
     recordSetStatus.value = LoadStatus.loading;
@@ -152,25 +151,20 @@ class RecordManageSingleController extends GetxController {
     isRecordEditMode.value = !isRecordEditMode.value;
   }
 
-  void toggleMVP() {
-    isMvpSilver.value = !isMvpSilver.value;
-    if (recordManageSingleEditController.selectedRecordData.value != null) {
-      calculateTotalPrices();
-    }
-  }
-
   void calculateTotalPrices() {
-    int total = 0;
-    for (var item in recordManageSingleEditController.selectedRecordData.value!.itemList) {
-      total += ((item.price * item.count.value) * (isMvpSilver.value ? 0.97 : 0.95)).round();
-    }
-    totalItemPrice.value = total;
-    totalItemPriceLocale.value = f.format(total);
-    totalItemPriceAfterDivision.value = (total / recordManageSingleEditController.selectedRecordData.value!.partyAmount.value).round();
-    totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
+    if(recordManageSingleEditController.selectedRecordData.value != null) {
+      int total = 0;
+      for (var item in recordManageSingleEditController.selectedRecordData.value!.itemList) {
+        total += ((item.price * item.count.value) * (recordManageDataController.isMVPSilver.value ? 0.97 : 0.95)).round();
+      }
+      totalItemPrice.value = total;
+      totalItemPriceLocale.value = f.format(total);
+      totalItemPriceAfterDivision.value = (total / recordManageSingleEditController.selectedRecordData.value!.partyAmount.value).round();
+      totalItemPriceAfterDivisionLocale.value = f.format(totalItemPriceAfterDivision.value);
 
-    // loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
-    // loggerNoStack.d("calculated totalItemPriceAfterDivision: $totalItemPriceAfterDivision");
+      // loggerNoStack.d("calculated totalItemPrice: $totalItemPrice");
+      // loggerNoStack.d("calculated totalItemPriceAfterDivision: $totalItemPriceAfterDivision");
+    }
   }
 
   void updateIsRecordEdited() {

@@ -13,13 +13,13 @@ import '../../../utils/logger.dart';
 class ContentBottomSingleItemList extends StatelessWidget {
   ContentBottomSingleItemList({super.key});
 
-  final recordUIController = Get.find<RecordManageSingleController>();
-  final recordManageController = Get.find<RecordManageSingleEditController>();
+  final recordManageSingleController = Get.find<RecordManageSingleController>();
+  final recordManageSingleEditController = Get.find<RecordManageSingleEditController>();
 
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => recordUIController.selectedWeekType.value != null && recordManageController.selectedRecordData.value != null
+      () => recordManageSingleController.selectedWeekType.value != null && recordManageSingleEditController.selectedRecordData.value != null
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -57,7 +57,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                 ),
                 Expanded(
                   child: ListView.builder(
-                    itemCount: recordManageController.selectedRecordData.value!.itemList.length,
+                    itemCount: recordManageSingleEditController.selectedRecordData.value!.itemList.length,
                     itemBuilder: (context, index) {
                       return _itemComponent(
                         isChild: true,
@@ -70,7 +70,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               ExtendedImage.asset(
-                                recordManageController.selectedRecordData.value!.itemList[index].item.imagePath,
+                                recordManageSingleEditController.selectedRecordData.value!.itemList[index].item.imagePath,
                                 width: 30,
                                 height: 30,
                                 fit: BoxFit.contain,
@@ -78,7 +78,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
                                 child: Text(
-                                  recordManageController.selectedRecordData.value!.itemList[index].item.korLabel,
+                                  recordManageSingleEditController.selectedRecordData.value!.itemList[index].item.korLabel,
                                 ),
                               )
                             ],
@@ -130,7 +130,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                 Expanded(
                   child: rightChild,
                 ),
-                recordUIController.isRecordEditMode.value
+                recordManageSingleController.isRecordEditMode.value
                     ? Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: IconButton(
@@ -140,7 +140,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                             color: isChild ? Colors.black : Colors.transparent,
                           ),
                           onPressed: () {
-                            recordManageController.deleteItem(index);
+                            recordManageSingleEditController.deleteItem(index);
                           },
                         ),
                       )
@@ -162,13 +162,13 @@ class ContentBottomSingleItemList extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            recordUIController.isRecordEditMode.value &&
-                    itemCanDuplicated.contains(recordManageController.selectedRecordData.value!.itemList[index].item)
+            recordManageSingleController.isRecordEditMode.value &&
+                    itemCanDuplicated.contains(recordManageSingleEditController.selectedRecordData.value!.itemList[index].item)
                 ? Obx(() => IconButton(
-                      onPressed: recordManageController.selectedRecordData.value!.itemList[index].count.value == 1
+                      onPressed: recordManageSingleEditController.selectedRecordData.value!.itemList[index].count.value == 1
                           ? null
                           : () {
-                              recordManageController.decreaseItemCount(index);
+                              recordManageSingleEditController.decreaseItemCount(index);
                             },
                       icon: const Icon(Icons.remove),
                       style: IconButton.styleFrom(
@@ -181,20 +181,20 @@ class ContentBottomSingleItemList extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5.0),
               child: Text(
-                "${recordManageController.selectedRecordData.value!.itemList[index].count.value}개",
+                "${recordManageSingleEditController.selectedRecordData.value!.itemList[index].count.value}개",
                 style: TextStyle(
-                  color: recordManageController.selectedRecordData.value!.itemList[index].count.value ==
-                          recordUIController.selectedRecordData.value!.itemList[index].count.value
+                  color: recordManageSingleEditController.selectedRecordData.value!.itemList[index].count.value ==
+                          recordManageSingleController.selectedRecordData.value!.itemList[index].count.value
                       ? Colors.black
                       : Colors.red,
                 ),
               ),
             ),
-            recordUIController.isRecordEditMode.value &&
-                    itemCanDuplicated.contains(recordManageController.selectedRecordData.value!.itemList[index].item)
+            recordManageSingleController.isRecordEditMode.value &&
+                    itemCanDuplicated.contains(recordManageSingleEditController.selectedRecordData.value!.itemList[index].item)
                 ? IconButton(
                     onPressed: () {
-                      recordManageController.increaseItemCount(index);
+                      recordManageSingleEditController.increaseItemCount(index);
                     },
                     icon: const Icon(Icons.add),
                     style: IconButton.styleFrom(
@@ -213,7 +213,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
   Widget _rightChild({
     required int index,
   }) {
-    return recordUIController.isRecordEditMode.value
+    return recordManageSingleController.isRecordEditMode.value
         ? Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -228,20 +228,20 @@ class ContentBottomSingleItemList extends StatelessWidget {
                     onKey: (RawKeyEvent event) {
                       if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
                         FocusScope.of(Get.context!).unfocus();
-                        recordManageController.applyPrice(index);
+                        recordManageSingleEditController.applyPrice(index);
                       }
                     },
                     child: TextField(
-                      controller: recordUIController.itemPriceControllers[index],
-                      focusNode: recordUIController.itemFocusNodes[index],
+                      controller: recordManageSingleController.itemPriceControllers[index],
+                      focusNode: recordManageSingleController.itemFocusNodes[index],
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.end,
                       decoration: InputDecoration(
-                        hintText: recordUIController.f.format(recordManageController.selectedRecordData.value!.itemList[index].price.value),
+                        hintText: recordManageSingleController.f.format(recordManageSingleEditController.selectedRecordData.value!.itemList[index].price.value),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
-                            color: recordManageController.selectedRecordData.value!.itemList[index].price.value ==
-                                    recordUIController.selectedRecordData.value!.itemList[index].price.value
+                            color: recordManageSingleEditController.selectedRecordData.value!.itemList[index].price.value ==
+                                    recordManageSingleController.selectedRecordData.value!.itemList[index].price.value
                                 ? Colors.black
                                 : Colors.red,
                           ),
@@ -249,8 +249,8 @@ class ContentBottomSingleItemList extends StatelessWidget {
                       ),
                       style: TextStyle(
                         fontSize: 14,
-                        color: recordManageController.selectedRecordData.value!.itemList[index].price.value ==
-                                recordUIController.selectedRecordData.value!.itemList[index].price.value
+                        color: recordManageSingleEditController.selectedRecordData.value!.itemList[index].price.value ==
+                                recordManageSingleController.selectedRecordData.value!.itemList[index].price.value
                             ? Colors.black
                             : Colors.red,
                       ),
@@ -262,8 +262,8 @@ class ContentBottomSingleItemList extends StatelessWidget {
                   child: Text(
                     "메소",
                     style: TextStyle(
-                      color: recordManageController.selectedRecordData.value!.itemList[index].price.value ==
-                              recordUIController.selectedRecordData.value!.itemList[index].price.value
+                      color: recordManageSingleEditController.selectedRecordData.value!.itemList[index].price.value ==
+                              recordManageSingleController.selectedRecordData.value!.itemList[index].price.value
                           ? Colors.black
                           : Colors.red,
                     ),
@@ -274,7 +274,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
           )
         : Center(
             child: Text(
-              "${recordUIController.f.format(recordManageController.selectedRecordData.value!.itemList[index].price.value)} 메소",
+              "${recordManageSingleController.f.format(recordManageSingleEditController.selectedRecordData.value!.itemList[index].price.value)} 메소",
             ),
           );
   }
@@ -295,7 +295,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                 ),
               ),
               Text(
-                DateFormat('yyyy년 MM월 dd일').format(recordManageController.selectedRecordData.value!.date),
+                DateFormat('yyyy년 MM월 dd일').format(recordManageSingleEditController.selectedRecordData.value!.date),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -318,22 +318,22 @@ class ContentBottomSingleItemList extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                    recordUIController.isRecordEditMode.value
+                    recordManageSingleController.isRecordEditMode.value
                         ? DropdownButtonHideUnderline(
                             child: DropdownButton<int>(
                               elevation: 0,
                               padding: EdgeInsets.zero,
                               isDense: true,
                               focusColor: Theme.of(Get.context!).scaffoldBackgroundColor,
-                              value: recordManageController.selectedRecordData.value!.partyAmount.value,
+                              value: recordManageSingleEditController.selectedRecordData.value!.partyAmount.value,
                               iconSize: 20,
                               onChanged: (newValue) {
-                                loggerNoStack.d("before update(Existing): ${recordUIController.selectedRecordData.value!}");
-                                loggerNoStack.d("before update(cloned): ${recordManageController.selectedRecordData.value!}");
-                                recordManageController.selectedRecordData.value!.partyAmount.value = newValue!;
-                                loggerNoStack.d("after update(Existing): ${recordUIController.selectedRecordData.value!}");
-                                loggerNoStack.d("after update(cloned): ${recordManageController.selectedRecordData.value!}");
-                                recordUIController.updateIsRecordEdited();
+                                loggerNoStack.d("before update(Existing): ${recordManageSingleController.selectedRecordData.value!}");
+                                loggerNoStack.d("before update(cloned): ${recordManageSingleEditController.selectedRecordData.value!}");
+                                recordManageSingleEditController.selectedRecordData.value!.partyAmount.value = newValue!;
+                                loggerNoStack.d("after update(Existing): ${recordManageSingleController.selectedRecordData.value!}");
+                                loggerNoStack.d("after update(cloned): ${recordManageSingleEditController.selectedRecordData.value!}");
+                                recordManageSingleController.updateIsRecordEdited();
                               },
                               items: <int>[1, 2, 3, 4, 5, 6].map<DropdownMenuItem<int>>((int value) {
                                 return DropdownMenuItem<int>(
@@ -351,7 +351,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                             ),
                           )
                         : Text(
-                            "${recordManageController.selectedRecordData.value!.partyAmount.value}명",
+                            "${recordManageSingleEditController.selectedRecordData.value!.partyAmount.value}명",
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontFamily: "Pretendard",
@@ -364,7 +364,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 14.0),
                   child: TextButton(
                     onPressed: () async {
-                      await recordUIController.removeBossRecord();
+                      await recordManageSingleController.removeBossRecord();
                     },
                     style: ButtonStyle(
                       overlayColor: MaterialStateProperty.all(Colors.transparent),
@@ -401,7 +401,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "총 수익: ${recordUIController.totalItemPriceLocale.value} 메소",
+                    "총 수익: ${recordManageSingleController.totalItemPriceLocale.value} 메소",
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
@@ -411,7 +411,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 5.0),
                     child: IconButton(
                       onPressed: () async {
-                        await recordUIController.showTotalHelpDialog();
+                        await recordManageSingleController.showTotalHelpDialog();
                       },
                       icon: Icon(
                         Icons.help_outline,
@@ -436,7 +436,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "1인당 분배금: ${recordUIController.totalItemPriceAfterDivisionLocale.value} 메소",
+                    "1인당 분배금: ${recordManageSingleController.totalItemPriceAfterDivisionLocale.value} 메소",
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 16,
@@ -446,7 +446,7 @@ class ContentBottomSingleItemList extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 5.0),
                     child: IconButton(
                       onPressed: () async {
-                        await recordUIController.showDivisionHelpDialog();
+                        await recordManageSingleController.showDivisionHelpDialog();
                       },
                       icon: Icon(
                         Icons.help_outline,

@@ -1,4 +1,3 @@
-import 'package:extended_image/extended_image.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/record_manage_data_controller.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +22,9 @@ class RecordManageMultiEditController extends GetxController {
 
   RxBool isRecordEditMode = false.obs;
   RxBool isRecordEdited = false.obs;
+
+  RxInt totalPrice = 0.obs;
+  RxString totalPriceLocale = "0".obs;
 
   void loadBossRecords(Map<Boss, List<Difficulty>> selectedBossAndDiff, DateTime startDate, DateTime endDate) {
     disposeControllers();
@@ -89,6 +91,17 @@ class RecordManageMultiEditController extends GetxController {
         }
       }
       isRecordEdited.value = false;
+    }
+  }
+
+  void calculateTotalPrice() {
+    if(bossRecords.isNotEmpty && itemsList.isNotEmpty) {
+      int totalPrice = 0;
+      for(var item in itemsList) {
+        totalPrice += ((item.price * item.count.value) * (recordManageDataController.isMVPSilver.value ? 0.97 : 0.95)).round();
+      }
+      this.totalPrice.value = totalPrice;
+      totalPriceLocale.value = f.format(totalPrice);
     }
   }
 

@@ -1,13 +1,16 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
 import 'package:oktoast/oktoast.dart';
 
+import '../../../constants.dart';
+import '../../../controllers/record_manage_multi_controller.dart';
+
 class ContentBottomMultiItemList extends StatelessWidget {
   ContentBottomMultiItemList({super.key});
 
+  final recordManageMultiController = Get.find<RecordManageMultiController>();
   final recordManageMultiEditController = Get.find<RecordManageMultiEditController>();
 
   @override
@@ -84,9 +87,8 @@ class ContentBottomMultiItemList extends StatelessWidget {
                     },
                   ),
                 ),
-                // _bottomParameters(),
-                // separator(axis: Axis.horizontal),
-                // _bottomComponent(),
+                separator(axis: Axis.horizontal),
+                _bottomComponent(),
               ],
             )
           : const Center(
@@ -181,6 +183,44 @@ class ContentBottomMultiItemList extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+
+  Widget _bottomComponent() {
+    return SizedBox(
+      height: 50,
+      child: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "총 수익: ${recordManageMultiEditController.totalPriceLocale.value} 메소",
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 5.0),
+              child: IconButton(
+                onPressed: () async {
+                  await recordManageMultiController.showTotalHelpDialog();
+                },
+                icon: Icon(
+                  Icons.help_outline,
+                  size: 16,
+                  color: Colors.grey.shade500,
+                ),
+                style: IconButton.styleFrom(
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

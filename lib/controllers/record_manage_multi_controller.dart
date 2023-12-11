@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
 import 'package:oktoast/oktoast.dart';
@@ -148,6 +149,44 @@ class RecordManageMultiController extends GetxController {
     DateTime startDate = this.startDate[0]!;
     DateTime endDate = this.endDate[0]!;
     recordManageMultiEditController.loadBossRecords(selectedBossList, startDate, endDate);
+  }
+
+  Future<void> showTotalHelpDialog() async {
+    await Get.dialog(
+      barrierDismissible: true,
+      AlertDialog(
+        insetPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        actionsPadding: EdgeInsets.zero,
+        actionsAlignment: MainAxisAlignment.center,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        elevation: 0.0,
+        title: null,
+        content: const Padding(
+          padding: EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0.0),
+          child: Text(
+            "<각 아이템 별 판매 수익 계산 방법>\n"
+                "- (각 아이템 별 획득 개수 * 단가) * (1 - 판매수수료율)\n"
+                "- 예시: [MVP 브론즈일 때] 반짝이는 파란 별 물약 2개를 각 4,500,000메소에 판매 = 9,000,000메소 * (1 - 0.05) = 8,550,000메소\n\n"
+                "- 판매수수료율은 MVP 등급에 따라 3% 또는 5%로 적용됩니다.(브론즈 이하: 5%, 실버 이상: 3%)\n\n"
+                "- 총 판매 수익(합계)는 각 아이템 별 판매 수익을 모두 합친 후 판매수수료를 제한 값으로, 소수점에서 반올림처리됩니다.\n(정확하지 않을 수 있습니다)",
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(top: 15.0, bottom: 10.0),
+            child: TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: const Text("확인"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void resetAll() {
