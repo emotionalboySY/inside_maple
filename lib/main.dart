@@ -18,28 +18,28 @@ import 'data.dart';
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
 
   if(Platform.isWindows) {
+    await windowManager.ensureInitialized();
     setWindowTitle("Inside Maple");
     setWindowMinSize(const Size(1280, 720));
+
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(1280, 720),
+      minimumSize: Size(1280, 720),
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.normal,
+    );
+
+    windowManager.waitUntilReadyToShow(
+        windowOptions,
+            () async {
+          await windowManager.show();
+          await windowManager.focus();
+        }
+    );
   }
-
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(1280, 720),
-    minimumSize: Size(1280, 720),
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.normal,
-  );
-
-  windowManager.waitUntilReadyToShow(
-    windowOptions,
-      () async {
-      await windowManager.show();
-      await windowManager.focus();
-      }
-  );
 
   var documentPath = await getApplicationDocumentsDirectory();
 
