@@ -164,8 +164,8 @@ class ContentBottomMultiItemList extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 5.0),
           child: IconButton(
-            onPressed: () {
-              showToast("단가 수정 버튼 눌림.");
+            onPressed: () async {
+              await recordManageMultiEditController.showPriceEditDialog(recordManageMultiEditController.itemsList[index].item);
             },
             style: IconButton.styleFrom(
               padding: EdgeInsets.zero,
