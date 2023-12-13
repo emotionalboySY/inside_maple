@@ -23,7 +23,12 @@ class RecordManageMultiEditController extends GetxController {
   RxInt totalPrice = 0.obs;
   RxString totalPriceLocale = "0".obs;
 
+  Map<String, dynamic> savedParams = {};
+
   void loadBossRecords(Map<Boss, List<Difficulty>> selectedBossAndDiff, DateTime startDate, DateTime endDate) {
+    savedParams["selectedBossAndDiff"] = selectedBossAndDiff;
+    savedParams["startDate"] = startDate;
+    savedParams["endDate"] = endDate;
     bossRecords.clear();
     itemsList.clear();
     itemsListEdited.clear();
@@ -90,7 +95,9 @@ class RecordManageMultiEditController extends GetxController {
     TextEditingController controller = TextEditingController();
     RxInt selectedIndex = (-1).obs;
     String previousText = "";
+    int priceToEdit = 0;
     await Get.dialog(
+      barrierDismissible: false,
       AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5.0),
@@ -198,6 +205,7 @@ class RecordManageMultiEditController extends GetxController {
                             return GestureDetector(
                               onTap: () {
                                 selectedIndex.value = index;
+                                priceToEdit = recordsHaveExactItem[selectedIndex.value].itemList.firstWhere((element) => element.item == itemData).price.value;
                               },
                               child: SizedBox(
                                 height: 30,
@@ -282,6 +290,7 @@ class RecordManageMultiEditController extends GetxController {
                       if (controller.text.isNotEmpty && int.tryParse(controller.text) == null) {
                         controller.text = previousText;
                       }
+                      priceToEdit = int.tryParse(controller.text)!;
                       previousText = controller.text;
                     },
                     enabled: whichType.value == "manual",
@@ -307,8 +316,11 @@ class RecordManageMultiEditController extends GetxController {
             width: 20,
           ),
           TextButton(
-            onPressed: () {
-              Get.back();
+            onPressed: () async {
+              bool confirmed = await priceEditConfirmDialog(itemData, priceToEdit);
+              if(confirmed) {
+                Get.back();
+              }
             },
             child: const Text(
               "저장",
@@ -319,8 +331,95 @@ class RecordManageMultiEditController extends GetxController {
           ),
         ],
       ),
-      barrierDismissible: true,
     );
+  }
+
+  Future<bool> priceEditConfirmDialog(ItemData item, int price) async {
+    bool confirmed = false;
+    await Get.dialog(
+      barrierDismissible: false,
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        elevation: 0.0,
+        title: const Center(
+          child: Text(
+            "아이템 판매 단가 수정 확인",
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "아이템: ",
+                ),
+                Text(
+                    item.korLabel,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "변경할 금액: "
+                ),
+                Text(
+                  "${f.format(price)} 메소",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.only(top: 15.0),
+              child: Text(
+                "위 정보대로 아이템 판매 단가를 수정하시겠습니까?",
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              loadBossRecords(savedParams["selectedBossAndDiff"], savedParams["startDate"], savedParams["endDate"]);
+              Get.back();
+              confirmed = true;
+            },
+            child: const Text(
+              "네",
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text(
+              "아니오",
+              style: TextStyle(
+                  color: Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return confirmed;
   }
 
   Future<void> showItemHistoryDialog(int index) async {

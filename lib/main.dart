@@ -17,30 +17,6 @@ import 'data.dart';
 
 void main() async {
 
-  WidgetsFlutterBinding.ensureInitialized();
-
-  if(Platform.isWindows) {
-    await windowManager.ensureInitialized();
-    setWindowTitle("Inside Maple");
-    setWindowMinSize(const Size(1280, 720));
-
-    WindowOptions windowOptions = const WindowOptions(
-      size: Size(1280, 720),
-      minimumSize: Size(1280, 720),
-      backgroundColor: Colors.transparent,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.normal,
-    );
-
-    windowManager.waitUntilReadyToShow(
-        windowOptions,
-            () async {
-          await windowManager.show();
-          await windowManager.focus();
-        }
-    );
-  }
-
   var documentPath = await getApplicationDocumentsDirectory();
 
   String documentPathStr = documentPath.path;
@@ -56,6 +32,37 @@ void main() async {
   Hive.registerAdapter(RxListAdapter());
 
   Get.put(MainController());
+
+  final box = await Hive.openBox("insideMaple");
+  final savedSize = await box.get("savedWindowSize", defaultValue: {"width": 1280.0, "height": 720.0});
+  await windowManager.setSize(Size(savedSize["width"], savedSize["height"]));
+  box.close();
+
+  loggerNoStack.d("savedSize: $savedSize");
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if(Platform.isWindows) {
+    await windowManager.ensureInitialized();
+    setWindowTitle("Inside Maple");
+    setWindowMinSize(const Size(1280, 720));
+
+    WindowOptions windowOptions = WindowOptions(
+      size: Size(savedSize["width"], savedSize["height"]),
+      minimumSize: const Size(1280, 720),
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.normal,
+    );
+
+    windowManager.waitUntilReadyToShow(
+        windowOptions,
+            () async {
+          await windowManager.show();
+          await windowManager.focus();
+        }
+    );
+  }
 
   runApp(const MyApp());
 }
@@ -74,15 +81,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
     super.initState();
     windowManager.addListener(this);
     windowManager.setPreventClose(true);
-    _restoreWindowSize();
   }
-
-  Future<void> _restoreWindowSize() async {
-    final box = await Hive.openBox("insideMaple");
-    final savedSize = await box.get("savedWindowSize", defaultValue: const Size(1280.0, 720.0));
-    await windowManager.setSize(savedSize);
-  }
-
 
   @override
   void onWindowClose() async {
@@ -91,8 +90,14 @@ class _MyAppState extends State<MyApp> with WindowListener {
       loggerNoStack.d("onWindowClose");
       final box = await Hive.openBox("insideMaple");
       final size = await windowManager.getSize();
-      box.put("savedSize", size);
+      Map sizeMap = {
+        "height": size.height,
+        "width": size.width,
+      };
+      loggerNoStack.d("last size: $sizeMap");
+      await box.put("savedWindowSize", sizeMap);
       loggerNoStack.d("size Saved");
+      await box.close();
       windowManager.destroy();
     }
   }
