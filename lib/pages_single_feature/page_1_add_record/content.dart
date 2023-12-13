@@ -5,6 +5,7 @@ import 'package:inside_maple/pages_single_feature/page_1_add_record/content_bott
 import 'package:inside_maple/pages_single_feature/page_1_add_record/content_top.dart';
 
 import '../../constants.dart';
+import '../../utils/utils.dart';
 import 'content_bottom_selected_list.dart';
 
 class PageAddRecord extends StatelessWidget {

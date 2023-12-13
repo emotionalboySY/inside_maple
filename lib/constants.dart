@@ -186,18 +186,6 @@ Map<String, Map<String, List<int>>> dropData = {
 
 enum LoadStatus { empty, loading, success, failed }
 
-Widget separator({
-  required Axis axis,
-}) {
-  return Container(
-    width: (axis == Axis.vertical) ? 1 : double.infinity,
-    height: (axis == Axis.horizontal) ? 1 : double.infinity,
-    decoration: const BoxDecoration(
-      color: Colors.black,
-    ),
-  );
-}
-
 class DifficultyAdapter extends TypeAdapter<Difficulty> {
 
   @override

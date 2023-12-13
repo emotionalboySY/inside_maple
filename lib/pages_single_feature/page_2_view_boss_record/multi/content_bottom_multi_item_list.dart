@@ -6,6 +6,7 @@ import 'package:oktoast/oktoast.dart';
 
 import '../../../constants.dart';
 import '../../../controllers/record_manage_multi_controller.dart';
+import '../../../utils/utils.dart';
 
 class ContentBottomMultiItemList extends StatelessWidget {
   ContentBottomMultiItemList({super.key});
@@ -42,13 +43,39 @@ class ContentBottomMultiItemList extends StatelessWidget {
                       ),
                     ),
                   ),
-                  rightChild: const Center(
-                    child: Text(
-                      "판매 단가(메소)",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
+                  rightChild: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          "평균 판매 단가",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 5.0),
+                          child: IconButton(
+                            onPressed: () async {
+                              await recordManageMultiEditController.showAvgPriceHelpDialog();
+                            },
+                            icon: Icon(
+                              Icons.help_outline,
+                              color: Colors.grey.shade500,
+                              size: 15,
+                            ),
+                            style: IconButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              hoverColor: Colors.transparent,
+                              highlightColor: Colors.transparent,
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ),
@@ -60,27 +87,7 @@ class ContentBottomMultiItemList extends StatelessWidget {
                         isChild: true,
                         height: 50,
                         index: index,
-                        leftChild: Padding(
-                          padding: const EdgeInsets.only(left: 32.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              ExtendedImage.asset(
-                                recordManageMultiEditController.itemsList[index].item.imagePath,
-                                width: 30,
-                                height: 30,
-                                fit: BoxFit.contain,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8.0),
-                                child: Text(
-                                  recordManageMultiEditController.itemsList[index].item.korLabel,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                        leftChild: _leftChild(index: index),
                         centerChild: _centerChild(index: index),
                         rightChild: _rightChild(index: index),
                       );
@@ -128,6 +135,37 @@ class ContentBottomMultiItemList extends StatelessWidget {
     );
   }
 
+  Widget _leftChild({
+    required int index,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 32.0),
+      child: GestureDetector(
+        onTap: () async {
+          await recordManageMultiEditController.showItemHistoryDialog(index);
+        },
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ExtendedImage.asset(
+              recordManageMultiEditController.itemsList[index].item.imagePath,
+              width: 30,
+              height: 30,
+              fit: BoxFit.contain,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                recordManageMultiEditController.itemsList[index].item.korLabel,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _centerChild({
     required int index,
   }) {
@@ -158,30 +196,23 @@ class ContentBottomMultiItemList extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          "${recordManageMultiEditController.f.format(recordManageMultiEditController.itemsList[index].price.value)} 메소",
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 5.0),
-          child: IconButton(
-            onPressed: () async {
+        Obx(
+          () => GestureDetector(
+            onTap: () async {
               await recordManageMultiEditController.showPriceEditDialog(recordManageMultiEditController.itemsList[index].item);
             },
-            style: IconButton.styleFrom(
-              padding: EdgeInsets.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              minimumSize: Size.zero,
-              hoverColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
-            icon: const Icon(
-              Icons.edit,
-              color: Colors.grey,
-              size: 16,
+            child: Text(
+              "${recordManageMultiEditController.f.format(recordManageMultiEditController.itemsList[index].price.value)} 메소",
+              style: TextStyle(
+                color: recordManageMultiEditController.flagList[recordManageMultiEditController.itemsList[index].item] == 1
+                    ? Colors.red
+                    : recordManageMultiEditController.flagList[recordManageMultiEditController.itemsList[index].item] == 2
+                        ? Colors.blue
+                        : Colors.black,
+              ),
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -215,6 +246,8 @@ class ContentBottomMultiItemList extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
+                  hoverColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
                 ),
               ),
             )

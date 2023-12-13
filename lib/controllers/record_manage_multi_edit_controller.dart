@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/record_manage_data_controller.dart';
+import 'package:inside_maple/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
@@ -11,24 +12,18 @@ class RecordManageMultiEditController extends GetxController {
 
   RecordManageDataController get recordManageDataController => Get.find<RecordManageDataController>();
 
-  List<FocusNode> itemFocusNodes = [];
-  List<TextEditingController> itemPriceControllers = [];
-
   RxList<BossRecord> bossRecords = <BossRecord>[].obs;
   Map<ItemData, List<Item>> itemsListRaw = {};
   RxList<Item> itemsList = <Item>[].obs;
-  RxList<ItemData> flagList = <ItemData>[].obs;
+  RxMap<ItemData, int> flagList = <ItemData, int>{}.obs;
   RxList<Item> itemsListEdited = <Item>[].obs;
 
-  RxBool isRecordEditMode = false.obs;
   RxBool isRecordEdited = false.obs;
 
   RxInt totalPrice = 0.obs;
   RxString totalPriceLocale = "0".obs;
 
   void loadBossRecords(Map<Boss, List<Difficulty>> selectedBossAndDiff, DateTime startDate, DateTime endDate) {
-    disposeControllers();
-    disposeFocusNodes();
     bossRecords.clear();
     itemsList.clear();
     itemsListEdited.clear();
@@ -55,8 +50,10 @@ class RecordManageMultiEditController extends GetxController {
     }
 
     itemsListRaw.forEach((itemData, itemList) {
-      if (itemList.any((element) => element.price.value == 0) || itemList.any((element) => element.price.value != itemList[0].price.value)) {
-        flagList.add(itemData);
+      if (itemList.any((element) => element.price.value == 0)) {
+        flagList.addAll({itemData: 1});
+      } else if (itemList.any((element) => element.price.value != itemList[0].price.value)) {
+        flagList.addAll({itemData: 2});
       }
       int totalCount = 0;
       int totalPrice = 0;
@@ -69,29 +66,10 @@ class RecordManageMultiEditController extends GetxController {
       itemsList.add(Item(item: itemData, count: totalCount.obs, price: avgPrice.obs));
       itemsListEdited.add(Item(item: itemData, count: totalCount.obs, price: avgPrice.obs));
     });
+    itemsList.sort((a, b) => a.item.korLabel.compareTo(b.item.korLabel));
     itemsList.refresh();
     itemsListEdited.refresh();
-  }
-
-  void applyPrice(int index) {
-    if (itemPriceControllers[index].text.isNotEmpty) {
-      int price = int.tryParse(itemPriceControllers[index].text) ?? 0;
-      itemsList[index].price.value = price;
-      updateIsRecordEdited();
-      // calculateTotalPrices();
-    }
-  }
-
-  void updateIsRecordEdited() {
-    if (isRecordEditMode.value) {
-      for (var i = 0; i < itemsList.length; i++) {
-        if (itemsList[i].price != itemsListEdited[i].price) {
-          isRecordEdited.value = true;
-          return;
-        }
-      }
-      isRecordEdited.value = false;
-    }
+    calculateTotalPrice();
   }
 
   void calculateTotalPrice() {
@@ -109,6 +87,9 @@ class RecordManageMultiEditController extends GetxController {
     List<BossRecord> recordsHaveExactItem;
     recordsHaveExactItem = readRecordsWithExactItem(itemData);
     RxString whichType = "list".obs;
+    TextEditingController controller = TextEditingController();
+    RxInt selectedIndex = (-1).obs;
+    String previousText = "";
     await Get.dialog(
       AlertDialog(
         shape: RoundedRectangleBorder(
@@ -139,42 +120,126 @@ class RecordManageMultiEditController extends GetxController {
                 "단가 수정은 해당 아이템 드랍된 보스 몬스터 격파 기록에 저장된 단가들 중 선택하거나, 직접 입력하여 수정할 수 있습니다.\n수정할 단가를 아래 리스트에서 선택하거나, 최하단 입력칸을 통해 입력해 주세요.",
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: separator(axis: Axis.horizontal),
+            ),
             Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Obx(
-                  () => Radio<String>(
-                    onChanged: (value) {
-                      whichType.value = value!;
-                    },
-                    value: "list",
-                    groupValue: whichType.value,
+                  () => Transform.scale(
+                    scale: 0.8,
+                    child: Radio<String>(
+                      onChanged: (value) {
+                        whichType.value = value!;
+                      },
+                      value: "list",
+                      groupValue: whichType.value,
+                    ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 10.0),
-                  child: Text(
+                GestureDetector(
+                  onTap: () {
+                    whichType.value = "list";
+                    controller.clear();
+                  },
+                  child: const Text(
                     "보스 리스트 중 선택",
                   ),
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: SizedBox(
-                height: 150,
-                width: 100,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: recordsHaveExactItem.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(
-                        recordsHaveExactItem[index].boss.korName,
-                      ),
-                    );
-                  },
+            Obx(
+              () => Opacity(
+                opacity: whichType.value == "list" ? 1 : 0.3,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 30.0),
+                  child: SizedBox(
+                    height: 150,
+                    width: 700,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Row(
+                          children: [
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "보스명(난이도)",
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "잡은 날짜",
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  "아이템 판매 단가",
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0),
+                          child: separator(axis: Axis.horizontal),
+                        ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: recordsHaveExactItem.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                              onTap: () {
+                                selectedIndex.value = index;
+                              },
+                              child: SizedBox(
+                                height: 30,
+                                child: Obx(
+                                  () => DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: selectedIndex.value == index ? Colors.deepPurple.shade100 : Colors.transparent,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Center(
+                                            child: Text(
+                                              "${recordsHaveExactItem[index].boss.korName}(${recordsHaveExactItem[index].difficulty.korName})",
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Center(
+                                            child: Text(
+                                              toKorDateLabel(recordsHaveExactItem[index].date),
+                                            ),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Center(
+                                            child: Text(
+                                              "${f.format(recordsHaveExactItem[index].itemList.firstWhere((element) => element.item == itemData).price.value)} 메소",
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -183,21 +248,217 @@ class RecordManageMultiEditController extends GetxController {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Obx(
-                  () => Radio<String>(
-                    onChanged: (value) {
-                      whichType.value = value!;
-                    },
-                    value: "manual",
-                    groupValue: whichType.value,
+                  () => Transform.scale(
+                    scale: 0.8,
+                    child: Radio<String>(
+                      onChanged: (value) {
+                        whichType.value = value!;
+                      },
+                      value: "manual",
+                      groupValue: whichType.value,
+                    ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 10.0),
-                  child: Text(
+                GestureDetector(
+                  onTap: () {
+                    whichType.value = "manual";
+                    selectedIndex.value = -1;
+                  },
+                  child: const Text(
                     "직접 입력",
                   ),
                 ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 30.0),
+              child: SizedBox(
+                width: 300,
+                child: Obx(
+                  () => TextFormField(
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      if (controller.text.isNotEmpty && int.tryParse(controller.text) == null) {
+                        controller.text = previousText;
+                      }
+                      previousText = controller.text;
+                    },
+                    enabled: whichType.value == "manual",
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text(
+              "취소",
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text(
+              "저장",
+              style: TextStyle(
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: true,
+    );
+  }
+
+  Future<void> showItemHistoryDialog(int index) async {
+    ItemData itemData = itemsList[index].item;
+    List<BossRecord> recordContainsItemData = [];
+    for (var record in bossRecords) {
+      if (record.itemList.indexWhere((element) => element.item == itemData) != -1) {
+        recordContainsItemData.add(record);
+      }
+    }
+
+    recordContainsItemData.sort((a, b) {
+      if (a.date == b.date) {
+        return 0;
+      } else if (a.date.isBefore(b.date)) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
+    await Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        elevation: 0.0,
+        title: const Center(
+          child: Text("보스 정보 보기"),
+        ),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Text("보스명(난이도)"),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "잡은 날짜",
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: separator(axis: Axis.horizontal),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: recordContainsItemData.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              "${recordContainsItemData[index].boss.korName}(${recordContainsItemData[index].difficulty.korName})",
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              toKorDateLabel(recordContainsItemData[index].date),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> showAvgPriceHelpDialog() async {
+    await Get.dialog(
+      AlertDialog(
+        elevation: 0.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        title: const Center(
+          child: Text(
+            "<평균 판매 단가 색 구별 방법>",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 10.0),
+              child: Text(
+                "- 검은색: 이 아이템에 대한 판매 가격이 모두 같음",
+              ),
+            ),
+            Text(
+              "- 빨간색: 저장된 아이템 정보 중 가격이 저장되지 않은 기록이 있음",
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+            Text(
+              "  (빨간색 영역을 누르면, 저장되지 않은 판매 단가를 저장할 수 있습니다.)",
+              style: TextStyle(
+                color: Colors.red,
+              ),
+            ),
+            Text(
+              "- 파란색: 저장된 아이템 정보 중 서로 다른 가격에 판매된 아이템이 있음",
+              style: TextStyle(
+                color: Colors.blue,
+              ),
+            ),
+            Text(
+              "  (파란색 영역은 참고용이며, 문제가 있는 부분이 아닙니다.)",
             ),
           ],
         ),
@@ -208,11 +469,16 @@ class RecordManageMultiEditController extends GetxController {
             },
             child: const Text(
               "확인",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.deepPurpleAccent,
+              ),
             ),
-          )
+          ),
         ],
+        actionsAlignment: MainAxisAlignment.center,
       ),
-      barrierDismissible: true,
     );
   }
 
@@ -226,54 +492,10 @@ class RecordManageMultiEditController extends GetxController {
     return foundRecords;
   }
 
-  void initializeFocusNodesAndControllers() {
-    disposeFocusNodes();
-    disposeControllers();
-    for (int i = 0; i < itemsList.length; i++) {
-      itemFocusNodes.add(FocusNode());
-      itemPriceControllers.add(TextEditingController());
-
-      itemFocusNodes[i].addListener(() {
-        if (!itemFocusNodes[i].hasFocus) {
-          applyPrice(i);
-        }
-        if (itemFocusNodes[i].hasFocus) {
-          itemPriceControllers[i].selection = TextSelection(baseOffset: 0, extentOffset: itemPriceControllers[i].text.length);
-        }
-      });
-      itemPriceControllers[i].text = itemsList[i].price.value.toString();
-    }
-  }
-
-  void toggleEditMode() {
-    isRecordEditMode.value = !isRecordEditMode.value;
-  }
-
   void resetAll() {
-    disposeFocusNodes();
-    disposeControllers();
     itemsListEdited.clear();
     itemsList.clear();
     bossRecords.clear();
-    isRecordEditMode.value = false;
     isRecordEdited.value = false;
-  }
-
-  void disposeFocusNodes() {
-    if (itemFocusNodes.isNotEmpty) {
-      for (int i = 0; i < itemFocusNodes.length; i++) {
-        itemFocusNodes[i].dispose();
-      }
-      itemFocusNodes.clear();
-    }
-  }
-
-  void disposeControllers() {
-    if (itemPriceControllers.isNotEmpty) {
-      for (int i = 0; i < itemPriceControllers.length; i++) {
-        itemPriceControllers[i].dispose();
-      }
-      itemPriceControllers.clear();
-    }
   }
 }

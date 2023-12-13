@@ -8,6 +8,7 @@ import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/single
 import 'package:inside_maple/pages_single_feature/page_2_view_boss_record/single/content_bottom_single_week_type_list.dart';
 
 import '../../controllers/record_manage_single_controller.dart';
+import '../../utils/utils.dart';
 import 'multi/content_bottom_multi_boss_list.dart';
 import 'multi/content_bottom_multi_date_range_picker.dart';
 import 'single/content_bottom_single_boss_list.dart';
