@@ -114,7 +114,9 @@ enum ItemData {
   item45("그라비티 모듈", "assets/images/drop_item/gravity_module.png"),
   item46("파멸의 징표", "assets/images/drop_item/sign_of_destruction.png"),
   item47("충정의 투구", "assets/images/drop_item/pitch_of_royalty.png"),
-  item48("생명의 연마석", "assets/images/drop_item/abrasive_stone_of_life.png");
+  item48("생명의 연마석", "assets/images/drop_item/abrasive_stone_of_life.png"),
+  item49("강렬한 힘의 결정", "assets/images/drop_item/crystal_of_intense_power.png"),
+  item50("수상한 에디셔널 큐브", "assets/images/drop_item/weird_additional_cube.png");
 
   const ItemData(this.korLabel, this.imagePath);
   final String korLabel;
@@ -184,58 +186,6 @@ Map<String, Map<String, List<int>>> dropData = {
   },
 };
 
+
+
 enum LoadStatus { empty, loading, success, failed }
-
-class DifficultyAdapter extends TypeAdapter<Difficulty> {
-
-  @override
-  final typeId = 0;
-
-  @override
-  Difficulty read(BinaryReader reader) {
-    var index = reader.readInt();
-    return Difficulty.values[index];
-  }
-
-  @override
-  void write(BinaryWriter writer, Difficulty obj) {
-    writer.writeInt(obj.index);
-  }
-
-}
-
-class BossAdapter extends TypeAdapter<Boss> {
-
-  @override
-  final typeId = 1;
-
-  @override
-  Boss read(BinaryReader reader) {
-    var index = reader.readInt();
-    return Boss.values[index];
-  }
-
-  @override
-  void write(BinaryWriter writer, Boss obj) {
-    writer.writeInt(obj.index);
-  }
-
-}
-
-class ItemDataAdapter extends TypeAdapter<ItemData> {
-
-  @override
-  final typeId = 2;
-
-  @override
-  ItemData read(BinaryReader reader) {
-    var index = reader.readInt();
-    return ItemData.values[index];
-  }
-
-  @override
-  void write(BinaryWriter writer, ItemData obj) {
-    writer.writeInt(obj.index);
-  }
-
-}

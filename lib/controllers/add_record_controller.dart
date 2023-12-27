@@ -89,6 +89,7 @@ class AddRecordController extends GetxController {
     }
 
     itemList.refresh();
+
   }
 
   void addItem(ItemData item) {
@@ -103,6 +104,11 @@ class AddRecordController extends GetxController {
     } catch (e) {
       selectedItemList.add(Item(item: item, count: 1.obs, price: 0.obs));
     }
+    selectedItemList.refresh();
+  }
+
+  void addItemExact(ItemData item, int count, int price) {
+    selectedItemList.add(Item(item: item, count: count.obs, price: price.obs));
     selectedItemList.refresh();
   }
 

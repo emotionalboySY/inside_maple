@@ -3,8 +3,6 @@ import 'package:hive/hive.dart';
 
 import 'constants.dart';
 
-part 'data.g.dart';
-
 @HiveType(typeId: 3)
 class Item {
   Item({
