@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_manage_data_controller.dart';
-import 'package:inside_maple/utils/utils.dart';
+import 'package:inside_maple/controllers/record_manage_data.dart';
+import 'package:inside_maple/utils/index.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 

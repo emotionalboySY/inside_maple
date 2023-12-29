@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import 'package:inside_maple/controllers/record_manage_single_controller.dart';
+import 'package:inside_maple/controllers/record_manage_single.dart';
 
 import '../constants.dart';
 import '../data.dart';

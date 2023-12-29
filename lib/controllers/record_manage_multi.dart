@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
+import 'package:inside_maple/controllers/record_manage_multi_edit.dart';
 import 'package:oktoast/oktoast.dart';
 
 import '../constants.dart';

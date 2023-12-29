@@ -4,18 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:inside_maple/controllers/user.dart';
 import 'package:inside_maple/routes.dart';
+import 'package:inside_maple/services/index.dart';
 import 'package:inside_maple/utils/logger.dart';
+import 'package:inside_maple/utils/user.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:window_size/window_size.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'constants.dart';
-import 'controllers/main_controller.dart';
-import 'data.dart';
+import 'controllers/main.dart';
 
 void main() async {
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Seoul'));
+
+  await dotenv.load(fileName: ".env");
 
   var documentPath = await getApplicationDocumentsDirectory();
 
@@ -23,18 +31,20 @@ void main() async {
 
   Hive.init("$documentPathStr/Inside Maple");
 
+  DioClient.initDio();
+
   Get.put(MainController());
+  Get.put(UserController());
 
   final box = await Hive.openBox("insideMaple");
   final savedSize = await box.get("savedWindowSize", defaultValue: {"width": 1280.0, "height": 720.0});
   await windowManager.setSize(Size(savedSize["width"], savedSize["height"]));
-  box.close();
 
   loggerNoStack.d("savedSize: $savedSize");
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  if(Platform.isWindows) {
+  if (Platform.isWindows) {
     await windowManager.ensureInitialized();
     setWindowTitle("Inside Maple");
     setWindowMinSize(const Size(1280, 720));
@@ -47,27 +57,31 @@ void main() async {
       titleBarStyle: TitleBarStyle.normal,
     );
 
-    windowManager.waitUntilReadyToShow(
-        windowOptions,
-            () async {
-          await windowManager.show();
-          await windowManager.focus();
-        }
-    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
 
-  runApp(const MyApp());
+  bool isLoggedIn = await checkIsUserLoggedIn();
+
+  runApp(
+    MyApp(
+      isLoggedIn: isLoggedIn,
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> with WindowListener {
-
   @override
   void initState() {
     super.initState();
@@ -78,7 +92,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
   @override
   void onWindowClose() async {
     bool isPreventClose = await windowManager.isPreventClose();
-    if(isPreventClose) {
+    if (isPreventClose) {
       loggerNoStack.d("onWindowClose");
       final box = await Hive.openBox("insideMaple");
       final size = await windowManager.getSize();
@@ -122,7 +136,7 @@ class _MyAppState extends State<MyApp> with WindowListener {
             ),
           ),
         ),
-        initialRoute: "/main",
+        initialRoute: widget.isLoggedIn ? "/main" : "/auth_login",
         getPages: routes,
       ),
     );

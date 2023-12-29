@@ -2,7 +2,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
-import 'package:inside_maple/controllers/add_record_controller.dart';
+import 'package:inside_maple/controllers/add_record.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../custom_icons_icons.dart';

@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
-import 'package:inside_maple/controllers/record_manage_single_edit_controller.dart';
+import 'package:inside_maple/controllers/record_manage_single_edit.dart';
 import 'package:intl/intl.dart';
 
-import '../../../controllers/record_manage_single_controller.dart';
+import '../../../controllers/record_manage_single.dart';
 import '../../../custom_icons_icons.dart';
 import '../../../utils/logger.dart';
-import '../../../utils/utils.dart';
+import '../../../utils/index.dart';
 
 class ContentBottomSingleItemList extends StatelessWidget {
   ContentBottomSingleItemList({super.key});

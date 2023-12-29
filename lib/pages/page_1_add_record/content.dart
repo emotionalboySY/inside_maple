@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/add_record_controller.dart';
-import 'package:inside_maple/pages_single_feature/page_1_add_record/content_bottom_item_grid.dart';
-import 'package:inside_maple/pages_single_feature/page_1_add_record/content_top.dart';
+import 'package:inside_maple/controllers/add_record.dart';
+import 'package:inside_maple/pages/page_1_add_record/content_bottom_item_grid.dart';
+import 'package:inside_maple/pages/page_1_add_record/content_top.dart';
 
 import '../../constants.dart';
-import '../../utils/utils.dart';
+import '../../utils/index.dart';
 import 'content_bottom_selected_list.dart';
 
 class PageAddRecord extends StatelessWidget {

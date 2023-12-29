@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_manage_data_controller.dart';
-import 'package:inside_maple/controllers/record_manage_single_edit_controller.dart';
+import 'package:inside_maple/controllers/record_manage_data.dart';
+import 'package:inside_maple/controllers/record_manage_single_edit.dart';
 import 'package:intl/intl.dart';
 import 'package:oktoast/oktoast.dart';
 

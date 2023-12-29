@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/constants.dart';
-import 'package:inside_maple/controllers/record_manage_multi_controller.dart';
+import 'package:inside_maple/controllers/record_manage_multi.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import '../../../controllers/record_manage_single_controller.dart';
+import '../../../controllers/record_manage_single.dart';
 
 class ContentBottomMultiBossList extends StatelessWidget {
   ContentBottomMultiBossList({super.key});

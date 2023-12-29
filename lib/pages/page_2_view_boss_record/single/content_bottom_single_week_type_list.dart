@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../constants.dart';
-import '../../../controllers/add_record_controller.dart';
-import '../../../controllers/record_manage_single_controller.dart';
+import '../../../controllers/add_record.dart';
+import '../../../controllers/record_manage_single.dart';
 
 class ContentBottomSingleWeekTypeList extends StatelessWidget {
   ContentBottomSingleWeekTypeList({super.key});

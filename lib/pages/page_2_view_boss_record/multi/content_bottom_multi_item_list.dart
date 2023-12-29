@@ -1,12 +1,12 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
+import 'package:inside_maple/controllers/record_manage_multi_edit.dart';
 import 'package:oktoast/oktoast.dart';
 
 import '../../../constants.dart';
-import '../../../controllers/record_manage_multi_controller.dart';
-import '../../../utils/utils.dart';
+import '../../../controllers/record_manage_multi.dart';
+import '../../../utils/index.dart';
 
 class ContentBottomMultiItemList extends StatelessWidget {
   ContentBottomMultiItemList({super.key});

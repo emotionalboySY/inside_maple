@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/add_record_controller.dart';
-import 'package:inside_maple/controllers/record_manage_data_controller.dart';
-import 'package:inside_maple/controllers/record_manage_multi_edit_controller.dart';
+import 'package:inside_maple/controllers/add_record.dart';
+import 'package:inside_maple/controllers/record_manage_data.dart';
+import 'package:inside_maple/controllers/record_manage_multi_edit.dart';
 
-import 'controllers/main_controller.dart';
-import 'controllers/record_manage_multi_controller.dart';
-import 'controllers/record_manage_single_edit_controller.dart';
-import 'controllers/record_manage_single_controller.dart';
+import 'controllers/main.dart';
+import 'controllers/record_manage_multi.dart';
+import 'controllers/record_manage_single_edit.dart';
+import 'controllers/record_manage_single.dart';
 
 class ContentMain extends StatelessWidget {
   ContentMain({super.key});

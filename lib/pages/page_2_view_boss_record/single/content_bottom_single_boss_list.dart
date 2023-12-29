@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../controllers/record_manage_single_controller.dart';
+import '../../../controllers/record_manage_single.dart';
 
 class ContentBottomSingleBossList extends StatelessWidget {
   ContentBottomSingleBossList({super.key});
