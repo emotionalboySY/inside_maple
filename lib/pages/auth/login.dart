@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class Login extends StatelessWidget {
-  const Login({super.key});
+import '../../controllers/auth.dart';
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +47,12 @@ class Login extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurpleAccent,
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      )),
+                    backgroundColor: Colors.deepPurpleAccent,
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
                   child: const Text(
                     "로그인",
                     style: TextStyle(
@@ -72,7 +75,7 @@ class Login extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      Get.toNamed('/auth_signup');
+                      Get.offNamed('/auth_signup')!.then((value) => Get.delete<AuthController>());
                     },
                     child: const Text(
                       "회원가입",
@@ -90,9 +93,7 @@ class Login extends StatelessWidget {
                     width: 5,
                   ),
                   TextButton(
-                    onPressed: () {
-
-                    },
+                    onPressed: () {},
                     child: const Text(
                       "비밀번호 찾기",
                     ),
