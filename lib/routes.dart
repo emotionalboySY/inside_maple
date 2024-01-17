@@ -15,7 +15,10 @@ List<GetPage> routes = [
   ),
   GetPage(
     name: '/auth_login',
-    page: () => const LoginPage(),
+    page: () {
+      Get.put(AuthController());
+      return LoginPage();
+    },
   ),
   GetPage(
     name: '/auth_signup',

@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import '../../controllers/auth.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
+
+  final authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,9 @@ class LoginPage extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 15,
                 ),
+                onChanged: (value) {
+                  authController.setEmail(value);
+                },
               ),
               const SizedBox(
                 height: 10,
@@ -38,6 +43,9 @@ class LoginPage extends StatelessWidget {
                   fontSize: 15,
                 ),
                 obscureText: true,
+                onChanged: (value) {
+                  authController.setPassword(value);
+                },
               ),
               const SizedBox(
                 height: 20,
@@ -45,7 +53,9 @@ class LoginPage extends StatelessWidget {
               SizedBox(
                 width: 200,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    await authController.login();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurpleAccent,
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),

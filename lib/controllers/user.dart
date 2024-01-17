@@ -10,7 +10,7 @@ class UserController extends GetxController {
 
   void updateUser(String token) {
     Map<String, dynamic> tokenObj = parseJWTPayload(token);
-    user = User.fromJson(tokenObj['user.dart']).obs;
+    user = User.fromJson(tokenObj['user']).obs;
     update();
     refresh();
   }

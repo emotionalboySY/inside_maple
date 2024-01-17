@@ -5,7 +5,7 @@ part 'user.g.dart';
 @JsonSerializable()
 class User {
   String email;
-  String nickname;
+  String? nickname;
 
   User({
     required this.email,

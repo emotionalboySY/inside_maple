@@ -49,3 +49,20 @@ Future<bool?> signUp(String email, String password) async {
     return null;
   }
 }
+
+Future<Map?> logIn(String email, String password) async {
+  try {
+    Response resp = await _dio.post(
+      '/auth/login',
+      data: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    return resp.data;
+  } on DioException catch (e) {
+    logger.e('Error sending request!\n${e.response}\n${e.type}\n${e.message}', error: "Sign in failed");
+    return null;
+  }
+}

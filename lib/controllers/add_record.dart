@@ -5,11 +5,13 @@ import 'package:hive/hive.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/utils/logger.dart';
 import 'package:oktoast/oktoast.dart';
+import '../../services/boss.dart' as boss_service;
 
 import '../data.dart';
+import '../model/boss.dart';
 
 class AddRecordController extends GetxController {
-  late RxList<Boss> bossList;
+  RxList<Boss> bossList = <Boss>[].obs;
   RxList<Difficulty> diffList = <Difficulty>[].obs;
   RxList<ItemData> itemList = <ItemData>[].obs;
 
@@ -278,9 +280,23 @@ class AddRecordController extends GetxController {
     );
   }
 
+  Future<void> loadBossList() async {
+    try {
+      final bossListLoaded = await boss_service.getBossList();
+      if(bossListLoaded == null) {
+        showToast("보스 몬스터 정보를 불러오는 데 실패했습니다.");
+        return;
+      }
+      bossList.value = bossListLoaded;
+      bossList.refresh();
+    } catch (e) {
+      logger.e(e);
+    }
+  }
+
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-    bossList = Boss.getKorListAfterCygnus().obs;
+    await loadBossList();
   }
 }

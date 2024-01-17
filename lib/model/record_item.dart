@@ -6,16 +6,16 @@ part 'record_item.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class RecordItem {
-  int recordItemId;
   int recordBossId;
-  ItemData itemData;
+  int recordItemId;
+  int itemId;
   int count;
   int price;
 
   RecordItem(
-      this.recordItemId,
       this.recordBossId,
-      this.itemData,
+      this.recordItemId,
+      this.itemId,
       this.count,
       this.price,
       );

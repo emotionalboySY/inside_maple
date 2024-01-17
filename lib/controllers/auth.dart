@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:inside_maple/controllers/user.dart';
 import 'package:inside_maple/utils/regexp.dart';
 
 import 'package:inside_maple/services/auth.dart' as service;
@@ -50,6 +51,27 @@ class AuthController extends GetxController {
       Get.offNamed("/auth_login");
     } else {
       showToast("회원가입에 실패하였습니다. 잠시 후 다시 시도해 주세요.");
+    }
+  }
+
+  Future<void> login() async {
+    Map? isSuccess = await service.logIn(_email.value, _password.value);
+    if(isSuccess == null) {
+      showToast("서버 오류입니다. 운영자에게 문의해 주세요.");
+      return;
+    }
+    else if(isSuccess['success'] == true) {
+      UserController.to.updateUser(isSuccess['token']);
+      showToast("로그인에 성공하였습니다.");
+      Get.offNamed("/main");
+    } else {
+      if(isSuccess['message'] == "id") {
+        showToast("존재하지 않는 이메일입니다.");
+      } else if(isSuccess['message'] == "pw") {
+        showToast("비밀번호가 일치하지 않습니다.");
+      } else {
+        showToast("로그인에 실패하였습니다. 잠시 후 다시 시도해 주세요.");
+      }
     }
   }
 

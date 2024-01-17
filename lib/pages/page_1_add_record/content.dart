@@ -4,7 +4,6 @@ import 'package:inside_maple/controllers/add_record.dart';
 import 'package:inside_maple/pages/page_1_add_record/content_bottom_item_grid.dart';
 import 'package:inside_maple/pages/page_1_add_record/content_top.dart';
 
-import '../../constants.dart';
 import '../../utils/index.dart';
 import 'content_bottom_selected_list.dart';
 
