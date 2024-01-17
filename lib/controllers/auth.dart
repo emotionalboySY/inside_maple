@@ -39,6 +39,20 @@ class AuthController extends GetxController {
     emailDuplicated.value = isDuplicated;
   }
 
+  Future<void> signUp() async {
+    bool? isSuccess = await service.signUp(_email.value, _password.value);
+    if(isSuccess == null) {
+      showToast("서버 오류입니다. 운영자에게 문의해 주세요.");
+      return;
+    }
+    if(isSuccess) {
+      showToast("회원가입에 성공하였습니다.");
+      Get.offNamed("/auth_login");
+    } else {
+      showToast("회원가입에 실패하였습니다. 잠시 후 다시 시도해 주세요.");
+    }
+  }
+
   void setEmail(String email) {
     _email.value = email;
   }

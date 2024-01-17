@@ -108,6 +108,7 @@ class SignUpPage extends StatelessWidget {
                       await authController.isEmailDuplicated();
                       if(_formKey.currentState!.validate()) {
                         loggerNoStack.d("SignUp has requested and email is not exist in server(Fine to exceed)");
+                        await authController.signUp();
                       }
                     },
                     style: ElevatedButton.styleFrom(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -25,26 +26,31 @@ void main() async {
 
   await dotenv.load(fileName: ".env");
 
-  var documentPath = await getApplicationDocumentsDirectory();
+  if(!kIsWeb) {
 
-  String documentPathStr = documentPath.path;
+    var documentPath = await getApplicationDocumentsDirectory();
 
-  Hive.init("$documentPathStr/Inside Maple");
+    String documentPathStr = documentPath.path;
+
+    Hive.init("$documentPathStr/Inside Maple");
+  } else {
+    Hive.init("Inside Maple");
+  }
 
   DioClient.initDio();
 
   Get.put(MainController());
   Get.put(UserController());
 
-  final box = await Hive.openBox("insideMaple");
-  final savedSize = await box.get("savedWindowSize", defaultValue: {"width": 1280.0, "height": 720.0});
-  await windowManager.setSize(Size(savedSize["width"], savedSize["height"]));
-
-  loggerNoStack.d("savedSize: $savedSize");
-
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Platform.isWindows) {
+  final box = await Hive.openBox("insideMaple");
+
+  if (!kIsWeb && Platform.isWindows) {
+    final savedSize = await box.get("savedWindowSize", defaultValue: {"width": 1280.0, "height": 720.0});
+    await windowManager.setSize(Size(savedSize["width"], savedSize["height"]));
+
+    loggerNoStack.d("savedSize: $savedSize");
     await windowManager.ensureInitialized();
     setWindowTitle("Inside Maple");
     setWindowMinSize(const Size(1280, 720));
@@ -85,8 +91,10 @@ class _MyAppState extends State<MyApp> with WindowListener {
   @override
   void initState() {
     super.initState();
-    windowManager.addListener(this);
-    windowManager.setPreventClose(true);
+    if(!kIsWeb && Platform.isWindows) {
+      windowManager.addListener(this);
+      windowManager.setPreventClose(true);
+    }
   }
 
   @override

@@ -28,3 +28,24 @@ Future<bool?> checkIsEmailDuplicated(String email) async {
     return null;
   }
 }
+
+Future<bool?> signUp(String email, String password) async {
+  try {
+    Response resp = await _dio.post(
+      '/auth/signup',
+      data: {
+        'email': email,
+        'password': password,
+      },
+    );
+
+    if(resp.data['success'] == true) {
+      return true;
+    } else {
+      return false;
+    }
+  } on DioException catch (e) {
+    logger.e('Error sending request!\n${e.response}\n${e.type}\n${e.message}', error: "Sign up failed");
+    return null;
+  }
+}
