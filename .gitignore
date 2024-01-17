@@ -47,6 +47,15 @@ lib/generated_plugin_registrant.dart
 # See https://dart.dev/guides/libraries/private-files#pubspeclock
 #pubspec.lock
 
+# Windows related
+Thumbs.db
+Desktop.ini
+windows/
+linux/
+macos/
+android/
+web/
+
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
