@@ -7,18 +7,20 @@ part of 'record_item.dart';
 // **************************************************************************
 
 RecordItem _$RecordItemFromJson(Map<String, dynamic> json) => RecordItem(
+      json['id'] as int,
       json['recordBossId'] as int,
-      json['recordItemId'] as int,
       json['itemId'] as int,
       json['count'] as int,
       json['price'] as int,
+      json['duplicable'] as bool,
     );
 
 Map<String, dynamic> _$RecordItemToJson(RecordItem instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'recordBossId': instance.recordBossId,
-      'recordItemId': instance.recordItemId,
       'itemId': instance.itemId,
       'count': instance.count,
       'price': instance.price,
+      'duplicable': instance.duplicable,
     };

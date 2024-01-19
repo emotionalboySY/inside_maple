@@ -12,6 +12,7 @@ class RecordBoss {
   DateTime date;
   int memberCount;
 
+
   RecordBoss(
       this.recordBossId,
       this.bossDataId,

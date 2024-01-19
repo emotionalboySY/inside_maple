@@ -35,10 +35,10 @@ List<GetPage> routes = [
         name: '/addRecord',
         page: () => PageAddRecord(),
       ),
-      GetPage(
-        name: '/viewRecord',
-        page: () => PageViewBossRecord(),
-      )
+      // GetPage(
+      //   name: '/viewRecord',
+      //   page: () => PageViewBossRecord(),
+      // )
     ],
   ),
 ];

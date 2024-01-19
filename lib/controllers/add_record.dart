@@ -5,15 +5,17 @@ import 'package:hive/hive.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/utils/logger.dart';
 import 'package:oktoast/oktoast.dart';
-import '../../services/boss.dart' as boss_service;
+import '../../services/boss_add.dart' as boss_service;
 
 import '../data.dart';
 import '../model/boss.dart';
+import '../model/item.dart';
+import '../model/record_item.dart';
 
 class AddRecordController extends GetxController {
   RxList<Boss> bossList = <Boss>[].obs;
   RxList<Difficulty> diffList = <Difficulty>[].obs;
-  RxList<ItemData> itemList = <ItemData>[].obs;
+  RxList<Item> itemList = <Item>[].obs;
 
   RxDouble itemListLength = 250.0.obs;
 
@@ -21,7 +23,7 @@ class AddRecordController extends GetxController {
   Rx<Difficulty?> selectedDiff = Rx<Difficulty?>(null);
   RxBool showLabel = true.obs;
 
-  RxList<Item> selectedItemList = <Item>[].obs;
+  RxList<RecordItem> selectedItemList = <RecordItem>[].obs;
   Rx<DateTime> selectedDate = DateTime(1900, 01, 01).obs;
   RxInt selectedPartyAmount = 1.obs;
 
@@ -30,28 +32,8 @@ class AddRecordController extends GetxController {
   void loadDifficulty() {
     selectedDiff.value = null;
     diffList.clear();
-    var diffTable = selectedBoss.value!.diffIndex;
-    int diffNum = int.parse(diffTable);
 
-    if (diffNum != 0 && diffNum % 2 == 1) {
-      diffList.add(Difficulty.easy);
-    }
-    diffNum = (diffNum / 10).floor();
-    if (diffNum != 0 && diffNum % 2 == 1) {
-      diffList.add(Difficulty.normal);
-    }
-    diffNum = (diffNum / 10).floor();
-    if (diffNum != 0 && diffNum % 2 == 1) {
-      diffList.add(Difficulty.chaos);
-    }
-    diffNum = (diffNum / 10).floor();
-    if (diffNum != 0 && diffNum % 2 == 1) {
-      diffList.add(Difficulty.hard);
-    }
-    diffNum = (diffNum / 10).floor();
-    if (diffNum != 0 && diffNum % 2 == 1) {
-      diffList.add(Difficulty.extreme);
-    }
+    diffList.addAll(selectedBoss.value!.diffs);
 
     diffList.refresh();
   }
@@ -68,6 +50,22 @@ class AddRecordController extends GetxController {
     loadItemList();
   }
 
+  Future<void> loadItemList() async {
+    itemList.clear();
+
+    List<Item>? loadedItemList = await boss_service.getItemList(selectedBoss.value!.id, selectedDiff.value!);
+
+    if(loadedItemList == null) {
+      showToast("아이템 목록을 불러오는 데 실패했습니다.");
+      return;
+    }
+
+    itemList.addAll(loadedItemList);
+
+    itemList.refresh();
+
+  }
+
   void toggleShowLabel() {
     showLabel.value = !showLabel.value;
     if (showLabel.value == true) {
@@ -77,45 +75,31 @@ class AddRecordController extends GetxController {
     }
   }
 
-  void loadItemList() {
-    itemList.clear();
-    String bossName = describeEnum(selectedBoss);
-    String diffName = selectedDiff.value!.engName;
-
-    var itemIndexList = dropData[bossName]![diffName]!;
-
-    for (var itemElement in ItemData.values) {
-      if (itemIndexList.contains(itemElement.index)) {
-        itemList.add(itemElement);
-      }
-    }
-
-    itemList.refresh();
-
+  String getImagePathByIndex(int index) {
+    return itemList.firstWhere((element) => element.id == selectedItemList[index - 1].itemId).path;
   }
 
-  void addItem(ItemData item) {
+  String getItemNameByIndex(int index) {
+    return itemList.firstWhere((element) => element.id == selectedItemList[index - 1].itemId).name;
+  }
+
+  void addItem(Item item) {
     try {
-      Item selectedItem = selectedItemList.firstWhere((element) => element.item == item);
-      if(itemCanDuplicated.contains(selectedItem.item)) {
-        selectedItem.increaseCount();
+      RecordItem selectedItem = selectedItemList.firstWhere((element) => element.id == item.id);
+      if(!selectedItem.duplicable) {
+        selectedItemList.firstWhere((element) => element.id == selectedItem.id).increaseCount();
       }
       else {
         showToast("선택한 아이템은 한 개만 드롭됩니다.");
       }
     } catch (e) {
-      selectedItemList.add(Item(item: item, count: 1.obs, price: 0.obs));
+      selectedItemList.add(RecordItem(-1, -1, item.id, 1, 0, item.duplicable));
     }
     selectedItemList.refresh();
   }
 
-  void addItemExact(ItemData item, int count, int price) {
-    selectedItemList.add(Item(item: item, count: count.obs, price: price.obs));
-    selectedItemList.refresh();
-  }
-
   void increaseItem(int index) {
-    if(itemCanDuplicated.contains(selectedItemList[index].item)) {
+    if(selectedItemList[index].duplicable) {
       selectedItemList[index].increaseCount();
       selectedItemList.refresh();
     }
@@ -174,58 +158,46 @@ class AddRecordController extends GetxController {
   }
 
   Future<void> saveRecordData() async {
-    saveStatus.value = true;
-    try {
-      final box = await Hive.openBox("insideMaple");
-      List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
-      WeekType weekType = getWeekType(selectedDate.value);
-      sortItemList();
-      BossRecord singleRecord = BossRecord(
-        boss: selectedBoss.value!,
-        difficulty: selectedDiff.value!,
-        date: selectedDate.value,
-        itemList: selectedItemList,
-        partyAmount: selectedPartyAmount.value.obs,
-        weekType: weekType,
-      );
-      if(checkDuplicatedRecord(recordRawList, singleRecord)) {
-        showToast("이미 저장된 기록입니다.");
-        saveStatus.value = false;
-        return;
-      }
-      recordRawList.add(singleRecord);
-      await box.put('bossRecordData', recordRawList);
-      resetAll();
-      box.close();
-      showToast("보스 기록이 성공적으로 저장되었습니다.");
-    } catch (e) {
-      showToast("보스 기록 저장에 실패했습니다. $e");
-      logger.e(e);
-    }
-    saveStatus.value = false;
+    // saveStatus.value = true;
+    // try {
+    //   List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
+    //   WeekType weekType = getWeekType(selectedDate.value);
+    //   sortItemList();
+    //   BossRecord singleRecord = BossRecord(
+    //     boss: selectedBoss.value!,
+    //     difficulty: selectedDiff.value!,
+    //     date: selectedDate.value,
+    //     itemList: selectedItemList,
+    //     partyAmount: selectedPartyAmount.value.obs,
+    //     weekType: weekType,
+    //   );
+    //   if(checkDuplicatedRecord(recordRawList, singleRecord)) {
+    //     showToast("이미 저장된 기록입니다.");
+    //     saveStatus.value = false;
+    //     return;
+    //   }
+    //   recordRawList.add(singleRecord);
+    //   resetAll();
+    //   showToast("보스 기록이 성공적으로 저장되었습니다.");
+    // } catch (e) {
+    //   showToast("보스 기록 저장에 실패했습니다. $e");
+    //   logger.e(e);
+    // }
+    // saveStatus.value = false;
   }
 
   void sortItemList() {
     selectedItemList.sort((a, b) {
-      if(a.item.korLabel.compareTo(b.item.korLabel) < 0) {
+      final aa = itemList.firstWhere((element) => element.id == a.id).name;
+      final bb = itemList.firstWhere((element) => element.id == b.id).name;
+      if(aa.compareTo(bb) < 0) {
         return -1;
-      } else if(a.item.korLabel.compareTo(b.item.korLabel) > 0) {
+      } else if(aa.compareTo(bb) > 0) {
         return 1;
       } else {
         return 0;
       }
     });
-  }
-
-  bool checkDuplicatedRecord(List<BossRecord> recordRawList, BossRecord recordToSave) {
-    bool isDuplicated = false;
-    for(var record in recordRawList) {
-      if(record.boss == recordToSave.boss && record.date == recordToSave.date) {
-        isDuplicated = true;
-        break;
-      }
-    }
-    return isDuplicated;
   }
 
   void resetAll() {

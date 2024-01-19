@@ -64,7 +64,7 @@ class BottomItemDropItemList extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 ExtendedImage.asset(
-                                  addRecordController.itemList[index].imagePath,
+                                  addRecordController.itemList[index].path,
                                   width: 35,
                                   height: 35,
                                   fit: BoxFit.contain,
@@ -74,7 +74,7 @@ class BottomItemDropItemList extends StatelessWidget {
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                       child: Text(
-                                        addRecordController.itemList[index].korLabel,
+                                        addRecordController.itemList[index].name,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),

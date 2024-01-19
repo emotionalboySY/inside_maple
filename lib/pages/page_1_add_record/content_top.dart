@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:inside_maple/controllers/add_record.dart';
 
 import '../../constants.dart';
+import '../../model/boss.dart';
 
 class TopItemsDifficulty extends StatelessWidget {
   TopItemsDifficulty({super.key});
@@ -42,7 +43,7 @@ class TopItemsDifficulty extends StatelessWidget {
                         (element) => DropdownMenuItem(
                           value: element,
                           child: Text(
-                            element.korName,
+                            element.name,
                             style: const TextStyle(
                               color: Colors.black,
                             ),
@@ -54,17 +55,19 @@ class TopItemsDifficulty extends StatelessWidget {
                     addRecordController.selectBoss(selectedValue!);
                   },
                   selectedItemBuilder: (context) {
-                    return addRecordController.bossList.map((Boss value) {
-                      return Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          value.korName,
-                          style: const TextStyle(
-                            color: Colors.black,
+                    return addRecordController.bossList
+                        .map(
+                          (Boss value) => Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              value.name,
+                              style: const TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
-                        ),
-                      );
-                    }).toList();
+                        )
+                        .toList();
                   },
                 ),
               ),

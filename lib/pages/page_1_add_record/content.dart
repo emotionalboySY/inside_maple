@@ -15,15 +15,22 @@ class PageAddRecord extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _topItems(),
-          separator(axis: Axis.horizontal),
-          Expanded(
-            child: _bottomItems(),
+      body: Obx(
+        () => switch(addRecordController.bossList.isNotEmpty) {
+          true => Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _topItems(),
+              separator(axis: Axis.horizontal),
+              Expanded(
+                child: _bottomItems(),
+              ),
+            ],
           ),
-        ],
+          false => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        }
       ),
     );
   }
@@ -62,5 +69,4 @@ class PageAddRecord extends StatelessWidget {
       ],
     );
   }
-
 }

@@ -77,14 +77,14 @@ class ContentBottomSelectedList extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 ExtendedImage.asset(
-                                  addRecordController.selectedItemList[index - 1].item.imagePath,
+                                  addRecordController.getImagePathByIndex(index),
                                   width: 25,
                                   height: 25,
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 5.0),
                                   child: Text(
-                                    addRecordController.selectedItemList[index - 1].item.korLabel,
+                                    addRecordController.getItemNameByIndex(index),
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -102,9 +102,9 @@ class ContentBottomSelectedList extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              itemCanDuplicated.contains(addRecordController.selectedItemList[index - 1].item)
+                              addRecordController.selectedItemList[index - 1].duplicable
                                   ? IconButton(
-                                      onPressed: addRecordController.selectedItemList[index - 1].count.value == 1 ? null : () {
+                                      onPressed: addRecordController.selectedItemList[index - 1].count == 1 ? null : () {
                                         addRecordController.decreaseItem(index - 1);
                                       },
                                       icon: const Icon(
@@ -121,14 +121,14 @@ class ContentBottomSelectedList extends StatelessWidget {
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
                                 child: Text(
-                                  addRecordController.selectedItemList[index - 1].count.value.toString(),
+                                  addRecordController.selectedItemList[index - 1].count.toString(),
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.normal,
                                   ),
                                 ),
                               ),
-                              itemCanDuplicated.contains(addRecordController.selectedItemList[index - 1].item)
+                              addRecordController.selectedItemList[index - 1].duplicable
                                   ? IconButton(
                                       onPressed: () {
                                         addRecordController.increaseItem(index - 1);
