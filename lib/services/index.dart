@@ -5,11 +5,13 @@ import 'package:inside_maple/utils/logger.dart';
 import '../utils/index.dart';
 
 class DioClient {
-  static final Dio _dio = Dio(BaseOptions(
-    baseUrl: getServerUrl(),
-    connectTimeout: const Duration(seconds: 5),
-    receiveTimeout: const Duration(seconds: 5),
-  ));
+  static final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: getServerUrl(),
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+    ),
+  );
 
   static final box = Hive.box('insideMaple');
 
