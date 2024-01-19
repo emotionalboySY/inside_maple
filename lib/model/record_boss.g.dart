@@ -16,7 +16,7 @@ RecordBoss _$RecordBossFromJson(Map<String, dynamic> json) => RecordBoss(
 
 Map<String, dynamic> _$RecordBossToJson(RecordBoss instance) =>
     <String, dynamic>{
-      'recordBossId': instance.recordBossId,
+      'recordBossId': instance.id,
       'bossDataId': instance.bossDataId,
       'difficulty': _$DifficultyEnumMap[instance.difficulty]!,
       'date': instance.date.toIso8601String(),

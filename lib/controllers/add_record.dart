@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:inside_maple/constants.dart';
 import 'package:inside_maple/utils/logger.dart';
 import 'package:oktoast/oktoast.dart';
@@ -10,6 +8,7 @@ import '../../services/boss_add.dart' as boss_service;
 import '../data.dart';
 import '../model/boss.dart';
 import '../model/item.dart';
+import '../model/record_boss.dart';
 import '../model/record_item.dart';
 
 class AddRecordController extends GetxController {
@@ -85,16 +84,18 @@ class AddRecordController extends GetxController {
 
   void addItem(Item item) {
     try {
-      RecordItem selectedItem = selectedItemList.firstWhere((element) => element.id == item.id);
-      if(!selectedItem.duplicable) {
-        selectedItemList.firstWhere((element) => element.id == selectedItem.id).increaseCount();
+      RecordItem selectedItem = selectedItemList.firstWhere((element) => element.itemId == item.id);
+      if(selectedItem.duplicable) {
+        selectedItemList.firstWhere((element) => element.itemId == selectedItem.itemId).increaseCount();
       }
       else {
         showToast("선택한 아이템은 한 개만 드롭됩니다.");
       }
     } catch (e) {
+      // loggerNoStack.e("addItem error: $e");
       selectedItemList.add(RecordItem(-1, -1, item.id, 1, 0, item.duplicable));
     }
+    sortItemList();
     selectedItemList.refresh();
   }
 
@@ -158,38 +159,40 @@ class AddRecordController extends GetxController {
   }
 
   Future<void> saveRecordData() async {
-    // saveStatus.value = true;
-    // try {
-    //   List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
-    //   WeekType weekType = getWeekType(selectedDate.value);
-    //   sortItemList();
-    //   BossRecord singleRecord = BossRecord(
-    //     boss: selectedBoss.value!,
-    //     difficulty: selectedDiff.value!,
-    //     date: selectedDate.value,
-    //     itemList: selectedItemList,
-    //     partyAmount: selectedPartyAmount.value.obs,
-    //     weekType: weekType,
-    //   );
-    //   if(checkDuplicatedRecord(recordRawList, singleRecord)) {
-    //     showToast("이미 저장된 기록입니다.");
-    //     saveStatus.value = false;
-    //     return;
-    //   }
-    //   recordRawList.add(singleRecord);
-    //   resetAll();
-    //   showToast("보스 기록이 성공적으로 저장되었습니다.");
-    // } catch (e) {
-    //   showToast("보스 기록 저장에 실패했습니다. $e");
-    //   logger.e(e);
-    // }
-    // saveStatus.value = false;
+    saveStatus.value = true;
+    try {
+      // WeekType weekType = getWeekType(selectedDate.value);
+      sortItemList();
+      RecordBoss recordBoss = RecordBoss(
+        -1,
+        selectedBoss.value!.id,
+        selectedDiff.value!,
+        selectedDate.value,
+        selectedPartyAmount.value,
+      );
+
+      List itemList = [];
+      for(RecordItem item in selectedItemList) {
+        itemList.add(item.toJson());
+      }
+      bool? result = await boss_service.addBossRecord(recordBoss.toJson(), itemList);
+      if(result == true) {
+        resetAll();
+        showToast("보스 기록이 성공적으로 저장되었습니다.");
+      } else {
+        showToast("보스 기록 저장에 실패했습니다.");
+      }
+    } catch (e) {
+      showToast("보스 기록 저장에 실패했습니다. $e");
+      logger.e(e);
+    }
+    saveStatus.value = false;
   }
 
   void sortItemList() {
     selectedItemList.sort((a, b) {
-      final aa = itemList.firstWhere((element) => element.id == a.id).name;
-      final bb = itemList.firstWhere((element) => element.id == b.id).name;
+      final aa = itemList.firstWhere((element) => element.id == a.itemId).name;
+      final bb = itemList.firstWhere((element) => element.id == b.itemId).name;
       if(aa.compareTo(bb) < 0) {
         return -1;
       } else if(aa.compareTo(bb) > 0) {
@@ -210,47 +213,48 @@ class AddRecordController extends GetxController {
     selectedDate.value = DateTime(1900, 01, 01);
   }
 
-  WeekType getWeekType(DateTime rawDate) {
-    DateTime date = rawDate;
-    bool isBeforeThursday = false;
-
-    DateTime firstDayOfMonth = DateTime(date.year, date.month);
-    int daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
-    DateTime firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
-
-    if (date.isBefore(firstThursday)) {
-      isBeforeThursday = true;
-      loggerNoStack.d("date is before firstThursday: $date < $firstThursday");
-      firstDayOfMonth = DateTime(date.year, date.month - 1);
-      daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
-      firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
-    }
-
-    loggerNoStack.d("firstThursday: $firstThursday");
-
-    int differenceInDays = date.difference(firstThursday).inDays;
-    int weekNum = (differenceInDays / 7).floor() + 1;
-    DateTime startDateOfWeek = firstThursday.add(Duration(days: (7 * (weekNum - 1))));
-    DateTime endDateOfWeek = startDateOfWeek.add(const Duration(days: 6));
-    if(isBeforeThursday) {
-      date = DateTime(date.year, date.month - 1);
-    }
-
-    loggerNoStack.d("WeekType\n"
-        "year: ${date.year}\n"
-        "month: ${date.month}\n"
-        "weekNum: $weekNum\n"
-        "startDate: $startDateOfWeek\n"
-        "endDate: $endDateOfWeek\n");
-
-    return WeekType(
-      year: date.year,
-      month: date.month,
-      weekNum: weekNum,
-      startDate: startDateOfWeek,
-      endDate: endDateOfWeek,
-    );
-  }
+  // WeekType Method
+  // WeekType getWeekType(DateTime rawDate) {
+  //   DateTime date = rawDate;
+  //   bool isBeforeThursday = false;
+  //
+  //   DateTime firstDayOfMonth = DateTime(date.year, date.month);
+  //   int daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
+  //   DateTime firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
+  //
+  //   if (date.isBefore(firstThursday)) {
+  //     isBeforeThursday = true;
+  //     loggerNoStack.d("date is before firstThursday: $date < $firstThursday");
+  //     firstDayOfMonth = DateTime(date.year, date.month - 1);
+  //     daysToAdd = (4 - firstDayOfMonth.weekday) % 7;
+  //     firstThursday = firstDayOfMonth.add(Duration(days: daysToAdd));
+  //   }
+  //
+  //   loggerNoStack.d("firstThursday: $firstThursday");
+  //
+  //   int differenceInDays = date.difference(firstThursday).inDays;
+  //   int weekNum = (differenceInDays / 7).floor() + 1;
+  //   DateTime startDateOfWeek = firstThursday.add(Duration(days: (7 * (weekNum - 1))));
+  //   DateTime endDateOfWeek = startDateOfWeek.add(const Duration(days: 6));
+  //   if(isBeforeThursday) {
+  //     date = DateTime(date.year, date.month - 1);
+  //   }
+  //
+  //   loggerNoStack.d("WeekType\n"
+  //       "year: ${date.year}\n"
+  //       "month: ${date.month}\n"
+  //       "weekNum: $weekNum\n"
+  //       "startDate: $startDateOfWeek\n"
+  //       "endDate: $endDateOfWeek\n");
+  //
+  //   return WeekType(
+  //     year: date.year,
+  //     month: date.month,
+  //     weekNum: weekNum,
+  //     startDate: startDateOfWeek,
+  //     endDate: endDateOfWeek,
+  //   );
+  // }
 
   Future<void> loadBossList() async {
     try {
