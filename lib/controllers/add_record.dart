@@ -26,6 +26,8 @@ class AddRecordController extends GetxController {
   Rx<DateTime> selectedDate = DateTime(1900, 01, 01).obs;
   RxInt selectedPartyAmount = 1.obs;
 
+  RxBool isRecordDuplicated = false.obs;
+
   RxBool saveStatus = false.obs;
 
   void loadDifficulty() {
@@ -148,8 +150,26 @@ class AddRecordController extends GetxController {
     }
   }
 
-  void setRaidDate(DateTime date) {
+  void setRaidDate(DateTime date) async {
     selectedDate.value = date;
+
+    bool? isDuplicated = await checkRecordDuplicate();
+
+    if(isDuplicated == null) {
+      showToast("보스 기록 중복 확인에 실패했습니다.");
+      return;
+    }
+    else if(isDuplicated == true) {
+      isRecordDuplicated.value = true;
+      return;
+    }
+    else {
+      isRecordDuplicated.value = false;
+    }
+  }
+
+  Future<bool?> checkRecordDuplicate() async {
+    return await boss_service.isRecordDuplicated(selectedBoss.value!.id, selectedDiff.value!, selectedDate.value);
   }
 
   void resetSelectedData() {

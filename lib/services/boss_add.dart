@@ -51,6 +51,28 @@ Future<List<Item>?> getItemList(int bossId, Difficulty diff) async {
   }
 }
 
+Future<bool?> isRecordDuplicated(int bossId, Difficulty diff, DateTime date) async {
+  try {
+    String diffStr = diff.engName;
+    Response resp = await _dio.post(
+      '/boss_add/check_record_duplicate',
+      data: {
+        "bossDataId": bossId,
+        "diff": diffStr,
+        "date": date.toIso8601String(),
+      },
+    );
+
+    if (resp.statusCode == 200) {
+      return resp.data["duplicated"];
+    }
+    return false;
+  } on DioException catch (e) {
+    logger.e('Error sending request!\n${e.response}\n${e.type}\n${e.message}', error: "Check record duplication failed");
+    return null;
+  }
+}
+
 Future<bool?> addBossRecord(Map data, List itemList) async {
   try {
     loggerNoStack.d(data);
