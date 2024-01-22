@@ -2,6 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
+
+import '../controllers/user.dart';
+
+final box = Hive.box('insideMaple');
 
 Map<String, dynamic> parseJWTPayload(String token) {
   final parts = token.split('.');
@@ -49,4 +55,18 @@ Widget separator({
 
 String getServerUrl() {
   return dotenv.env['SERVER_URL']!;
+}
+
+void updateUser(String token) {
+  box.put('auth_token', token);
+
+  final user = Get.find<UserController>();
+  user.updateUser(token);
+}
+
+void removeUser() {
+  box.delete('auth_token');
+
+  final user = Get.find<UserController>();
+  user.user = null;
 }

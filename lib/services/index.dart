@@ -19,7 +19,7 @@ class DioClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          String authToken = box.get('auth_token', defaultValue: 'empty_auth_token');
+          String authToken = await box.get('auth_token', defaultValue: 'empty_auth_token');
 
           options.headers.addAll({
             "authorization": "Bearer $authToken",

@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:inside_maple/controllers/user.dart';
+import 'package:inside_maple/utils/index.dart';
 import 'package:inside_maple/utils/regexp.dart';
 
-import 'package:inside_maple/services/auth.dart' as service;
+import 'package:inside_maple/services/auth.dart' as auth_service;
 import 'package:oktoast/oktoast.dart';
 
 class AuthController extends GetxController {
@@ -32,7 +32,7 @@ class AuthController extends GetxController {
   }
 
   Future<void> isEmailDuplicated() async {
-    bool? isDuplicated = await service.checkIsEmailDuplicated(_email.value);
+    bool? isDuplicated = await auth_service.checkIsEmailDuplicated(_email.value);
     if(isDuplicated == null) {
       showToast("이메일 중복 확인에 실패하였습니다.");
       return;
@@ -41,7 +41,7 @@ class AuthController extends GetxController {
   }
 
   Future<void> signUp() async {
-    bool? isSuccess = await service.signUp(_email.value, _password.value);
+    bool? isSuccess = await auth_service.signUp(_email.value, _password.value);
     if(isSuccess == null) {
       showToast("서버 오류입니다. 운영자에게 문의해 주세요.");
       return;
@@ -55,13 +55,13 @@ class AuthController extends GetxController {
   }
 
   Future<void> login() async {
-    Map? isSuccess = await service.logIn(_email.value, _password.value);
+    Map? isSuccess = await auth_service.logIn(_email.value, _password.value);
     if(isSuccess == null) {
       showToast("서버 오류입니다. 운영자에게 문의해 주세요.");
       return;
     }
     else if(isSuccess['success'] == true) {
-      UserController.to.updateUser(isSuccess['token']);
+      updateUser(isSuccess['token']);
       showToast("로그인에 성공하였습니다.");
       Get.offNamed("/main");
     } else {
