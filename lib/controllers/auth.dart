@@ -61,7 +61,7 @@ class AuthController extends GetxController {
       return;
     }
     else if(isSuccess['success'] == true) {
-      UserController.to.updateUser(isSuccess['token']);
+      await UserController.to.updateUser(isSuccess['token']);
       showToast("로그인에 성공하였습니다.");
       Get.offNamed("/main");
     } else {

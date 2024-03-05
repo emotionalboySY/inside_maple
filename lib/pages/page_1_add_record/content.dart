@@ -43,7 +43,7 @@ class PageAddRecord extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           TopItemsDifficulty(),
-          const TopItemsMenu(),
+          TopItemsMenu(),
         ],
       ),
     );

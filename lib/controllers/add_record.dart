@@ -84,15 +84,18 @@ class AddRecordController extends GetxController {
   }
 
   void addItem(Item item) {
+    loggerNoStack.d(item.id);
     try {
-      RecordItem selectedItem = selectedItemList.firstWhere((element) => element.id == item.id);
-      if(!selectedItem.duplicable) {
-        selectedItemList.firstWhere((element) => element.id == selectedItem.id).increaseCount();
+      RecordItem selectedItem = selectedItemList.firstWhere((element) => element.itemId == item.id);
+      loggerNoStack.d(selectedItem.duplicable);
+      if(selectedItem.duplicable) {
+        selectedItemList.firstWhere((element) => element.itemId == selectedItem.itemId).increaseCount();
       }
       else {
         showToast("선택한 아이템은 한 개만 드롭됩니다.");
       }
     } catch (e) {
+      logger. e(e);
       selectedItemList.add(RecordItem(-1, -1, item.id, 1, 0, item.duplicable));
     }
     selectedItemList.refresh();
@@ -158,32 +161,22 @@ class AddRecordController extends GetxController {
   }
 
   Future<void> saveRecordData() async {
-    // saveStatus.value = true;
-    // try {
-    //   List<BossRecord> recordRawList = await box.get('bossRecordData', defaultValue: <BossRecord>[]).cast<BossRecord>();
-    //   WeekType weekType = getWeekType(selectedDate.value);
-    //   sortItemList();
-    //   BossRecord singleRecord = BossRecord(
-    //     boss: selectedBoss.value!,
-    //     difficulty: selectedDiff.value!,
-    //     date: selectedDate.value,
-    //     itemList: selectedItemList,
-    //     partyAmount: selectedPartyAmount.value.obs,
-    //     weekType: weekType,
-    //   );
-    //   if(checkDuplicatedRecord(recordRawList, singleRecord)) {
-    //     showToast("이미 저장된 기록입니다.");
-    //     saveStatus.value = false;
-    //     return;
-    //   }
-    //   recordRawList.add(singleRecord);
-    //   resetAll();
-    //   showToast("보스 기록이 성공적으로 저장되었습니다.");
-    // } catch (e) {
-    //   showToast("보스 기록 저장에 실패했습니다. $e");
-    //   logger.e(e);
-    // }
-    // saveStatus.value = false;
+    final isDuplicated = await boss_service.checkIsDuplicatedRecord(selectedBoss.value!.id, selectedDiff.value!, selectedDate.value);
+    if(isDuplicated == null) {
+      showToast("보스 리워드 중복 기록 확인에 실패하였습니다. 관리자에게 문의하세요.");
+    } else if(isDuplicated == true) {
+      showToast("이미 저장된 기록입니다. 다른 보스 및 난이도를 선택해 주세요.");
+    } else {
+      final result = await boss_service.addBossRecord(selectedBoss.value!.id, selectedDiff.value!, selectedPartyAmount.value, selectedDate.value, selectedItemList);
+      if(result == null) {
+        showToast("보스 기록 저장에 실패하였습니다. 관리자에게 문의하세요.");
+      } else if(result == false) {
+        showToast("보스 기록 저장에 실패했습니다. 관리자에게 문의하세요.");
+      } else {
+        resetAll();
+        showToast("보스 기록이 성공적으로 저장되었습니다.");
+      }
+    }
   }
 
   void sortItemList() {

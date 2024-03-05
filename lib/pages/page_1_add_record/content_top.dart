@@ -137,7 +137,9 @@ class TopItemsDifficulty extends StatelessWidget {
 }
 
 class TopItemsMenu extends StatelessWidget {
-  const TopItemsMenu({super.key});
+  TopItemsMenu({super.key});
+
+  final addRecordController = Get.find<AddRecordController>();
 
   @override
   Widget build(BuildContext context) {
@@ -149,63 +151,50 @@ class TopItemsMenu extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(right: 12.0),
           child: TextButton(
-            onPressed: () {
-              Get.defaultDialog(
-                backgroundColor: Colors.white,
-                buttonColor: Colors.white,
-                radius: 5.0,
-                title: "선택지 초기화",
-                content: const Text(
-                  "선택한 보스와 난이도를 초기화 하시겠습니까?",
-                ),
-                confirm: SizedBox(
-                  height: 30,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Get.find<AddRecordController>().resetAll();
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                      ),
-                      backgroundColor: Colors.deepPurple,
-                      padding: EdgeInsets.zero,
-                    ),
-                    child: const Text(
-                      "초기화",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
+            onPressed: () async {
+              await Get.dialog(
+                barrierDismissible: false,
+                AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
                   ),
-                ),
-                cancel: SizedBox(
-                  height: 30,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                        side: const BorderSide(
-                          color: Colors.black54,
+                  elevation: 0,
+                  title: const Text(
+                    "선택지 초기화"
+                  ),
+                  content: const Text(
+                    "선택한 보스와 난이도를 초기화 하시겠습니까?"
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      child: const Text(
+                        "취소",
+                        style: TextStyle(
+                          color: Colors.black,
                         ),
                       ),
-                      backgroundColor: Colors.white,
-                      padding: EdgeInsets.zero,
                     ),
-                    child: const Text(
-                      "취소",
-                      style: TextStyle(
-                        color: Colors.black54,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: TextButton(
+                        onPressed: () {
+                          addRecordController.resetAll();
+                          Get.back();
+                        },
+                        child: const Text(
+                          "초기화",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-                textCancel: "취소",
-                barrierDismissible: false,
+                    )
+                  ],
+                )
               );
             },
             child: const Text(
