@@ -30,4 +30,9 @@ class RecordItem {
   void decreaseCount() {
     count--;
   }
+
+  @override
+  String toString() {
+    return 'RecordItem{id: $id, recordBossId: $recordBossId, itemId: $itemId, count: $count, price: $price, duplicable: $duplicable}';
+  }
 }

@@ -11,10 +11,10 @@
 //
 // class RecordManageDataController extends GetxController {
 //
-//   final recordManageSingleController = Get.find<RecordManageSingleController>();
-//   final recordManageSingleEditController = Get.find<RecordManageSingleEditController>();
-//   final recordManageMultiController = Get.find<RecordManageMultiController>();
-//   final recordManageMultiEditController = Get.find<RecordManageMultiEditController>();
+//   // final recordManageSingleController = Get.find<RecordManageSingleController>();
+//   // final recordManageSingleEditController = Get.find<RecordManageSingleEditController>();
+//   // final recordManageMultiController = Get.find<RecordManageMultiController>();
+//   // final recordManageMultiEditController = Get.find<RecordManageMultiEditController>();
 //
 //   final List<RecordBoss> _loadedBossRecords = <RecordBoss>[];
 //
@@ -27,8 +27,8 @@
 //     List<RecordBoss> loadedRecords = await boss_service.loadRecords();
 //     _loadedBossRecords.addAll(loadedRecords);
 //
-//     recordManageSingleController.setDataFromRaw(_loadedBossRecords);
-//     recordManageMultiController.setDataFromRaw(_loadedBossRecords);
+//     // recordManageSingleController.setDataFromRaw(_loadedBossRecords);
+//     // recordManageMultiController.setDataFromRaw(_loadedBossRecords);
 //   }
 //
 //   Future<void> removeSingleRecord(RecordBoss recordToRemove) async {
@@ -44,7 +44,7 @@
 //   void toggleMVP() {
 //     isMVPSilver.value = !isMVPSilver.value;
 //     recordManageSingleController.calculateTotalPrices();
-//     recordManageMultiEditController.calculateTotalPrice();
+//     // recordManageMultiEditController.calculateTotalPrice();
 //   }
 //
 //   List<RecordBoss> get loadedBossRecords => _loadedBossRecords;

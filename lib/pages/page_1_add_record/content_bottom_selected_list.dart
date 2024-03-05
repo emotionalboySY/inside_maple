@@ -182,7 +182,7 @@ class ContentBottomSelectedList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 13.0),
             child: Obx(
               () => ElevatedButton(
-                onPressed: addRecordController.selectedDate.value != DateTime(1900, 01, 01) && addRecordController.selectedItemList.isNotEmpty
+                onPressed: addRecordController.selectedDate.value != DateTime(1900, 01, 01) && addRecordController.selectedItemList.isNotEmpty && addRecordController.isRecordDuplicated.value == false
                     ? () {
                         addRecordController.saveRecordData();
                       }
@@ -267,7 +267,33 @@ class _RaidDatePicker extends StatelessWidget {
                       ),
                     )
                   : const SizedBox(),
-            )
+            ),
+            Obx(
+                () => recordController.isRecordDuplicated.value
+                    ? const Padding(
+                        padding: EdgeInsets.only(left: 5.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.red,
+                              size: 16,
+                            ),
+                            SizedBox(
+                              width: 3.0,
+                            ),
+                            Text(
+                              "저장된 기록 있음!",
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        )
+                    : const SizedBox(),
+            ),
           ],
         ),
       ),

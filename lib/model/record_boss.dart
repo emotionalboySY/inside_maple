@@ -6,14 +6,14 @@ part 'record_boss.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class RecordBoss {
-  int recordBossId;
+  int id;
   int bossDataId;
   Difficulty difficulty;
   DateTime date;
   int memberCount;
 
   RecordBoss(
-      this.recordBossId,
+      this.id,
       this.bossDataId,
       this.difficulty,
       this.date,
