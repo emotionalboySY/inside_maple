@@ -5,6 +5,7 @@ import 'package:inside_maple/pages/auth/login.dart';
 import 'package:inside_maple/pages/auth/sign_up.dart';
 import 'package:inside_maple/pages/page_1_add_record/content.dart';
 import 'package:inside_maple/pages/page_2_view_boss_record/content.dart';
+import 'package:inside_maple/pages/page_3_view_character_profile/content.dart';
 
 import 'controllers/auth.dart';
 
@@ -39,6 +40,10 @@ List<GetPage> routes = [
       //   name: '/viewRecord',
       //   page: () => PageViewBossRecord(),
       // )
+      GetPage(
+        name: '/profile',
+        page: () => PageCharacterProfile(),
+      )
     ],
   ),
 ];

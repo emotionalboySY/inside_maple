@@ -41,6 +41,10 @@ String toKorDateLabel(DateTime date) {
   return "${date.year}년 ${date.month}월 ${date.day}일";
 }
 
+String toDashDateLabel(DateTime date) {
+  return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+}
+
 Widget separator({
   required Axis axis,
 }) {

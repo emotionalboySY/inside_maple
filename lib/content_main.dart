@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inside_maple/controllers/add_record.dart';
+import 'package:inside_maple/controllers/character_profile.dart';
+import 'package:oktoast/oktoast.dart';
 // import 'package:inside_maple/controllers/record_manage_data.dart';
 // import 'package:inside_maple/controllers/record_manage_multi_edit.dart';
 
@@ -85,6 +87,25 @@ class ContentMain extends StatelessWidget {
                           });
                         },
                         title: "보스 리워드 기록하기",
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 16.0,
+                    ),
+                    Expanded(
+                      child: _menuButton(
+                        onPressed: () {
+                          if(DateTime.now().hour == 0) {
+                            showToast("매일 오전 0시부터 1시까지는 넥슨 OpenAPI를 이용한 기능 사용이 불가능합니다.");
+                          }
+                          else {
+                            Get.put(CharacterProfileController());
+                            Get.toNamed("/page/profile")?.then((value) {
+                              Get.delete<CharacterProfileController>();
+                            });
+                          }
+                        },
+                        title: "캐릭터 프로필"
                       ),
                     ),
                   ],
